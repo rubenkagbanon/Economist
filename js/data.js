@@ -4,36 +4,51 @@
 
 // ═══════════════ CONFIG ═══════════════
 const VALID_CODES  = ["economist2026"]; // code permanent illimité
-const ONE_TIME_CODES_PATH = 'access_codes';   // Firebase path for limited codes
-const PASSWORD_RESETS_PATH = 'password_resets'; // Firebase path for recovery codes
-const OWNER_EMAIL  = "theseeconomists@gmail.com"; // ⚠️ Changez ceci pour votre email admin
+const ONE_TIME_CODES_PATH = 'access_codes';   // Supabase path (kv_store) for limited codes
+const PASSWORD_RESETS_PATH = 'password_resets'; // Supabase path (kv_store) for recovery codes
+const OWNER_EMAIL  = "rubenkagbanon@gmail.com"; // ⚠️ Changez ceci pour votre email admin
 const MM = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
 // ═══════════════ STATE ═══════════════
 let articles = [], users = [], currentUser = null, lastPublishedId = null;
 let currentActiveCat = 'all';
-let _db, _ref, _set, _get, _push, _remove, _onValue;
-let fbReady = false;
+let _sb;
+let dbReady = false;
 
-// ═══════════════ FIREBASE INIT ═══════════════
-document.addEventListener('fb-ready', () => {
-  const fb = window._fb;
-  _db = fb.db; _ref = fb.ref; _set = fb.set; _get = fb.get;
-  _push = fb.push; _remove = fb.remove; _onValue = fb.onValue;
-  fbReady = true;
+// ═══════════════ SUPABASE INIT ═══════════════
+document.addEventListener('db-ready', () => {
+  _sb = window._sb;
+  dbReady = true;
   init();
 });
 
 // ═══════════════ DB HELPERS ═══════════════
+// Émule l'arbre de chemins de l'ancienne base Firebase au-dessus d'une
+// simple table Postgres `kv_store(path text primary key, value jsonb)` :
+// dbGet('articles') renvoie l'objet {id: article, ...} de toutes les
+// lignes dont le path commence par "articles/", comme le faisait Firebase.
+const KV_TABLE = 'kv_store';
+
 async function dbGet(path) {
-  const snap = await _get(_ref(_db, path));
-  return snap.exists() ? snap.val() : null;
+  const { data: row, error } = await _sb.from(KV_TABLE).select('value').eq('path', path).maybeSingle();
+  if (error) { console.error('dbGet', path, error); return null; }
+  if (row) return row.value;
+  const { data: rows, error: err2 } = await _sb.from(KV_TABLE).select('path,value').like('path', `${path}/%`);
+  if (err2) { console.error('dbGet', path, err2); return null; }
+  if (!rows || !rows.length) return null;
+  const out = {};
+  rows.forEach(r => { out[r.path.slice(path.length + 1)] = r.value; });
+  return out;
 }
 async function dbSet(path, val) {
-  await _set(_ref(_db, path), val);
+  const { error } = await _sb.from(KV_TABLE).upsert({ path, value: val });
+  if (error) console.error('dbSet', path, error);
 }
 async function dbDelete(path) {
-  await _remove(_ref(_db, path));
+  const { error: e1 } = await _sb.from(KV_TABLE).delete().eq('path', path);
+  const { error: e2 } = await _sb.from(KV_TABLE).delete().like('path', `${path}/%`);
+  if (e1) console.error('dbDelete', path, e1);
+  if (e2) console.error('dbDelete', path, e2);
 }
 
 // ═══════════════ LOAD DATA ═══════════════
@@ -54,7 +69,7 @@ async function saveArticle(a) {
 async function deleteArticleDB(id) {
   await dbDelete(`articles/${id}`);
 }
-// Clé Firebase = email encodé (les emails contiennent des caractères interdits comme "." et "@")
+// Clé de path = email encodé (les emails contiennent des caractères interdits par certains systèmes, comme "." et "@")
 function userKey(email){
   return email.replace(/\./g,'_').replace(/@/g,'__at__');
 }

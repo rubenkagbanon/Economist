@@ -9,7 +9,7 @@ async function doLogin(){
   const pwd  =document.getElementById('login-pwd').value;
   if(!email||!pwd)return;
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  await loadData(); // recharger depuis Firebase
+  await loadData(); // recharger depuis Supabase
   const u=users.find(u=>u.email===email&&u.pwd===pwd);
   btn.textContent='Se connecter';btn.disabled=false;
   if(!u){document.getElementById('login-err').style.display='block';return;}
@@ -56,6 +56,7 @@ async function doSignup(){
 
 function doLogout(){
   currentUser=null;clearLocalSession();
+  _writeUnlocked=false;editorBlocks=[];
   renderNav();showPage('home');showToast(t('toast_logout'));
 }
 
@@ -96,7 +97,7 @@ async function saveProfileEdit(){
 // MOT DE PASSE OUBLIÉ — récupération par e-mail + code
 // ═══════════════════════════════════════════════════════════
 // Étape 1 : la personne entre son e-mail → on génère un code à 6
-//           chiffres, on le stocke dans Firebase (valable 15 min)
+//           chiffres, on le stocke dans Supabase (valable 15 min)
 //           et on l'envoie par e-mail via EmailJS (js/email.js).
 // Étape 2 : la personne entre le code reçu + un nouveau mot de
 //           passe → on vérifie le code puis on met à jour le compte.
