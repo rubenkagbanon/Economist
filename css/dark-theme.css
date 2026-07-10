@@ -1,0 +1,110 @@
+/* ════════════════════════════════════════════════════════════
+   dark-theme.css — Mode nuit
+   ────────────────────────────────────────────────────────────
+   Corrige le bug signalé : plusieurs textes (paragraphes, sous-
+   titres, formulaires) utilisaient des couleurs de gris fixes en
+   hexadécimal (#444, #666, #888…) qui restaient sombres même sur
+   fond sombre, les rendant illisibles. Le style.css de base a été
+   modifié pour que ces textes utilisent désormais des variables
+   (--txt-strong, --txt-soft, --txt-mut, --txt-lite, --txt-pale)
+   qui sont redéfinies ici avec des teintes claires adaptées.
+   ════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"]{
+  --blanc:#111010;
+  --noir:#F5F4F0;
+  --gris-clair:#2a2a2a;
+  --gris:#8a8a8a;
+  --bg-card:#1a1a1a;
+  --bg-input:#1e1e1e;
+  --bg-subtle:#1a1a1a;
+  /* Paliers de gris texte, réajustés pour rester lisibles sur fond sombre */
+  --txt-strong:#F0EEE9;
+  --txt-soft:#D8D5D0;
+  --txt-mut:#B8B4AE;
+  --txt-lite:#938F89;
+  --txt-pale:#77736e;
+}
+
+/* ── Base ── */
+[data-theme="dark"] body{background:#111010;color:#F5F4F0}
+[data-theme="dark"] nav{background:rgba(17,16,16,0.97);border-color:#222}
+[data-theme="dark"] .loading-screen,[data-theme="dark"] #loading-screen{background:#111010}
+[data-theme="dark"] .loading-logo-e{color:#F5F4F0}
+
+/* ── Modales & formulaires ── */
+[data-theme="dark"] .modal-box,[data-theme="dark"] .gate,
+[data-theme="dark"] .form-row input,[data-theme="dark"] .form-row select,[data-theme="dark"] .form-row textarea,
+[data-theme="dark"] .m-row input,[data-theme="dark"] .m-row textarea,
+[data-theme="dark"] .reg-row input,[data-theme="dark"] .reg-row select,[data-theme="dark"] .reg-row textarea,
+[data-theme="dark"] .nav-search-input{
+  background:#1a1a1a;color:#F5F4F0;border-color:#2a2a2a;
+}
+[data-theme="dark"] .nav-search-input:focus{background:#1e1e1e}
+[data-theme="dark"] .nav-search-icon{color:var(--txt-pale)}
+[data-theme="dark"] .modal-close{color:var(--txt-lite)}
+[data-theme="dark"] .modal-tab{color:var(--txt-mut)}
+[data-theme="dark"] .avatar-upload-hint{color:var(--txt-pale)}
+[data-theme="dark"] .nav-mobile-menu{background:#151515;border-color:#222}
+
+/* ── Navigation ── */
+[data-theme="dark"] .nav-user{color:var(--txt-soft)}
+[data-theme="dark"] .cat{color:var(--txt-soft)}
+[data-theme="dark"] .nav-link-item{color:var(--txt-lite)}
+[data-theme="dark"] .nav-cats-sep{background:#2a2a2a}
+[data-theme="dark"] .srd{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .srd-item:hover{background:#1e1e1e}
+[data-theme="dark"] .srd-section{background:var(--bg-subtle);color:var(--txt-lite)}
+[data-theme="dark"] .srd-author{color:var(--txt-pale)}
+
+/* ── Article : lecture ── */
+[data-theme="dark"] .art-full-body{color:#d8d5d0;font-weight:300}
+[data-theme="dark"] .art-full-body h2{border-color:#2a2a2a}
+[data-theme="dark"] .art-full-body h3{color:var(--txt-soft)}
+[data-theme="dark"] .art-full-body blockquote{background:#1e1618;color:var(--txt-soft)}
+[data-theme="dark"] .art-full-deck{color:var(--txt-soft)}
+[data-theme="dark"] .art-card{border-color:#222}
+[data-theme="dark"] .art-excerpt{color:var(--txt-mut)}
+[data-theme="dark"] .art-thumb-empty{background:linear-gradient(135deg,#1a1a1a,#222)}
+[data-theme="dark"] .art-info-box{background:#1a1618;border-color:rgba(139,26,26,0.3)}
+[data-theme="dark"] .art-info-box-body{color:var(--txt-soft)}
+[data-theme="dark"] .art-credits-box{background:#161616;border-color:#2a2a2a}
+[data-theme="dark"] .art-credits-body,[data-theme="dark"] .art-sources-body{color:var(--txt-mut)}
+[data-theme="dark"] .art-sources-box{background:#161616}
+[data-theme="dark"] .empty-state p{color:var(--txt-mut)}
+
+/* ── Éditeur d'article ── */
+[data-theme="dark"] .article-blocks-editor{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .block-para{color:#F5F4F0}
+[data-theme="dark"] .block-para:focus,[data-theme="dark"] .block-para:focus-within{background:#1e1e1e;border-color:#333}
+[data-theme="dark"] .block-h2,[data-theme="dark"] .block-h3{color:#F5F4F0;border-color:#2a2a2a}
+[data-theme="dark"] .block-quote{background:#1e1618;color:var(--txt-soft)}
+[data-theme="dark"] .block-infobox{background:#1e1618;color:var(--txt-soft)}
+[data-theme="dark"] .block-sources,[data-theme="dark"] .block-credits{color:var(--txt-mut);border-color:#2a2a2a}
+[data-theme="dark"] .tb-btn{background:#1a1a1a;border-color:#2a2a2a;color:var(--txt-pale)}
+[data-theme="dark"] .add-block-btn{color:var(--txt-pale);border-color:#2a2a2a}
+[data-theme="dark"] .block-insert-line{background:#2a2a2a}
+[data-theme="dark"] .block-insert-line:hover .insert-line-bar{background:var(--rouge)}
+[data-theme="dark"] .img-upload-zone{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .img-upload-zone:hover{background:#1e1618}
+[data-theme="dark"] #cover-placeholder{color:var(--txt-pale)}
+[data-theme="dark"] .hint{color:var(--txt-pale)}
+[data-theme="dark"] .gate p,[data-theme="dark"] .success-msg p,[data-theme="dark"] .reg-note,[data-theme="dark"] .reg-success p{color:var(--txt-mut)}
+
+/* ── Stats / Admin / Profil ── */
+[data-theme="dark"] .stats-table td,[data-theme="dark"] .stats-table th{border-color:#222}
+[data-theme="dark"] .stats-table tr:hover td{background:#1e1e1e}
+[data-theme="dark"] .my-stat-card,[data-theme="dark"] .reg-card,[data-theme="dark"] .success-msg,[data-theme="dark"] .reg-success{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .admin_access,[data-theme="dark"] .profile-bio,[data-theme="dark"] .profile-meta{color:var(--txt-soft)}
+
+/* ── Footer (toujours sombre, conservé tel quel) ── */
+[data-theme="dark"] footer{background:#0a0909}
+
+/* ── Onboarding ── */
+[data-theme="dark"] #onboard-box{background:#1a1a1a;color:#F5F4F0}
+[data-theme="dark"] .onboard-step-desc{color:var(--txt-pale)}
+[data-theme="dark"] .onboard-step{border-color:#2a2a2a}
+[data-theme="dark"] .onboard-sub{color:var(--txt-mut)}
+
+/* ── Mot de passe oublié ── */
+[data-theme="dark"] .m-link{color:var(--rouge)}

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Economist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Serif+Text:ital@0;1&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+
+<!-- Firebase (base de données) : voir js/firebase-config.js -->
+<script type="module" src="js/firebase-config.js"></script>
+
+<!-- EmailJS (envoi de vrais e-mails, sans backend) -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="loading-logo-e">E</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-text" id="loading-text">Economist · Connexion à la base…</div>
+</div>
+
+<canvas id="planet-tr" class="planet-canvas"></canvas>
+<canvas id="planet-bl" class="planet-canvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<!-- ONBOARDING MODAL -->
+<div id="onboard-overlay">
+  <div id="onboard-box">
+    <button class="modal-close" onclick="closeOnboard()">×</button>
+    <div class="onboard-label">Bienvenue sur Economist</div>
+    <h2 class="onboard-title">Comment <em>publier</em><br>votre article</h2>
+    <p class="onboard-sub">En quelques étapes simples, votre article sera visible par tous les lecteurs, sur tous les appareils.</p>
+    <div class="onboard-steps">
+      <div class="onboard-step">
+        <div class="onboard-num">1</div>
+        <div class="onboard-step-body">
+          <div class="onboard-step-title">Créez un compte</div>
+          <div class="onboard-step-desc">Inscrivez-vous avec votre e-mail. Votre profil est synchronisé sur tous vos appareils.</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-num">2</div>
+        <div class="onboard-step-body">
+          <div class="onboard-step-title">Obtenez un code d'accès</div>
+          <div class="onboard-step-desc">Proposez votre idée d'article à la rédaction via le formulaire. Si retenue, vous recevez un code par e-mail.</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-num">3</div>
+        <div class="onboard-step-body">
+          <div class="onboard-step-title">Rédigez votre article</div>
+          <div class="onboard-step-desc">Entrez votre code, choisissez votre rubrique, ajoutez titres, paragraphes, images et citations via l'éditeur de blocs.</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-num">4</div>
+        <div class="onboard-step-body">
+          <div class="onboard-step-title">Publiez en un clic</div>
+          <div class="onboard-step-desc">Votre article est immédiatement visible par tous les lecteurs, partout dans le monde.</div>
+        </div>
+      </div>
+    </div>
+    <div class="onboard-footer">
+      <button class="btn-modal" style="width:auto" onclick="closeOnboard()">Commencer →</button>
+      <label class="onboard-check"><input type="checkbox" id="onboard-no-show"> Ne plus afficher</label>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE OVERLAY -->
+<div class="nav-mobile-overlay" id="mob-overlay" onclick="closeMobileMenu()"></div>
+<div class="nav-mobile-menu" id="mob-menu">
+  <button class="modal-close" onclick="closeMobileMenu()" style="top:.8rem;right:1rem;position:absolute">×</button>
+  <div style="margin-bottom:1.2rem">
+    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem">Rechercher</div>
+    <input type="text" id="mob-search" placeholder="Articles, auteurs…" oninput="doMobSearch(this.value)"
+      style="width:100%;font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.65rem 1rem;outline:none;"
+      onfocus="this.style.borderColor='var(--rouge)'" onblur="this.style.borderColor='var(--gris-clair)'">
+    <div id="mob-search-results" style="margin-top:.4rem;border:.5px solid var(--gris-clair);display:none;max-height:240px;overflow-y:auto;background:white"></div>
+  </div>
+  <div class="nav-mobile-item" onclick="navGo('home')" data-i18n="cat_une">À la une</div>
+  <div class="nav-mobile-item" onclick="navGo('propose')" data-i18n="nav_propose">Proposer un article</div>
+  <div class="nav-mobile-item" id="mob-write-item" style="display:none" onclick="navGo('write')">✏ <span data-i18n="nav_write">Écrire</span></div>
+  <div class="nav-mobile-item" id="mob-mystats-item" style="display:none" onclick="navGo('mystats')">📊 <span data-i18n="nav_stats">Mes statistiques</span></div>
+  <div class="nav-mobile-item" id="mob-admin-item" style="display:none" onclick="navGo('admin')">⚙ Admin</div>
+  <div class="nav-mobile-actions" id="mob-actions"></div>
+</div>
+
+<!-- MODAL AUTH -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title" data-i18n="auth_welcome">Bienvenue</div>
+    <p class="modal-sub" data-i18n="auth_sync">Votre compte est synchronisé sur tous vos appareils.</p>
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchTab('login')" data-i18n="auth_login">Connexion</div>
+      <div class="modal-tab" onclick="switchTab('signup')" data-i18n="auth_signup">Créer un compte</div>
+    </div>
+    <div class="modal-panel active" id="tab-login">
+      <div class="m-row"><label data-i18n="auth_email">Email</label><input type="email" id="login-email" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="m-row"><label data-i18n="auth_pwd">Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="m-err" id="login-err" data-i18n="auth_err_login">Email ou mot de passe incorrect.</div></div>
+      <button class="btn-modal" id="btn-login" onclick="doLogin()" data-i18n="auth_btn_login">Se connecter</button>
+      <div style="text-align:right;margin-top:.6rem"><span class="m-link" style="font-size:.78rem" onclick="openForgotPwd()">Mot de passe oublié ?</span></div>
+      <div class="m-divider"></div>
+      <span style="font-family:var(--sans);font-size:.8rem;color:var(--txt-lite)"><span data-i18n="auth_no_account">Pas de compte ?</span> <span class="m-link" onclick="switchTab('signup')" data-i18n="auth_signup">Créer un compte</span></span>
+    </div>
+    <div class="modal-panel" id="tab-signup">
+      <div class="form-two-col" style="gap:.9rem">
+        <div class="m-row"><label>Prénom</label><input type="text" id="su-first" placeholder="Jean"></div>
+        <div class="m-row"><label>Nom</label><input type="text" id="su-last" placeholder="Dupont"></div>
+      </div>
+      <div class="m-row"><label>Email</label><input type="email" id="su-email" placeholder="votre@email.com"></div>
+      <div class="m-row"><label>Mot de passe</label>
+        <div style="position:relative">
+          <input type="password" id="su-pwd" placeholder="8 caractères minimum" style="padding-right:2.5rem;width:100%">
+          <button type="button" onclick="togglePwd('su-pwd',this)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt-pale);font-size:13px;padding:0;line-height:1" title="Afficher / masquer">👁</button>
+        </div>
+      </div>
+      <div class="m-row"><label>Confirmer le mot de passe</label>
+        <div style="position:relative">
+          <input type="password" id="su-pwd2" placeholder="Répétez votre mot de passe" style="padding-right:2.5rem;width:100%">
+          <button type="button" onclick="togglePwd('su-pwd2',this)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt-pale);font-size:13px;padding:0;line-height:1" title="Afficher / masquer">👁</button>
+        </div>
+      </div>
+      <div class="m-err" id="su-err">Veuillez remplir tous les champs.</div>
+      <div class="m-ok" id="su-ok" data-i18n="auth_ok_created">Compte créé !</div>
+      <button class="btn-modal" id="btn-signup" onclick="doSignup()" data-i18n="auth_btn_signup">Créer mon compte</button>
+    </div>
+    <div class="modal-panel" id="tab-forgot">
+      <div id="fp-step1">
+        <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.4rem;line-height:1.6">Entrez l'e-mail de votre compte. Nous vous enverrons un code de vérification.</p>
+        <div class="m-row"><label>Email</label><input type="email" id="fp-email" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')sendResetCode()"></div>
+        <div class="m-err" id="fp-err">Erreur.</div>
+        <button class="btn-modal" id="btn-fp-send" onclick="sendResetCode()">Envoyer le code</button>
+      </div>
+      <div id="fp-step2" style="display:none">
+        <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.4rem;line-height:1.6">Un code a été envoyé à <strong id="fp-email-shown"></strong>. Entrez-le ci-dessous avec votre nouveau mot de passe.</p>
+        <div class="m-row"><label>Code reçu</label><input type="text" id="fp-code" placeholder="123456" maxlength="6"></div>
+        <div class="m-row"><label>Nouveau mot de passe</label><input type="password" id="fp-new-pwd" placeholder="8 caractères minimum"></div>
+        <div class="m-row"><label>Confirmer le mot de passe</label><input type="password" id="fp-new-pwd2" placeholder="Répétez votre mot de passe"></div>
+        <div class="m-err" id="fp-err2">Erreur.</div>
+        <button class="btn-modal" id="btn-fp-confirm" onclick="confirmResetPwd()">Réinitialiser le mot de passe</button>
+      </div>
+      <div class="m-divider"></div>
+      <span class="m-link" onclick="switchTab('login')">← Retour à la connexion</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROFIL EDIT -->
+<div class="modal-overlay" id="profile-edit-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProfileEdit()">×</button>
+    <div class="modal-title">Mon profil</div>
+    <p class="modal-sub">Visible par tous les visiteurs.</p>
+    <div class="avatar-upload-wrap">
+      <div class="avatar-preview" id="edit-avatar-preview" onclick="document.getElementById('edit-avatar-input').click()"></div>
+      <div><div class="avatar-upload-hint">Cliquez pour changer votre photo<br><span style="font-size:.75rem">JPG, PNG — max 1Mo</span></div></div>
+    </div>
+    <input type="file" id="edit-avatar-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+    <div class="m-row"><label>Bio</label><textarea id="edit-bio" placeholder="Quelques mots sur vous…" style="min-height:80px"></textarea></div>
+    <button class="btn-modal" onclick="saveProfileEdit()">Enregistrer</button>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-top">
+    <div class="nav-date" id="nav-date"></div>
+    <div class="logo-wrap" onclick="filterCat(document.querySelector('.cat'),'all');showPage('home')">
+      <div class="logo-e">E</div>
+      <div class="logo-text">Economist</div>
+      <div class="logo-underline"></div>
+    </div>
+    <div class="nav-actions" id="nav-actions"></div>
+    <div class="nav-top-controls">
+      <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()" title="Traduire / Translate">FR</button>
+      <button class="ctrl-btn" id="theme-toggle" onclick="toggleTheme()" title="Thème sombre">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-cats">
+    <div class="cat active" onclick="filterCat(this,'all')" data-i18n="cat_une">À la une</div>
+    <div class="cat" onclick="filterCat(this,'Économie')" data-i18n="cat_eco">Économie</div>
+    <div class="cat" onclick="filterCat(this,'Finance')" data-i18n="cat_fin">Finance</div>
+    <div class="cat" onclick="filterCat(this,'Politiques')" data-i18n="cat_pol">Politiques</div>
+    <div class="cat" onclick="filterCat(this,'Sociologie')" data-i18n="cat_soc">Sociologie</div>
+    <div class="cat" onclick="filterCat(this,'Droit')" data-i18n="cat_dro">Droit</div>
+    <div class="cat" onclick="filterCat(this,'Technologies')" data-i18n="cat_tec">Technologies</div>
+    <div class="cat" onclick="filterCat(this,'Afrique')" data-i18n="cat_afr">Afrique</div>
+    <div class="cat" onclick="filterCat(this,'Monde')" data-i18n="cat_mon">Monde</div>
+    <div class="cat" onclick="filterCat(this,'Écologie')" data-i18n="cat_ecol">Écologie</div>
+    <div class="cat" onclick="filterCat(this,'IA')" data-i18n="cat_ia">IA</div>
+    <div class="cat" onclick="filterCat(this,'Data Science')" data-i18n="cat_data">Data Science</div>
+    <div class="nav-cats-sep"></div>
+    <div class="cat nav-link-item" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</div>
+    <div class="cat nav-link-item" id="nav-cats-write" style="display:none" onclick="showPage('write')" data-i18n="nav_write">Écrire</div>
+    <div class="cat nav-link-item" id="nav-cats-mystats" style="display:none" onclick="showPage('mystats')" data-i18n="nav_stats">Mes stats</div>
+    <div class="cat nav-link-item" id="nav-cats-admin" style="display:none" onclick="showPage('admin')" data-i18n="nav_admin">Admin</div>
+    <div class="cat nav-link-item" id="nav-cats-login" onclick="openModal('login')" data-i18n="nav_login">S'abonner / Connexion</div>
+    <div class="cat nav-link-item" id="nav-cats-logout" style="display:none" onclick="doLogout()" data-i18n="nav_logout">Déconnexion</div>
+  </div>
+</nav>
+
+<div id="page-home" class="page active"><div id="home-content"></div></div>
+<div id="page-article" class="page"><div class="article-page" id="article-content"></div></div>
+
+<div id="page-propose" class="page">
+  <div class="propose-page">
+    <h2>Proposer un <em>article</em></h2>
+    <p class="propose-sub">Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.</p>
+    <div class="reg-card">
+      <div class="reg-section">Votre contact</div>
+      <div class="form-two-col" style="gap:1.2rem">
+        <div class="reg-row"><label>Prénom *</label><input type="text" id="r-first" placeholder="Jean"></div>
+        <div class="reg-row"><label>Nom *</label><input type="text" id="r-last" placeholder="Dupont"></div>
+      </div>
+      <div class="reg-row"><label>Email *</label><input type="email" id="r-email" placeholder="votre@email.com"><span class="reg-note">Vous recevrez votre code si votre idée est retenue.</span></div>
+      <div class="reg-row"><label>Profession</label><input type="text" id="r-job" placeholder="Économiste, étudiant…"></div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-section">Votre idée</div>
+      <div class="reg-row"><label>Rubrique *</label>
+        <select id="r-cat"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Afrique</option><option>Monde</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
+      </div>
+      <div class="reg-row"><label>Sujet *</label><textarea id="r-subject" placeholder="Décrivez brièvement votre idée…"></textarea></div>
+      <div class="reg-row"><label>Motivation (optionnel)</label><textarea id="r-why" style="min-height:80px" placeholder="Pourquoi ce sujet ?"></textarea></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+      <button class="reg-submit" onclick="submitRequest()">Envoyer ma proposition →</button>
+      <span style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
+    </div>
+    <div class="reg-success" id="reg-success">
+      <h3>Proposition envoyée.</h3>
+      <p>Votre demande a été transmise à la rédaction. Si retenue, vous recevrez un code à <strong id="reg-email-shown"></strong>.</p>
+    </div>
+  </div>
+</div>
+
+<div id="page-write" class="page">
+  <div class="write-page">
+    <h2>Écrire un <em>article</em></h2>
+    <p class="write-sub" id="write-gate-sub">Connectez-vous et entrez votre code d'accès pour rédiger.</p>
+    <div id="write-login-gate" style="display:none;border:.5px solid var(--gris-clair);border-left:3px solid var(--rouge);padding:2rem 2.5rem;margin-bottom:2rem">
+      <p style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">Vous devez être connecté pour rédiger.</p>
+      <button class="btn-red" onclick="openModal('login')">Se connecter</button>
+      <span style="margin:0 .8rem;color:var(--txt-pale);font-family:var(--sans);font-size:.85rem">ou</span>
+      <button class="btn-outline" onclick="openModal('signup')">Créer un compte</button>
+    </div>
+    <div class="gate" id="code-gate" style="display:none">
+      <div class="gate-label">Code d'accès rédacteur</div>
+      <p>Entrez votre code reçu par e-mail.<br>Pas de code ? <span style="color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('propose')">Proposer un article →</span></p>
+      <div class="gate-row">
+        <input type="password" id="access-code" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkCode()">
+        <button class="btn-red" onclick="checkCode()">Déverrouiller</button>
+      </div>
+      <div class="gate-err" id="gate-err">Code incorrect.</div>
+    </div>
+    <div style="display:none" id="write-form">
+      <div class="form-wrap">
+        <div class="form-two-col">
+          <div class="form-row"><label data-i18n="lbl_rubrique">Rubrique *</label>
+            <select id="f-cat"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Afrique</option><option>Monde</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
+          </div>
+          <div class="form-row"><label>Auteur *</label><input type="text" id="f-author" placeholder="Prénom Nom"></div>
+        </div>
+        <div class="form-row"><label>Titre *</label><input type="text" id="f-title" placeholder="Un titre précis…" oninput="updateCount('f-title','tc',80)">
+          <div style="display:flex;justify-content:space-between"><span class="hint">80 caractères</span><span class="char-count" id="tc">0 / 80</span></div></div>
+        <div class="form-row"><label>Chapeau *</label><textarea id="f-deck" rows="3" placeholder="Résumé 2-3 lignes…" oninput="updateCount('f-deck','dc',250)"></textarea>
+          <div style="display:flex;justify-content:space-between"><span class="hint">En italique sous le titre</span><span class="char-count" id="dc">0 / 250</span></div></div>
+        <div class="form-row"><label>Image de couverture (optionnel)</label>
+          <div class="img-upload-zone" onclick="document.getElementById('f-img-file').click()">
+            <div id="cover-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Cliquer pour charger une image</span>
+              <span class="hint" style="margin-top:4px">JPG, PNG, WebP · ou URL ci-dessous</span>
+            </div>
+            <img id="cover-preview" style="display:none;width:100%;height:100%;object-fit:cover">
+          </div>
+          <input type="file" id="f-img-file" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+          <input type="url" id="f-img" placeholder="https://… (URL alternative)" style="margin-top:.5rem;font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.6rem 1rem;outline:none;width:100%" oninput="handleCoverUrl(this.value)">
+        </div>
+        <div class="form-row"><label data-i18n="lbl_corps">Corps de l'article *</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem">
+            <div class="editor-toolbar">
+              <button type="button" class="tb-btn" onclick="insertBlock('paragraph')">¶ Paragraphe</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('h2')">H2</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('h3')">H3</button>
+              <button type="button" class="tb-btn" style="background:#fff8f8;border-color:rgba(139,26,26,0.2)" onclick="triggerInlineImg()">🖼 Image</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('quote')">« Citation</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('separator')">— —</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('infobox')" title="Encadré d'information">ℹ Info</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('sources')" title="Sources bibliographiques">🔗 Sources</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('credits')" title="Crédits / auteurs">✍ Crédits</button>
+            </div>
+            <span class="char-count" id="bc">0 mot</span>
+          </div>
+          <div id="fmt-toolbar" class="fmt-toolbar">
+            <button class="fmt-btn" onmousedown="event.preventDefault();applyFormat('bold')" title="Gras"><b>G</b></button>
+            <div class="fmt-sep"></div>
+            <button class="fmt-btn" onmousedown="event.preventDefault();applyFormat('italic')" title="Italique"><em>I</em></button>
+          </div>
+          <input type="file" id="inline-img-input" accept="image/*" style="display:none" onchange="handleInlineImage(event)">
+          <div id="article-blocks" class="article-blocks-editor"></div>
+          <div class="add-block-row"><button type="button" class="add-block-btn" onclick="insertBlock('paragraph')">+ Ajouter un bloc</button></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+          <button class="btn-publish" id="btn-publish" onclick="publishArticle()">Publier →</button>
+          <span style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
+        </div>
+        <div class="success-msg" id="success-msg">
+          <h3>Article publié.</h3>
+          <p>Visible par tous les visiteurs du site, sur tous les appareils.</p>
+          <span class="view-link" onclick="goToNewArticle()">Lire mon article →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-mystats" class="page">
+  <div class="my-stats-page">
+    <h2>Mes <em>statistiques</em></h2>
+    <p style="font-family:var(--sans);font-size:.9rem;color:var(--gris);margin-bottom:2.5rem;font-weight:300">Tableau de bord privé.</p>
+    <div id="my-stats-content"></div>
+  </div>
+</div>
+
+<div id="page-admin" class="page">
+  <div class="admin-page">
+    <h2>Espace <em>Admin</em></h2>
+    <div id="admin-content"></div>
+  </div>
+</div>
+
+<div id="page-profile" class="page">
+  <div class="profile-page" id="profile-content"></div>
+</div>
+
+<footer>
+  <div class="foot-top">
+    <div><div class="foot-logo-e">E</div><div class="foot-sub">Economist</div></div>
+    <div class="foot-links">
+      <span class="foot-link">À propos</span>
+      <span class="foot-link" onclick="showPage('propose')">Proposer un article</span>
+      <span class="foot-link" onclick="showPage('write')">Écrire</span>
+    </div>
+  </div>
+  <div class="foot-copy">© 2026 <span>Economist</span>. Tous droits réservés. Abidjan · Paris · Londres</div>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     Scripts de l'application, dans l'ordre de dépendance.
+     Chaque fichier a une responsabilité claire (voir commentaires
+     en tête de chaque fichier dans le dossier /js).
+     ════════════════════════════════════════════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/email.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/articles.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/planet.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
