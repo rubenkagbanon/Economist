@@ -6,7 +6,7 @@
 const VALID_CODES  = ["economist2026"]; // code permanent illimité
 const ONE_TIME_CODES_PATH = 'access_codes';   // Supabase path (kv_store) for limited codes
 const PASSWORD_RESETS_PATH = 'password_resets'; // Supabase path (kv_store) for recovery codes
-const OWNER_EMAIL  = "rubenkagbanon@gmail.com"; // ⚠️ Changez ceci pour votre email admin
+const OWNER_EMAIL  = "theseeconomists@gmail.com"; //  Changez ceci pour votre email admin
 const MM = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
 // ═══════════════ STATE ═══════════════
