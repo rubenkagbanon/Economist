@@ -48,6 +48,7 @@ async function doSignup(){
   }
   const u={first,last,email,pwd,joined:today(),avatar:'',bio:''};
   users.push(u); await saveUser(u);
+  emailSendWelcome(u.email,u.first);
   currentUser=u; saveLocalSession(u.email);
   errEl.style.display='none';okEl.style.display='block';
   setTimeout(()=>{closeModal();renderNav();showToast(`${t('toast_created')}, ${first} !`);},1000);

@@ -92,3 +92,19 @@ async function emailSendVerificationCode(toEmail, toName, code, purpose){
   });
   return ok;
 }
+
+// ═══════════════ BIENVENUE (nouvelle inscription) ═══════════════
+async function emailSendWelcome(toEmail, toFirstName){
+  const message =
+    `Bonjour ${toFirstName||''},\n\n`+
+    `Bienvenue sur Economist ! Votre compte a bien été créé avec l'adresse ${toEmail}.\n\n`+
+    `Vous pouvez dès maintenant lire tous nos articles, et proposer les vôtres depuis "Proposer un article".\n\n`+
+    `— Economist`;
+  return await sendEmail({
+    to_email: toEmail,
+    subject: 'Bienvenue sur Economist !',
+    from_name: 'Economist',
+    reply_to: OWNER_EMAIL,
+    message
+  });
+}
