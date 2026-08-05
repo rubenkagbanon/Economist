@@ -18,9 +18,9 @@
 // 4. "Account" → "General" → copiez votre PUBLIC_KEY
 // 5. Remplacez les 3 valeurs ci-dessous.
 // ────────────────────────────────────────────────────────────
-const EMAILJS_PUBLIC_KEY  = "zNY6DfPspNqEMTqdu";     // ex: "a1B2c3D4e5F6g7H8i"
-const EMAILJS_SERVICE_ID  = "service_eifozxx";     // ex: "service_economist"
-const EMAILJS_TEMPLATE_ID = "template_nd4krj5";    // ex: "template_notif"
+const EMAILJS_PUBLIC_KEY  = "VWz1Tmbj4CndEFo9U";    
+const EMAILJS_SERVICE_ID  = "service_3r94wdl";     
+const EMAILJS_TEMPLATE_ID = "template_o52gu3d";    
 
 let _emailjsReady = false;
 function initEmailJS(){
