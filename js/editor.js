@@ -63,15 +63,30 @@ async function checkCode(){
 
   if(VALID_CODES.includes(val)){ _writeUnlocked=true; renderWritePage(); return; }
 
-  const codes=await dbGet(ONE_TIME_CODES_PATH);
-  let key=null, entry=null;
-  if(codes){
-    for(const [k,v] of Object.entries(codes)){ if(v.code===val){ key=k; entry=v; break; } }
+  const codes = await dbGet(ONE_TIME_CODES_PATH);
+  let key = null, entry = null;
+  if(codes && typeof codes === 'object' && !Array.isArray(codes)){
+    if(codes.code !== undefined){
+      if(codes.code === val){ entry = codes; }
+    } else {
+      for(const [k,v] of Object.entries(codes)){
+        if(v && v.code === val){ key = k; entry = v; break; }
+      }
+    }
   }
-  if(!entry || (entry.used||0)>=(entry.max||2)){
-    errEl.textContent='Code incorrect ou épuisé.'; errEl.style.display='block'; return;
+
+  if(entry?.expires && Date.now() > entry.expires){
+    errEl.textContent='Code expiré. Demandez un nouveau code.';
+    errEl.style.display='block';
+    return;
   }
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`, {...entry, used:(entry.used||0)+1});
+  if(!entry || (entry.used||0) >= (entry.max||2)){
+    errEl.textContent='Code incorrect ou épuisé.'; errEl.style.display='block';
+    return;
+  }
+
+  const savePath = key ? `${ONE_TIME_CODES_PATH}/${key}` : ONE_TIME_CODES_PATH;
+  await dbSet(savePath, {...entry, used:(entry.used||0)+1});
   _writeUnlocked=true;
   renderWritePage();
 }
