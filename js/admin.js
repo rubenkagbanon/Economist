@@ -92,9 +92,10 @@ async function adminAddCode(){
   const key=val.replace(/[^a-zA-Z0-9]/g,'_');
   const existing=await dbGet(`${ONE_TIME_CODES_PATH}/${key}`);
   if(existing){showToast('Ce code existe déjà.');return;}
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code:val,max,used:0});
+  const expires = Date.now() + 50*60*1000; // 50 minutes
+  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code:val,max,used:0,expires});
   document.getElementById('new-code-val').value='';
-  showToast(`Code "${val}" créé (max ${max} utilisations).`);
+  showToast(`Code "${val}" créé (max ${max} utilisations, valide 50 min).`);
   loadAdminCodes();
 }
 
@@ -112,7 +113,8 @@ async function adminSendManualCode(){
   if(!email){showToast('Entrez un e-mail.');return;}
   const code=genVerifCode();
   const key=code;
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email});
+  const expires = Date.now() + 50*60*1000; // 50 minutes
+  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email,expires});
   const sent=await emailSendVerificationCode(email,'',code,'access');
   showToast(sent?`Code envoyé à ${email}.`:'E-mail non configuré (voir js/email.js). Code créé: '+code);
   emailEl.value='';
@@ -145,11 +147,12 @@ async function loadAdminProposals(){
 
 async function adminApproveProposal(id,email,firstName){
   const code=genVerifCode();
-  await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:email});
+  const expires = Date.now() + 50*60*1000; // 50 minutes
+  await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:email,expires});
   const sent=await emailSendVerificationCode(email,firstName,code,'access');
   const prop=await dbGet(`proposals/${id}`);
   await dbSet(`proposals/${id}`,{...prop,status:'sent'});
-  showToast(sent?`Code envoyé à ${email}.`:'E-mail non configuré — code créé: '+code);
+  showToast(sent?`Code envoyé à ${email}.`:'É-mail non configuré — code créé: '+code);
   loadAdminProposals();loadAdminCodes();
 }
 async function adminDeleteProposal(id){
