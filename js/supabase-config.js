@@ -10,8 +10,8 @@
 // est conçue pour être visible côté client. La vraie protection se fait via les policies
 // RLS de la table — voir README.md, section Supabase.
 //
-const SUPABASE_URL      = "https://hlfazijixffnipjjsfke.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsZmF6aWppeGZmbmlwampzZmtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MjQ1NjUsImV4cCI6MjEwMTUwMDU2NX0.zl5sk4rYhyh7i2e3UfUfqvOJZg1x5idx0vxk4D-x3Pw";
+const SUPABASE_URL      = "https://soimafxvczlxdqvybkut.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvaW1hZnh2Y3pseGRxdnlia3V0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NzU2NjUsImV4cCI6MjA5OTI1MTY2NX0.xBXgIKuRPk9GdeydSBMjR2Dp0kPJuhwBE8CfqU0dUaY";
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
