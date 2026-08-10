@@ -25,8 +25,8 @@ body{background:var(--blanc);color:var(--noir);font-family:var(--serif-text);ove
 #planet-tr{top:-10%;right:-8%;width:520px;height:520px;}
 #planet-bl{bottom:-15%;left:-8%;width:400px;height:400px;}
 @media(max-width:768px){
-  #planet-tr{top:-5%;right:-20%;width:200px;height:200px;}
-  #planet-bl{bottom:-8%;left:-20%;width:160px;height:160px;}
+  #planet-tr{top:-8%;right:10%;width:220px;height:220px;}
+  #planet-bl{bottom:-8%;left:10%;width:180px;height:180px;}
 }
 
 /* LOADING */
@@ -289,16 +289,12 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .profile-edit-btn:hover{border-color:var(--rouge);color:var(--rouge)}
 
 /* FOOTER */
-footer{background:var(--noir);color:white;padding:3.5rem 3.5rem;margin:4rem auto 0;max-width:1200px;box-sizing:border-box;position:relative;z-index:1;}
-.foot-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:2rem;border-bottom:.5px solid #222;margin-bottom:2rem;flex-wrap:wrap;gap:1.5rem;}
-.foot-logo-e{font-family:var(--serif);font-size:30px;font-weight:400;display:inline-block;position:relative;color:white}
-.foot-logo-e::after{content:'';position:absolute;bottom:2px;right:-1px;width:7px;height:7px;background:var(--rouge);clip-path:polygon(100% 0,100% 100%,0 100%)}
-.foot-sub{font-family:var(--sans);font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#555;margin-top:3px}
-.foot-links{display:flex;gap:2rem;flex-wrap:wrap}
+footer{background:var(--noir);color:white;padding:3.5rem 3.5rem;margin:4rem 0 0;box-sizing:border-box;position:relative;z-index:1;width:100%;}
+.foot-copy{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-family:var(--sans);font-size:10.5px;color:#3a3a3a;flex-wrap:wrap;max-width:calc(100% - 7rem);margin:0 auto;}
+.foot-copy span{color:var(--rouge)}
+.foot-links{display:flex;gap:2rem;flex-wrap:wrap;justify-content:flex-end;}
 .foot-link{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#555;cursor:pointer;transition:color .2s}
 .foot-link:hover{color:var(--rouge)}
-.foot-copy{font-family:var(--sans);font-size:10.5px;color:#3a3a3a}
-.foot-copy span{color:var(--rouge)}
 .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
 .revealed{opacity:1;transform:translateY(0)}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
