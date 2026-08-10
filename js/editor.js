@@ -75,8 +75,19 @@ async function checkCode(){
     }
   }
 
-  if(!entry || (entry.used||0) >= (entry.max||2)){
-    errEl.textContent='Code incorrect ou épuisé.'; errEl.style.display='block';
+  if(!entry){
+    errEl.textContent='Code incorrect.'; errEl.style.display='block';
+    return;
+  }
+
+  if(entry.forEmail && currentUser && entry.forEmail.toLowerCase() !== currentUser.email.toLowerCase()){
+    errEl.textContent='Ce code n\u2019est pas associé à votre adresse e-mail.';
+    errEl.style.display='block';
+    return;
+  }
+
+  if((entry.used||0) >= (entry.max||2)){
+    errEl.textContent='Code épuisé.'; errEl.style.display='block';
     return;
   }
 
