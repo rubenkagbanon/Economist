@@ -75,11 +75,6 @@ async function checkCode(){
     }
   }
 
-  if(entry?.expires && Date.now() > entry.expires){
-    errEl.textContent='Code expiré. Demandez un nouveau code.';
-    errEl.style.display='block';
-    return;
-  }
   if(!entry || (entry.used||0) >= (entry.max||2)){
     errEl.textContent='Code incorrect ou épuisé.'; errEl.style.display='block';
     return;
@@ -228,7 +223,11 @@ async function publishArticle(){
   articles.push(a);
   await saveArticle(a);
   lastPublishedId=id;
+  _writeUnlocked=false;
   document.getElementById('success-msg').style.display='block';
+  document.getElementById('write-form').style.display='none';
+  document.getElementById('code-gate').style.display='block';
+  document.getElementById('gate-err').style.display='none';
 }
 function goToNewArticle(){
   if(!lastPublishedId)return;
