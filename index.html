@@ -267,9 +267,9 @@
       <div class="form-wrap">
         <div class="form-two-col">
           <div class="form-row"><label data-i18n="lbl_rubrique">Rubrique *</label>
-            <select id="f-cat"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Afrique</option><option>Monde</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
+            <select id="f-cat" onchange="saveDraft()"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Afrique</option><option>Monde</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
           </div>
-          <div class="form-row"><label>Auteur *</label><input type="text" id="f-author" placeholder="Prénom Nom"></div>
+          <div class="form-row"><label>Auteur *</label><input type="text" id="f-author" placeholder="Prénom Nom" oninput="saveDraft()"></div>
         </div>
         <div class="form-row"><label>Titre *</label><input type="text" id="f-title" placeholder="Un titre précis…" oninput="updateCount('f-title','tc',80)">
           <div style="display:flex;justify-content:space-between"><span class="hint">80 caractères</span><span class="char-count" id="tc">0 / 80</span></div></div>
