@@ -17,8 +17,26 @@ function maybeShowOnboarding(){
 // Appelé par data.js une fois la connexion Supabase établie ('db-ready')
 async function init(){
   await loadData();
-  const savedEmail=getLocalEmail();
-  if(savedEmail) currentUser = users.find(u=>u.email===savedEmail) || null;
+
+  if(_sb && _sb.auth){
+    const { data: { session } } = await _sb.auth.getSession();
+    if(session && session.user){
+      await syncGoogleUserFromSession(session);
+    } else {
+      const savedEmail=getLocalEmail();
+      if(savedEmail) currentUser = users.find(u=>u.email===savedEmail) || null;
+    }
+    _sb.auth.onAuthStateChange(async (_event, session) => {
+      if(session && session.user){
+        await syncGoogleUserFromSession(session);
+        renderNav();
+        if(typeof renderHome==='function') renderHome(currentActiveCat);
+      }
+    });
+  } else {
+    const savedEmail=getLocalEmail();
+    if(savedEmail) currentUser = users.find(u=>u.email===savedEmail) || null;
+  }
 
   applyTranslations();
   updateLangButton();

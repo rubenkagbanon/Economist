@@ -55,7 +55,80 @@ async function doSignup(){
   btn.textContent=t('auth_btn_signup');btn.disabled=false;
 }
 
-function doLogout(){
+async function syncGoogleUserFromSession(session){
+  if(!session || !session.user) return null;
+  const email=(session.user.email||'').trim().toLowerCase();
+  if(!email) return null;
+  await loadData();
+  const meta=session.user.user_metadata || {};
+  const fullName=(meta.full_name || meta.name || email.split('@')[0] || 'Google User').trim();
+  const nameParts=fullName.split(/\s+/).filter(Boolean);
+  const first=nameParts[0] || 'Google';
+  const last=nameParts.slice(1).join(' ') || 'User';
+  const avatar=meta.avatar_url || '';
+
+  let u = users.find(x => (x.email||'').toLowerCase() === email);
+  if(!u){
+    u={first,last,email,pwd:'google-oauth',joined:today(),avatar,bio:'',authProvider:'google'};
+    users.push(u);
+    await saveUser(u);
+  } else {
+    let changed = false;
+    if(!u.first && first){u.first=first;changed=true;}
+    if(!u.last && last){u.last=last;changed=true;}
+    if(!u.avatar && avatar){u.avatar=avatar;changed=true;}
+    if(!u.authProvider){u.authProvider='google';changed=true;}
+    if(changed) await saveUser(u);
+  }
+
+  currentUser = u;
+  saveLocalSession(email);
+  return u;
+}
+
+async function doGoogleAuth(mode='login'){
+  const btn=document.getElementById(mode==='signup' ? 'btn-google-signup' : 'btn-google-login');
+  const label = mode==='signup' ? 'Créer mon compte avec Google' : 'Se connecter avec Google';
+  if(btn){
+    btn.disabled=true;
+    btn.innerHTML='<span class="spinner"></span>…';
+  }
+
+  try{
+    if(!_sb || !_sb.auth){ throw new Error('Supabase Auth indisponible.'); }
+    const redirectTo = window.location.protocol === 'file:' ? window.location.href : `${window.location.origin}${window.location.pathname}`;
+    const { data, error } = await _sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: { access_type: 'offline', prompt: 'consent' }
+      }
+    });
+    if(error) throw error;
+    if(data && data.session){
+      await syncGoogleUserFromSession(data.session);
+      closeModal(); renderNav(); renderHome(currentActiveCat);
+      showToast(`${t('toast_welcome')}, ${currentUser.first} !`);
+      return;
+    }
+    if(data && data.url){
+      window.location.href = data.url;
+      return;
+    }
+    throw new Error('Impossible de démarrer la connexion Google.');
+  } catch(err){
+    console.error('Google OAuth error:', err);
+    showToast('Connexion Google impossible. Vérifiez la configuration OAuth Supabase.');
+  } finally{
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;display:block"><path fill="#EA4335" d="M12 10.2v3.7h5.2c-.2 1.3-1.6 3.7-5.2 3.7-3.1 0-5.6-2.6-5.6-5.7s2.5-5.7 5.6-5.7c1.8 0 3 .7 3.7 1.4l2.5-2.4C16.7 3.3 14.7 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12S6.8 21.5 12 21.5c6.9 0 11.5-4.8 11.5-11.5 0-.8-.1-1.5-.2-2.1H12z"/><path fill="#34A853" d="M3.9 7.4l3.4 2.5c.9-1.7 2.9-2.9 4.7-2.9 1.8 0 3 .7 3.7 1.4l2.5-2.4C16.7 3.3 14.7 2.5 12 2.5c-3.4 0-6.3 1.8-8.1 4.9z"/><path fill="#FBBC05" d="M12 21.5c2.8 0 5.1-.9 6.8-2.5l-3.1-2.6c-.9.6-2.1 1-3.7 1-3.6 0-4.9-2.5-5.2-3.7l-3.3 2.6C2.9 18.8 7 21.5 12 21.5z"/><path fill="#4285F4" d="M3.9 7.4c-.4.8-.7 1.8-.7 3.1s.3 2.3.7 3.1l3.4-2.5c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6L3.9 7.4z"/></svg> ${label}`;
+    }
+  }
+}
+
+async function doLogout(){
+  try{ if(_sb && _sb.auth){ await _sb.auth.signOut(); } }catch(e){ console.error('Google logout error:', e); }
   currentUser=null;clearLocalSession();
   _writeUnlocked=false;editorBlocks=[];
   renderNav();showPage('home');showToast(t('toast_logout'));
