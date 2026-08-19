@@ -58,18 +58,27 @@ function doSearch(q, targetId){
   const el=document.getElementById(targetId); if(!el)return;
   q=q.trim().toLowerCase();
   if(!q){ el.classList.remove('open'); el.innerHTML=''; return; }
-  const results = articles.filter(a =>
-    a.title.toLowerCase().includes(q) || a.author.toLowerCase().includes(q)
+  const userResults = users.filter(u => {
+    const name = `${u.first||''} ${u.last||''}`.trim().toLowerCase();
+    return name.includes(q) || (u.email||'').toLowerCase().includes(q);
+  }).slice(0,4);
+  const articleResults = articles.filter(a =>
+    (a.title||'').toLowerCase().includes(q) || (a.author||'').toLowerCase().includes(q)
   ).slice(0,8);
-  if(!results.length){
+  if(!userResults.length && !articleResults.length){
     el.innerHTML = `<div class="srd-section">Aucun résultat</div>`;
   } else {
-    el.innerHTML = results.map(a => `
+    el.innerHTML = `${userResults.length ? `<div class="srd-section">Utilisateurs</div>${userResults.map(u => `
+      <div class="srd-item" onclick="selectSearchUser('${encodeURIComponent(u.email||'')}','${targetId}')">
+        <div class="srd-cat">Profil</div>
+        <div class="srd-title">${u.first||''} ${u.last||''}</div>
+        <div class="srd-author">${u.email||''}</div>
+      </div>`).join('')}` : ''}${articleResults.length ? `<div class="srd-section">Articles</div>${articleResults.map(a => `
       <div class="srd-item" onclick="selectSearchResult(${a.id},'${targetId}')">
         <div class="srd-cat">${tCat(a.cat)}</div>
-        <div class="srd-title">${a.title}</div>
-        <div class="srd-author">${a.author}</div>
-      </div>`).join('');
+        <div class="srd-title">${a.title||''}</div>
+        <div class="srd-author">${a.author||''}</div>
+      </div>`).join('')}` : ''}`;
   }
   el.classList.add('open');
 }
@@ -83,6 +92,14 @@ function selectSearchResult(id, targetId){
   document.querySelectorAll('.nav-search-input,#mob-search').forEach(i=>i.value='');
   closeMobileMenu();
   openArticle(id);
+}
+function selectSearchUser(encodedEmail, targetId){
+  hideSearchResults(targetId);
+  const el=document.getElementById(targetId); if(el) el.innerHTML='';
+  document.querySelectorAll('.nav-search-input,#mob-search').forEach(i=>i.value='');
+  closeMobileMenu();
+  showPage('profile');
+  openProfile(decodeURIComponent(encodedEmail));
 }
 
 // ═══════════════ AUTH MODAL ═══════════════
