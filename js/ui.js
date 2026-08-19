@@ -56,8 +56,14 @@ function navGo(name){ closeMobileMenu(); showPage(name); }
 // ═══════════════ SEARCH (desktop + mobile share this) ═══════════════
 function doSearch(q, targetId){
   const el=document.getElementById(targetId); if(!el)return;
+  const isMobileSearch = targetId === 'mob-search-results';
   q=q.trim().toLowerCase();
-  if(!q){ el.classList.remove('open'); el.innerHTML=''; return; }
+  if(!q){
+    el.classList.remove('open');
+    if(isMobileSearch) el.style.display='none';
+    el.innerHTML='';
+    return;
+  }
   const userResults = users.filter(u => {
     const name = `${u.first||''} ${u.last||''}`.trim().toLowerCase();
     return name.includes(q) || (u.email||'').toLowerCase().includes(q);
@@ -81,6 +87,7 @@ function doSearch(q, targetId){
       </div>`).join('')}` : ''}`;
   }
   el.classList.add('open');
+  if(isMobileSearch) el.style.display='block';
 }
 function doMobSearch(q){ doSearch(q, 'mob-search-results'); }
 function hideSearchResults(targetId){
