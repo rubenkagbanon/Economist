@@ -65,8 +65,9 @@ function doSearch(q, targetId){
     return;
   }
   const userResults = users.filter(u => {
-    const name = `${u.first||''} ${u.last||''}`.trim().toLowerCase();
-    return name.includes(q) || (u.email||'').toLowerCase().includes(q);
+    const firstName = (u.first||'').toLowerCase();
+    const lastName = (u.last||'').toLowerCase();
+    return firstName.includes(q) || lastName.includes(q);
   }).slice(0,4);
   const articleResults = articles.filter(a =>
     (a.title||'').toLowerCase().includes(q) || (a.author||'').toLowerCase().includes(q)
@@ -75,10 +76,12 @@ function doSearch(q, targetId){
     el.innerHTML = `<div class="srd-section">Aucun résultat</div>`;
   } else {
     el.innerHTML = `${userResults.length ? `<div class="srd-section">Utilisateurs</div>${userResults.map(u => `
-      <div class="srd-item" onclick="selectSearchUser('${encodeURIComponent(u.email||'')}','${targetId}')">
+      <div class="srd-item" onclick="selectSearchUser(${users.indexOf(u)},'${targetId}')">
         <div class="srd-cat">Profil</div>
-        <div class="srd-title">${u.first||''} ${u.last||''}</div>
-        <div class="srd-author">${u.email||''}</div>
+        <div class="srd-profile-row">
+          ${avHtml(u,32)}
+          <div class="srd-title">${u.first||''} ${u.last||''}</div>
+        </div>
       </div>`).join('')}` : ''}${articleResults.length ? `<div class="srd-section">Articles</div>${articleResults.map(a => `
       <div class="srd-item" onclick="selectSearchResult(${a.id},'${targetId}')">
         <div class="srd-cat">${tCat(a.cat)}</div>
@@ -100,13 +103,15 @@ function selectSearchResult(id, targetId){
   closeMobileMenu();
   openArticle(id);
 }
-function selectSearchUser(encodedEmail, targetId){
+function selectSearchUser(userIndex, targetId){
   hideSearchResults(targetId);
   const el=document.getElementById(targetId); if(el) el.innerHTML='';
   document.querySelectorAll('.nav-search-input,#mob-search').forEach(i=>i.value='');
   closeMobileMenu();
+  const user=users[userIndex];
+  if(!user)return;
   showPage('profile');
-  openProfile(decodeURIComponent(encodedEmail));
+  openProfile(user.email);
 }
 
 // ═══════════════ AUTH MODAL ═══════════════
