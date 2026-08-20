@@ -68,7 +68,7 @@
 [data-theme="dark"] .art-card{border-color:#222}
 [data-theme="dark"] .art-excerpt{color:var(--txt-mut)}
 [data-theme="dark"] .art-thumb-empty{background:linear-gradient(135deg,#1a1a1a,#222)}
-[data-theme="dark"] .art-info-box{background:#1a1618;border-color:rgba(139,26,26,0.3)}
+[data-theme="dark"] .art-info-box{background:#1a1618;border-color:rgba(139,0,0,0.3)}
 [data-theme="dark"] .art-info-box-body{color:var(--txt-soft)}
 [data-theme="dark"] .art-credits-box{background:#161616;border-color:#2a2a2a}
 [data-theme="dark"] .art-credits-body,[data-theme="dark"] .art-sources-body{color:var(--txt-mut)}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Economist</title>
+  <desc id="desc">Logo Economist avec un E blanc, un accent rouge et le nom Economist</desc>
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="none" stroke="#f4f4f4" stroke-width="2">
+    <path d="M194 131h95c35 0 55 18 55 44 0 23-16 38-39 45 27 6 45 23 45 48 0 31-25 52-62 52h-94z"/>
+    <path d="M226 132v188M226 132h62c21 0 33 12 33 29s-12 29-33 29h-62M226 190h56c28 0 44 14 44 37 0 23-16 37-44 37h-56"/>
+  </g>
+  <path d="M307 249c-8 34-24 58-49 71h49z" fill="#8B0000"/>
+  <text x="256" y="353" fill="#f4f4f4" font-family="Georgia, serif" font-size="24" letter-spacing="15" text-anchor="middle">ECONOMIST</text>
+</svg>

@@ -1,7 +1,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 @font-face{font-family:'EconomistSans';font-style:normal;font-weight:300 900;font-display:swap;src:url('https://marber-cdn.economist.com/foundations/latest/fonts/economist-sans-roman.woff2') format('woff2')}
 :root{
-  --rouge:#8B1A1A;
+  --rouge:#8B0000;
   --noir:#111010;
   --gris:#999;
   --gris-clair:#E8E8E8;
@@ -39,6 +39,7 @@ body{min-height:100vh;display:flex;flex-direction:column;background:var(--blanc)
 #loading-screen.hidden{opacity:0;pointer-events:none}
 .loading-logo-e{font-family:var(--serif);font-size:56px;font-weight:400;line-height:1;position:relative;display:inline-block;color:var(--noir);}
 .loading-logo-e::after{content:'';position:absolute;bottom:4px;right:-1px;width:12px;height:12px;background:var(--rouge);clip-path:polygon(100% 0,100% 100%,0 100%);}
+.loading-logo-image{width:180px;height:180px;display:block;object-fit:contain}
 .loading-bar-wrap{width:120px;height:1px;background:var(--gris-clair);overflow:hidden}
 .loading-bar{height:100%;background:var(--rouge);animation:loadBar 2s ease forwards}
 @keyframes loadBar{0%{width:0}60%{width:65%}100%{width:100%}}
@@ -99,6 +100,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .desktop-menu-item:hover{color:var(--rouge)}
 .nav-date{font-family:var(--sans);font-size:10.5px;letter-spacing:.18em;color:var(--gris);text-transform:uppercase}
 .logo-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
+.nav-logo-image{width:108px;height:66px;display:block;object-fit:contain}
 .logo-e{font-family:var(--serif);font-size:40px;font-weight:400;line-height:1;position:relative;display:inline-block;color:var(--noir);}
 .logo-e::after{content:'';position:absolute;bottom:3px;right:-1px;width:9px;height:9px;background:var(--rouge);clip-path:polygon(100% 0,100% 100%,0 100%);}
 .logo-text{font-family:var(--sans);font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:var(--noir)}
@@ -276,7 +278,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .block-quote{font-family:var(--sans);font-size:.93rem;font-weight:300;font-style:italic;border:none;border-left:3px solid var(--rouge);padding:.5rem 1rem;outline:none;width:100%;background:#fff8f8;color:var(--txt-soft);line-height:1.8;min-height:60px;white-space:pre-wrap;word-break:break-word;cursor:text;}
 .block-quote b,.block-quote strong{font-weight:700}
 .block-quote[contenteditable]:empty:before{content:attr(data-placeholder);color:var(--txt-pale);pointer-events:none}
-.block-infobox{font-family:var(--sans);font-size:.9rem;font-weight:300;background:#fff8f8;border:.5px solid rgba(139,26,26,0.15);border-left:3px solid var(--rouge);padding:.8rem 1rem;outline:none;width:100%;line-height:1.75;min-height:60px;color:var(--txt-strong);white-space:pre-wrap;word-break:break-word;cursor:text;}
+.block-infobox{font-family:var(--sans);font-size:.9rem;font-weight:300;background:#fff8f8;border:.5px solid rgba(139,0,0,0.15);border-left:3px solid var(--rouge);padding:.8rem 1rem;outline:none;width:100%;line-height:1.75;min-height:60px;color:var(--txt-strong);white-space:pre-wrap;word-break:break-word;cursor:text;}
 .block-infobox[contenteditable]:empty:before{content:attr(data-placeholder);color:var(--txt-pale);pointer-events:none}
 .block-sep{text-align:center;padding:.8rem 0;font-family:var(--sans);font-size:1.1rem;letter-spacing:.6em;color:var(--rouge);user-select:none;width:100%;}
 .block-img-wrap{width:100%;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;}
@@ -292,7 +294,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .my-stat-num{font-family:var(--serif);font-size:2.4rem;font-weight:400;color:var(--rouge);line-height:1}
 .my-stat-label{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-top:.5rem}
 .admin-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:var(--rouge);color:white;padding:4px 12px;margin-bottom:2rem}
-.btn-danger{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,26,26,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;}
+.btn-danger{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,0,0,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:var(--rouge);color:white}
 .stats-section-title{font-family:var(--sans);font-size:9px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--noir);}
 .stats-table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:.88rem}
@@ -301,7 +303,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .stats-table tr:hover td{background:#fafafa}
 .td-title{font-family:var(--serif-text);font-size:.95rem;cursor:pointer;color:var(--rouge)}
 .td-title:hover{text-decoration:underline}
-.stats-cat-badge{font-family:var(--sans);font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);border:.5px solid rgba(139,26,26,0.25);padding:2px 7px;display:inline-block}
+.stats-cat-badge{font-family:var(--sans);font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);border:.5px solid rgba(139,0,0,0.25);padding:2px 7px;display:inline-block}
 .profile-page{max-width:900px;margin:0 auto;padding:4rem 2rem;position:relative;z-index:1}
 .profile-header{display:flex;align-items:center;gap:2rem;margin-bottom:3rem;padding-bottom:2rem;border-bottom:.5px solid var(--gris-clair);flex-wrap:wrap}
 .profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2rem;color:white;flex-shrink:0;overflow:hidden;}
@@ -309,7 +311,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .profile-name{font-family:var(--serif);font-size:2rem;font-weight:400}
 .profile-meta{font-family:var(--sans);font-size:10px;letter-spacing:.1em;color:var(--gris);margin-top:.4rem;line-height:1.8}
 .profile-bio{font-family:var(--serif-text);font-size:.95rem;color:var(--txt-soft);margin-top:.6rem;font-style:italic;line-height:1.6}
-.profile-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;border:.5px solid rgba(139,26,26,0.3);padding:3px 10px;color:var(--rouge);margin-top:.6rem}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;border:.5px solid rgba(139,0,0,0.3);padding:3px 10px;color:var(--rouge);margin-top:.6rem}
 .profile-edit-btn{font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;background:none;border:.5px solid var(--gris-clair);color:var(--txt-mut);padding:6px 14px;cursor:pointer;transition:all .2s;margin-top:.8rem;display:inline-block}
 .profile-edit-btn:hover{border-color:var(--rouge);color:var(--rouge)}
 
@@ -343,7 +345,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .foot-copy > div:first-child{order:2;}
   .foot-links{order:1;justify-content:flex-start;gap:1.2rem;width:100%;margin-bottom:1rem;}
   .foot-link{font-size:9px;}
-  .logo-e{font-size:32px}
+  .nav-logo-image{width:88px;height:54px}
 }
 @media(max-width:500px){
   .nav-top{padding:0 .8rem}
@@ -404,7 +406,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
 .art-sources-box{margin:2.5rem 0 1rem;padding-top:1.2rem;border-top:.5px solid var(--gris-clair)}
 .art-sources-title{font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gris);margin-bottom:.6rem}
 .art-sources-body{font-family:var(--sans);font-size:.85rem;line-height:1.8;color:var(--txt-mut)}
-.art-info-box{margin:1.8rem 0;padding:1.1rem 1.4rem;background:#fff8f8;border:.5px solid rgba(139,26,26,0.15);border-left:3px solid var(--rouge)}
+.art-info-box{margin:1.8rem 0;padding:1.1rem 1.4rem;background:#fff8f8;border:.5px solid rgba(139,0,0,0.15);border-left:3px solid var(--rouge)}
 .art-info-box-title{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem}
 .art-info-box-body{font-family:var(--sans);font-size:.9rem;line-height:1.75;color:var(--txt-soft)}
 .art-credits-box{float:right;clear:right;width:200px;margin:0 0 1.5rem 2.5rem;padding:1rem 1.2rem;border:.5px solid var(--gris-clair);border-top:2px solid var(--gris-clair)}
