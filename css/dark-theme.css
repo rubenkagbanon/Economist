@@ -84,7 +84,6 @@
 [data-theme="dark"] .block-infobox{background:#1e1618;color:var(--txt-soft)}
 [data-theme="dark"] .block-sources,[data-theme="dark"] .block-credits{color:var(--txt-mut);border-color:#2a2a2a}
 [data-theme="dark"] .tb-btn{background:#1a1a1a;border-color:#2a2a2a;color:var(--txt-pale)}
-[data-theme="dark"] .add-block-btn{color:var(--txt-pale);border-color:#2a2a2a}
 [data-theme="dark"] .block-insert-line{background:#2a2a2a}
 [data-theme="dark"] .block-insert-line:hover .insert-line-bar{background:var(--rouge)}
 [data-theme="dark"] .img-upload-zone{background:#1a1a1a;border-color:#2a2a2a}

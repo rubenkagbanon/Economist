@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>Economist</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Serif+Text:ital@0;1&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Slab:wght@100..900&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dark-theme.css">
-<link rel="icon" type="image/png" href="css/Logo.png">
+<link id="site-favicon" rel="icon" type="image/png" href="css/Logo.png">
 
 <!-- Supabase (base de données) : voir js/supabase-config.js -->
 <script type="module" src="js/supabase-config.js"></script>
@@ -87,6 +87,7 @@
   <div class="nav-mobile-item" onclick="navGo('propose')" data-i18n="nav_propose">Proposer un article</div>
   <div class="nav-mobile-item" id="mob-write-item" style="display:none" onclick="navGo('write')"><span data-i18n="nav_write">Écrire</span></div>
   <div class="nav-mobile-item" id="mob-mystats-item" style="display:none" onclick="navGo('mystats')"><span data-i18n="nav_stats">Mes statistiques</span></div>
+  <div class="nav-mobile-item" id="mob-logout-item" style="display:none" onclick="closeMobileMenu();doLogout()" data-i18n="nav_logout">Déconnexion</div>
   <div class="nav-mobile-item" id="mob-admin-item" style="display:none" onclick="navGo('admin')">⚙ Admin</div>
   <div class="nav-mobile-actions" id="mob-actions"></div>
 </div>
@@ -324,7 +325,7 @@
         </div>
         <div class="form-row"><label data-i18n="lbl_corps">Corps de l'article *</label>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem">
-            <div class="editor-toolbar">
+            <div class="editor-toolbar" id="legacy-block-picker" style="display:none">
               <button type="button" class="tb-btn" onclick="insertBlock('paragraph')">¶ Paragraphe</button>
               <button type="button" class="tb-btn" onclick="insertBlock('h2')">H2</button>
               <button type="button" class="tb-btn" onclick="insertBlock('h3')">H3</button>
@@ -344,7 +345,6 @@
           </div>
           <input type="file" id="inline-img-input" accept="image/*" style="display:none" onchange="handleInlineImage(event)">
           <div id="article-blocks" class="article-blocks-editor"></div>
-          <div class="add-block-row"><button type="button" class="add-block-btn" onclick="insertBlock('paragraph')">+ Ajouter un bloc</button></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
           <button class="btn-publish" id="btn-publish" onclick="publishArticle()">Publier →</button>

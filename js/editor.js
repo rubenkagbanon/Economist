@@ -125,7 +125,7 @@ function renderWritePage(){
       document.getElementById('f-deck').value = '';
       _coverData = '';
       hideCoverPreview();
-      editorBlocks=[{type:'paragraph',html:''}];
+      editorBlocks=[];
     }
     renderBlocks();
     updateWordCount();
@@ -189,6 +189,8 @@ function blockHtml(b,i){
   switch(b.type){
     case 'paragraph':
       inner=`<div class="block-content"><div class="block-para" contenteditable="true" data-placeholder="Écrivez un paragraphe…" oninput="updateBlockText(${i},this)" onmouseup="showFmtToolbar()" onkeyup="showFmtToolbar()">${b.html||''}</div></div>`; break;
+    case 'h1':
+      inner=`<div class="block-content"><div class="block-h1" contenteditable="true" data-placeholder="Titre H1…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'h2':
       inner=`<div class="block-content"><div class="block-h2" contenteditable="true" data-placeholder="Sous-titre H2…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'h3':
@@ -206,11 +208,22 @@ function blockHtml(b,i){
     case 'image':
       inner=`<div class="block-content"><div class="block-img-wrap"><img src="${b.src}" alt=""><input type="text" class="block-img-caption" placeholder="Légende (optionnel)" value="${(b.caption||'').replace(/"/g,'&quot;')}" oninput="updateBlockValue(${i},this)"></div></div>`; break;
   }
-  return `<div class="block-wrap">${inner}<button type="button" class="block-del" title="Supprimer" onclick="deleteBlock(${i})">✕</button></div>`;
+  return `<div class="block-wrap">${inner}<div class="block-actions"><button type="button" class="block-type-btn" title="Modifier le type de ce bloc" onclick="toggleBlockTypePicker(${i})">Type</button><button type="button" class="block-del" title="Supprimer ce bloc" onclick="deleteBlock(${i})">✕</button><div class="block-type-picker" id="block-type-picker-${i}" style="display:none">${blockPickerOptionsHtml('change',i)}</div></div></div>`;
 }
 function renderBlocks(){
-  document.getElementById('article-blocks').innerHTML = editorBlocks.map((b,i)=>blockHtml(b,i)).join('');
+  const editor=document.getElementById('article-blocks');
+  let html=blockInsertPointHtml(0,!editorBlocks.length);
+  editorBlocks.forEach((b,i)=>{ html+=blockHtml(b,i)+blockInsertPointHtml(i+1); });
+  editor.innerHTML=html;
   updateWordCount();
+}
+function blockPickerOptionsHtml(action,index){
+  const call=type=>action==='change'?`changeBlockType(${index},'${type}')`:`insertBlockAt('${type}',${index})`;
+  const button=(type,label,title)=>`<button type="button" class="tb-btn" title="${title}" onclick="${call(type)}">${label}</button>`;
+  return `${button('paragraph','¶ Paragraphe','Ajouter un paragraphe de texte')}${button('h1','H1','Ajouter un titre principal')}${button('h2','H2','Ajouter un grand sous-titre')}${button('h3','H3','Ajouter un petit sous-titre')}${button('quote','« Citation','Ajouter une citation mise en avant')}${button('separator','— —','Ajouter un séparateur visuel')}${button('infobox','ℹ Info','Ajouter un encadré d’information')}${button('sources','🔗 Sources','Ajouter les sources bibliographiques')}${button('credits','✍ Crédits','Ajouter les crédits ou les auteurs')}`;
+}
+function blockInsertPointHtml(index,isOpen=false){
+  return `<div class="block-insert-point"><button type="button" class="add-inline-block-btn" title="Insérer un bloc à cet emplacement" onclick="toggleInsertPicker(${index})">+ Ajouter ici</button><div class="block-picker-inline" id="block-picker-inline-${index}" style="display:${isOpen?'flex':'none'}"><div class="block-picker-prompt">Choisir le type de bloc</div><div class="block-picker-options">${blockPickerOptionsHtml('insert',index)}<button type="button" class="tb-btn" title="Ajouter une image dans l’article" onclick="triggerInlineImg(${index})">🖼 Image</button></div></div></div>`;
 }
 function updateBlockText(i,el){ editorBlocks[i].html = el.innerHTML; updateWordCount(); saveDraft(); }
 function updateBlockValue(i,el){
@@ -220,12 +233,27 @@ function updateBlockValue(i,el){
 }
 function deleteBlock(i){
   editorBlocks.splice(i,1);
-  if(!editorBlocks.length) editorBlocks=[{type:'paragraph',html:''}];
   renderBlocks();
   saveDraft();
 }
+function toggleInsertPicker(index){
+  const picker=document.getElementById(`block-picker-inline-${index}`); if(!picker)return;
+  document.querySelectorAll('.block-picker-inline').forEach(el=>{if(el!==picker)el.style.display='none';});
+  picker.style.display=picker.style.display==='none'?'flex':'none';
+}
+function toggleBlockTypePicker(index){
+  const picker=document.getElementById(`block-type-picker-${index}`); if(!picker)return;
+  picker.style.display=picker.style.display==='none'?'flex':'none';
+}
+function closeBlockPicker(){
+  document.querySelectorAll('.block-picker-inline,.block-type-picker').forEach(el=>{el.style.display='none';});
+}
 function insertBlock(type){
-  editorBlocks.push({type, html:'', text:''});
+  insertBlockAt(type,editorBlocks.length);
+}
+function insertBlockAt(type,index){
+  editorBlocks.splice(index,0,{type, html:'', text:''});
+  closeBlockPicker();
   renderBlocks();
   saveDraft();
   setTimeout(()=>{
@@ -233,12 +261,23 @@ function insertBlock(type){
     const last=editable[editable.length-1]; if(last) last.focus();
   },30);
 }
-function triggerInlineImg(){ document.getElementById('inline-img-input').click(); }
+function changeBlockType(index,type){
+  if(!editorBlocks[index])return;
+  editorBlocks[index].type=type;
+  closeBlockPicker();
+  renderBlocks();
+  saveDraft();
+}
+let pendingImageInsertIndex=null;
+function triggerInlineImg(index=editorBlocks.length){
+  pendingImageInsertIndex=index;
+  document.getElementById('inline-img-input').click();
+}
 function handleInlineImage(e){
   const file=e.target.files[0]; if(!file)return;
   if(file.size>2*1024*1024){ showToast('Image trop lourde (max 2Mo)'); return; }
   const r=new FileReader();
-  r.onload=ev=>{ editorBlocks.push({type:'image', src:ev.target.result, caption:''}); renderBlocks(); saveDraft(); };
+  r.onload=ev=>{ editorBlocks.splice(pendingImageInsertIndex??editorBlocks.length,0,{type:'image', src:ev.target.result, caption:''}); pendingImageInsertIndex=null; closeBlockPicker(); renderBlocks(); saveDraft(); };
   r.readAsDataURL(file);
   e.target.value='';
 }
@@ -260,7 +299,7 @@ document.addEventListener('mousedown', e=>{
 
 function stripHtml(html){ const d=document.createElement('div'); d.innerHTML=html||''; return d.textContent||''; }
 function updateWordCount(){
-  const words = editorBlocks.filter(b=>['paragraph','quote','infobox','h2','h3'].includes(b.type))
+  const words = editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type))
     .map(b=>stripHtml(b.html)).join(' ').trim().split(/\s+/).filter(Boolean).length;
   const el=document.getElementById('bc'); if(el) el.textContent = `${words} mot${words>1?'s':''}`;
 }
@@ -297,6 +336,7 @@ function handleCoverUrl(url){
 function blockToHtml(b){
   switch(b.type){
     case 'paragraph': return `<p>${b.html||''}</p>`;
+    case 'h1': return `<h1>${b.html||''}</h1>`;
     case 'h2': return `<h2>${b.html||''}</h2>`;
     case 'h3': return `<h3>${b.html||''}</h3>`;
     case 'quote': return `<blockquote>${b.html||''}</blockquote>`;
@@ -314,7 +354,7 @@ async function publishArticle(){
   const cat   =document.getElementById('f-cat').value;
   const author=document.getElementById('f-author').value.trim();
   if(!title||!deck||!cat||!author){ showToast('Remplissez tous les champs obligatoires.'); return; }
-  const bodyText = editorBlocks.filter(b=>['paragraph','quote','infobox','h2','h3'].includes(b.type))
+  const bodyText = editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type))
     .map(b=>stripHtml(b.html)).join('\n\n').trim();
   if(!bodyText){ showToast("Ajoutez du contenu à l'article."); return; }
   const bodyHtml = editorBlocks.map(blockToHtml).join('\n');

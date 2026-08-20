@@ -44,6 +44,11 @@ async function init(){
   renderNav();
   renderHome(currentActiveCat);
 
+  try{
+    const savedPage=localStorage.getItem('eco_page');
+    if(savedPage && savedPage!=='home' && document.getElementById('page-'+savedPage)) showPage(savedPage);
+  }catch(e){}
+
   document.getElementById('loading-screen').classList.add('hidden');
   maybeShowOnboarding();
 }
@@ -53,6 +58,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const savedTheme=localStorage.getItem('eco_theme');
     if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   }catch(e){}
+  updateLogoForTheme();
   try{
     const savedLang=localStorage.getItem('eco_lang');
     if(savedLang) _lang=savedLang;

@@ -7,12 +7,13 @@ function renderNav(){
   const loggedIn = !!currentUser;
   const toggle = (id, show) => { const el=document.getElementById(id); if(el) el.style.display = show ? '' : 'none'; };
   toggle('nav-cats-write', loggedIn);
-  toggle('nav-cats-mystats', loggedIn);
+  toggle('nav-cats-mystats', loggedIn && isOwner());
   toggle('nav-cats-admin', loggedIn && isOwner());
   toggle('nav-cats-login', !loggedIn);
   toggle('nav-cats-logout', loggedIn);
   toggle('mob-write-item', loggedIn);
   toggle('mob-mystats-item', loggedIn);
+  toggle('mob-logout-item', loggedIn);
   toggle('mob-admin-item', loggedIn && isOwner());
   toggle('desktop-nav-login', !loggedIn);
   toggle('desktop-nav-logout', loggedIn);
@@ -159,11 +160,22 @@ function togglePwd(inputId, btn){
 }
 
 // ═══════════════ THEME ═══════════════
+function updateLogoForTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const logoSrc=isDark ? 'css/dark logo.png' : 'css/Logo.png';
+  document.querySelectorAll('.loading-logo-image, .nav-logo-image').forEach(img=>{
+    img.src=logoSrc;
+  }); 
+  const favicon=document.getElementById('site-favicon');
+  if(favicon) favicon.href=logoSrc;
+}
+
 function toggleTheme(){
   const html=document.documentElement;
   const dark = html.getAttribute('data-theme')==='dark';
   const next = dark ? 'light' : 'dark';
   html.setAttribute('data-theme', next);
+  updateLogoForTheme();
   try{ localStorage.setItem('eco_theme', next); }catch(e){}
 }
 
