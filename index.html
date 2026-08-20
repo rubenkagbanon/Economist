@@ -193,6 +193,18 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="article-preview-modal">
+  <div class="modal-box article-preview-box">
+    <button class="modal-close" onclick="closeArticlePreview()">×</button>
+    <div class="art-full-k" id="preview-cat"></div>
+    <h1 class="art-full-title" id="preview-title"></h1>
+    <div class="art-full-deck" id="preview-deck"></div>
+    <div class="art-full-meta" id="preview-meta"></div>
+    <div class="art-full-cover" id="preview-cover-wrap" style="display:none"><img id="preview-cover" alt=""></div>
+    <div class="art-full-body" id="preview-body"></div>
+  </div>
+</div>
+
 <nav>
   <div class="nav-top">
     <div class="logo-wrap" onclick="filterCat(document.querySelector('.cat'),'all');showPage('home')">
@@ -347,6 +359,7 @@
           <div id="article-blocks" class="article-blocks-editor"></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+          <button class="btn-publish" type="button" onclick="previewArticle()">Aperçu</button>
           <button class="btn-publish" id="btn-publish" onclick="publishArticle()">Publier →</button>
           <span style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
         </div>

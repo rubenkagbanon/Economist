@@ -81,8 +81,8 @@ async function emailSendVerificationCode(toEmail, toName, code, purpose){
     ? 'Economist — Votre code de réinitialisation'
     : 'Economist — Votre code d\'accès rédacteur';
   const message = purpose==='reset'
-    ? `Bonjour ${toName||''},\n\nVoici votre code de vérification pour réinitialiser votre mot de passe : ${code}\n\nUtilisez ce code dès que possible. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n— Economist`
-    : `Bonjour ${toName||''},\n\nVotre idée d'article a été retenue ! Voici votre code d'accès rédacteur : ${code}\n\nCe code permet d'accéder à l'éditeur pour publier un article. Après publication, vous devrez demander un nouveau code.\n\n— Economist`;
+    ? `Bonjour ${toName||''},\n\nVoici votre code de vérification pour réinitialiser votre mot de passe : ${code}\n\nUtilisez ce code dès que possible. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n Economist`
+    : `Bonjour ${toName||''},\n\nVotre idée d'article a été retenue ! Voici votre code d'accès rédacteur : ${code}\n\nCe code permet d'accéder à l'éditeur pour publier un article. Après publication, vous devrez demander un nouveau code.\n\n Economist`;
   const ok = await sendEmail({
     to_email: toEmail,
     subject,

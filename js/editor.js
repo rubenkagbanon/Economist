@@ -200,7 +200,7 @@ function blockHtml(b,i){
     case 'infobox':
       inner=`<div class="block-content"><span class="block-infobox-label">Encadré d'information</span><div class="block-infobox" contenteditable="true" data-placeholder="Texte de l'encadré…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'sources':
-      inner=`<div class="block-content"><span class="block-sources-label">Sources</span><textarea class="block-sources" placeholder="Une source par ligne…" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
+      inner=`<div class="block-content"><span class="block-sources-label">Sources</span><textarea class="block-sources" placeholder="Une source par ligne… URL ou [texte](https://lien)" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
     case 'credits':
       inner=`<div class="block-content"><span class="block-credits-label">Crédits</span><textarea class="block-credits" placeholder="Rédigé par…, sources…" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
     case 'separator':
@@ -275,7 +275,7 @@ function triggerInlineImg(index=editorBlocks.length){
 }
 function handleInlineImage(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>2*1024*1024){ showToast('Image trop lourde (max 2Mo)'); return; }
+  if(file.size>4*1024*1024){ showToast('Image trop lourde (max 4Mo)'); return; }
   const r=new FileReader();
   r.onload=ev=>{ editorBlocks.splice(pendingImageInsertIndex??editorBlocks.length,0,{type:'image', src:ev.target.result, caption:''}); pendingImageInsertIndex=null; closeBlockPicker(); renderBlocks(); saveDraft(); };
   r.readAsDataURL(file);
@@ -298,6 +298,15 @@ document.addEventListener('mousedown', e=>{
 });
 
 function stripHtml(html){ const d=document.createElement('div'); d.innerHTML=html||''; return d.textContent||''; }
+function escapeHtml(value){
+  return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+function sourceToHtml(value){
+  let html=escapeHtml(value);
+  html=html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  html=html.replace(/(^|[\s>])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>');
+  return html.replace(/\n/g,'<br>');
+}
 function updateWordCount(){
   const words = editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type))
     .map(b=>stripHtml(b.html)).join(' ').trim().split(/\s+/).filter(Boolean).length;
@@ -320,7 +329,7 @@ function hideCoverPreview(){
 }
 function handleCoverUpload(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>2*1024*1024){ showToast('Image trop lourde (max 2Mo)'); return; }
+  if(file.size>4*1024*1024){ showToast('Image trop lourde (max 4Mo)'); return; }
   const r=new FileReader();
   r.onload=ev=>{ _coverData=ev.target.result; showCoverPreview(_coverData); document.getElementById('f-img').value=''; saveDraft(); };
   r.readAsDataURL(file);
@@ -342,11 +351,32 @@ function blockToHtml(b){
     case 'quote': return `<blockquote>${b.html||''}</blockquote>`;
     case 'separator': return `<div class="art-sep">⁂</div>`;
     case 'infobox': return `<div class="art-info-box"><div class="art-info-box-title">Info</div><div class="art-info-box-body">${b.html||''}</div></div>`;
-    case 'sources': return `<div class="art-sources-box"><div class="art-sources-title">Sources</div><div class="art-sources-body">${(b.text||'').replace(/\n/g,'<br>')}</div></div>`;
+    case 'sources': return `<div class="art-sources-box"><div class="art-sources-title">Sources</div><div class="art-sources-body">${sourceToHtml(b.text)}</div></div>`;
     case 'credits': return `<div class="art-credits-box"><div class="art-credits-title">Crédits</div><div class="art-credits-body">${(b.text||'').replace(/\n/g,'<br>')}</div></div>`;
     case 'image': return `<div class="art-inline-img"><img src="${b.src}" alt="">${b.caption?`<div class="art-inline-caption">${b.caption}</div>`:''}</div>`;
     default: return '';
   }
+}
+function previewArticle(){
+  const title=document.getElementById('f-title').value.trim();
+  const deck=document.getElementById('f-deck').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const author=document.getElementById('f-author').value.trim();
+  if(!title||!deck||!cat||!author){ showToast('Remplissez les champs obligatoires.'); return; }
+  const bodyText=editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type)).map(b=>stripHtml(b.html)).join(' ').trim();
+  if(!bodyText){ showToast("Ajoutez du contenu à l'article."); return; }
+  document.getElementById('preview-cat').textContent=tCat(cat);
+  document.getElementById('preview-title').textContent=title;
+  document.getElementById('preview-deck').textContent=deck;
+  document.getElementById('preview-meta').textContent=`${t('home_par')} ${author}`;
+  const coverWrap=document.getElementById('preview-cover-wrap');
+  coverWrap.style.display=_coverData?'block':'none';
+  if(_coverData)document.getElementById('preview-cover').src=_coverData;
+  document.getElementById('preview-body').innerHTML=editorBlocks.map(blockToHtml).join('\n');
+  document.getElementById('article-preview-modal').classList.add('open');
+}
+function closeArticlePreview(){
+  document.getElementById('article-preview-modal').classList.remove('open');
 }
 async function publishArticle(){
   const title =document.getElementById('f-title').value.trim();

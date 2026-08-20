@@ -31,6 +31,7 @@
 [data-theme="dark"] nav{background:rgba(17,16,16,0.97);border-color:#222}
 [data-theme="dark"] .loading-screen,[data-theme="dark"] #loading-screen{background:#111010}
 [data-theme="dark"] .loading-logo-e{color:#F5F4F0}
+[data-theme="dark"] .toast{background:#1a1a1a;color:#F5F4F0;border-left-color:var(--rouge)}
 
 /* ── Modales & formulaires ── */
 [data-theme="dark"] .modal-box,[data-theme="dark"] .gate,

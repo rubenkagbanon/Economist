@@ -100,7 +100,7 @@ async function openArticle(id){
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=users.find(u=>u.first+' '+u.last===a.author);
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
-  const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,0,0,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='var(--rouge)';this.style.color='white'" onmouseout="this.style.background='none';this.style.color='var(--rouge)'">🗑 ${t('admin_delete')}</button>`:'';
+  const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#8B0000;border:.5px solid #8B0000;color:#fff;padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='#700000';this.style.color='#fff'" onmouseout="this.style.background='#8B0000';this.style.color='#fff'">🗑 ${t('admin_delete')}</button>`:'';
   document.getElementById('article-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
       <button class="back-btn" style="margin-bottom:0" onclick="showPage('home')">${t('home_back')}</button>${delBtn}
