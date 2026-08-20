@@ -50,7 +50,7 @@ function renderHome(cat){
     wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><span></span><span></span><span></span></div>
       <h2>${t('home_coming')}</h2>
       <p>${t('home_desc')}</p>
-      <p>${cat==='all'?t('home_none_all'):t('home_none_cat')+' '+tCat(cat)+' » pour l\'instant.'}</p>
+      <p>${cat==='all'?t('home_none_all'):tEmptyCategory(cat)}</p>
       <span class="empty-cta" onclick="showPage('propose')">${t('home_cta')}</span></div>`;
     triggerReveal();return;
   }

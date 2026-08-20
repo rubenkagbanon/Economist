@@ -373,6 +373,8 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
 @media(max-width:900px){.nav-top-controls{gap:.3rem}.ctrl-btn{padding:4px 7px;font-size:9px}}
 @media(min-width:901px){
   .nav-search-wrap,.nav-user{transform:translateX(-5rem)}
+  .nav-top-controls{order:4}
+  .nav-desktop-hamburger{order:5;margin-left:.8rem}
 }
 
 /* ═══════════ BLOCK INSERT LINE ═══════════ */

@@ -52,7 +52,11 @@ const I18N = {
     stats_articles:"Articles", stats_reads:"Lectures", stats_words:"Mots écrits",
     stats_avg:"Lectures / article", stats_my:"Mes articles", stats_table_titre:"Titre",
     stats_table_cat:"Rubrique", stats_table_date:"Date", stats_table_reads:"Lectures",
-    stats_table_action:"Action", stats_none:"Vous n'avez publié aucun article."
+    stats_table_action:"Action", stats_none:"Vous n'avez publié aucun article.",
+    search_label:"Rechercher", search_placeholder:"Articles, auteurs…", search_users:"Utilisateurs", search_articles:"Articles", search_empty:"Aucun résultat",
+    editor_paragraph:"Paragraphe", editor_h1:"Titre H1", editor_h2:"Sous-titre H2", editor_h3:"Sous-titre H3", editor_image:"Image", editor_quote:"Citation", editor_separator:"Séparateur", editor_info:"Info", editor_sources:"Sources", editor_credits:"Crédits",
+    editor_choose:"Choisir le type de bloc", editor_add_here:"+ Ajouter ici", editor_add_title:"Insérer un bloc à cet emplacement",
+    loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés."
   },
   en: {
     auth_welcome:"Welcome", auth_sync:"Your account is synced across all your devices.",
@@ -101,7 +105,11 @@ const I18N = {
     stats_articles:"Articles", stats_reads:"Reads", stats_words:"Words written",
     stats_avg:"Reads / article", stats_my:"My articles", stats_table_titre:"Title",
     stats_table_cat:"Category", stats_table_date:"Date", stats_table_reads:"Reads",
-    stats_table_action:"Action", stats_none:"You haven't published any articles yet."
+    stats_table_action:"Action", stats_none:"You haven't published any articles yet.",
+    search_label:"Search", search_placeholder:"Articles, authors…", search_users:"Users", search_articles:"Articles", search_empty:"No results",
+    editor_paragraph:"Paragraph", editor_h1:"H1 title", editor_h2:"H2 subtitle", editor_h3:"H3 subtitle", editor_image:"Image", editor_quote:"Quote", editor_separator:"Separator", editor_info:"Info", editor_sources:"Sources", editor_credits:"Credits",
+    editor_choose:"Choose a block type", editor_add_here:"+ Add here", editor_add_title:"Insert a block at this position",
+    loading:"Economist · Connecting to database…", footer_rights:"All rights reserved."
   }
 };
 
@@ -122,6 +130,11 @@ function t(key){
 function tCat(cat){
   return _lang==='en' ? (CAT_EN[cat]||cat) : cat;
 }
+function tEmptyCategory(cat){
+  return _lang==='en'
+    ? `No articles in “${tCat(cat)}” for now.`
+    : `Aucun article en « ${tCat(cat)} » pour l'instant.`;
+}
 function tDate(dateStr){
   if(_lang!=='en' || !dateStr) return dateStr;
   let out = dateStr;
@@ -131,6 +144,12 @@ function tDate(dateStr){
 function applyTranslations(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    el.title = t(el.getAttribute('data-i18n-title'));
   });
 }
 function updateLangButton(){
