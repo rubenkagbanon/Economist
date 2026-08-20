@@ -78,9 +78,8 @@ function renderHome(cat){
   const wrap=document.getElementById('home-content');
   const all=[...articles].reverse();
   const filtered=cat==='all'?all:all.filter(a=>a.cat===cat);
-  const homeIntro=`<section class="home-intro" aria-labelledby="home-intro-title"><h2 id="home-intro-title">${t('home_intro_title')}</h2><p>${t('home_intro_desc')}</p></section>`;
   if(filtered.length===0){
-    wrap.innerHTML=`${homeIntro}<div class="empty-state reveal"><div class="empty-anim"><span></span><span></span><span></span></div>
+    wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><span></span><span></span><span></span></div>
       <h2>${t('home_coming')}</h2>
       <p>${t('home_desc')}</p>
       <p>${cat==='all'?t('home_none_all'):tEmptyCategory(cat)}</p>
@@ -91,7 +90,7 @@ function renderHome(cat){
   const catLabel=cat==='all'?t('cat_une'):tCat(cat);
   const isMobile=window.innerWidth<768;
   if(isMobile){
-    wrap.innerHTML=`${homeIntro}<div class="sec-wrap reveal" style="padding-bottom:1rem">
+    wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
         ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
         <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${tCat(hero.cat)}</div>
@@ -101,7 +100,7 @@ function renderHome(cat){
       </div></div>
       ${rest.length?`<div class="sec-wrap reveal" style="padding-top:1.5rem"><div class="sec-head"><span class="sec-name">${catLabel}</span></div><div class="grid-articles">${rest.map(a=>artCardHtml(a)).join('')}</div></div>`:''}`;
   } else {
-    wrap.innerHTML=`${homeIntro}<div class="sec-wrap reveal" style="padding-bottom:1rem">
+    wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="display:grid;grid-template-columns:1fr 320px;border-bottom:.5px solid var(--gris-clair)">
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
           ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}

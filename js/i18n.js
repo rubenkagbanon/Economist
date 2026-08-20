@@ -36,8 +36,8 @@ const I18N = {
     toast_del_code:"Code supprimé.", toast_welcome:"Bon retour", toast_created:"Bienvenue",
     toast_logout:"Vous êtes déconnecté.", toast_profile:"Profil mis à jour.",
 
-    home_intro_title:"Economist : comprendre l'économie et le monde",
-    home_intro_desc:"Une plateforme éditoriale qui publie des articles d'actualité, des analyses et des points de vue dans les domaines de l'économie, de la finance, de la politique, de la data science, de la technologie et des transformations sociales.",
+    about_intro_title:"Economist",
+    about_intro_desc:"Un espace indépendant pour lire, comprendre et partager les grandes transformations économiques et sociales.",
     home_coming:"À paraître", home_desc:"Nos rédacteurs travaillent sur de nouveaux articles.",
     home_none_all:"Aucun article publié pour l'instant.", home_none_cat:"Aucun article en «",
     home_cta:"Proposer un article →", home_alire:"À lire aussi", home_par:"Par", home_read:"de lecture",
@@ -91,8 +91,8 @@ const I18N = {
     toast_del_code:"Code deleted.", toast_welcome:"Welcome back", toast_created:"Welcome",
     toast_logout:"You have been logged out.", toast_profile:"Profile updated.",
 
-    home_intro_title:"Economist: understand the economy and the world",
-    home_intro_desc:"An editorial platform publishing news articles, analysis and perspectives on economics, finance, politics, data science, technology and social change.",
+    about_intro_title:"Economist: understand the economy and the world",
+    about_intro_desc:"An editorial platform publishing news articles, analysis and perspectives on economics, finance, politics, data science, technology and social change.",
     home_coming:"Coming soon", home_desc:"Our writers are working on new articles.",
     home_none_all:"No articles published yet.", home_none_cat:"No articles in «",
     home_cta:"Submit an article →", home_alire:"Also worth reading", home_par:"By", home_read:"read",
