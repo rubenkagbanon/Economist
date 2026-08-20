@@ -44,9 +44,12 @@ async function init(){
   renderNav();
   renderHome(currentActiveCat);
 
+  const routePage=pageFromPath();
+  if(routePage) showPage(routePage);
+
   try{
     const savedPage=localStorage.getItem('eco_page');
-    if(savedPage && savedPage!=='home' && document.getElementById('page-'+savedPage)) showPage(savedPage);
+    if(!routePage && savedPage && savedPage!=='home' && document.getElementById('page-'+savedPage)) showPage(savedPage);
   }catch(e){}
 
   document.getElementById('loading-screen').classList.add('hidden');

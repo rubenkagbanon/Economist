@@ -7,6 +7,10 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(!pg)return;
   pg.classList.add('active');
+  const route=name==='privacy'?'/privacy':name==='rules'?'/rules':'/';
+  if(window.location.pathname!==route){
+    try{ window.history.pushState({page:name},'',route); }catch(e){}
+  }
   if(name!=='article'){
     try{ localStorage.setItem('eco_page', name); }catch(e){}
   }
@@ -16,6 +20,16 @@ function showPage(name){
   if(name==='mystats') { loadData().then(()=>renderMyStats()); }
   if(name==='admin')   { loadData().then(()=>renderAdmin()); }
 }
+function pageFromPath(){
+  const path=window.location.pathname.replace(/\/+$/,'')||'/';
+  if(path==='/privacy')return 'privacy';
+  if(path==='/rules')return 'rules';
+  return null;
+}
+window.addEventListener('popstate',()=>{
+  const page=pageFromPath();
+  if(page)showPage(page); else showPage('home');
+});
 function filterCat(el,cat){
   document.querySelectorAll('.cat:not(.nav-link-item)').forEach(c=>c.classList.remove('active'));
   if(el)el.classList.add('active');
