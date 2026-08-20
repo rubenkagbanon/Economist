@@ -14,6 +14,10 @@ function renderNav(){
   toggle('mob-write-item', loggedIn);
   toggle('mob-mystats-item', loggedIn);
   toggle('mob-admin-item', loggedIn && isOwner());
+  toggle('desktop-nav-login', !loggedIn);
+  toggle('desktop-nav-logout', loggedIn);
+  toggle('desktop-nav-write', loggedIn);
+  toggle('desktop-nav-stats', loggedIn);
 
   const searchHtml = `<div class="nav-search-wrap">
       <svg class="nav-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -52,6 +56,18 @@ function closeMobileMenu(){
   document.getElementById('hamburger').classList.remove('open');
 }
 function navGo(name){ closeMobileMenu(); showPage(name); }
+
+// ═══════════════ DESKTOP MENU ═══════════════
+function toggleDesktopMenu(){
+  document.getElementById('desktop-nav-menu').classList.toggle('open');
+  document.getElementById('desktop-nav-overlay').classList.toggle('open');
+  document.getElementById('desktop-hamburger').classList.toggle('open');
+}
+function closeDesktopMenu(){
+  document.getElementById('desktop-nav-menu').classList.remove('open');
+  document.getElementById('desktop-nav-overlay').classList.remove('open');
+  document.getElementById('desktop-hamburger').classList.remove('open');
+}
 
 // ═══════════════ SEARCH (desktop + mobile share this) ═══════════════
 function doSearch(q, targetId){

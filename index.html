@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>Economist</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Serif+Text:ital@0;1&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dark-theme.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -88,6 +89,17 @@
   <div class="nav-mobile-item" id="mob-mystats-item" style="display:none" onclick="navGo('mystats')"><span data-i18n="nav_stats">Mes statistiques</span></div>
   <div class="nav-mobile-item" id="mob-admin-item" style="display:none" onclick="navGo('admin')">⚙ Admin</div>
   <div class="nav-mobile-actions" id="mob-actions"></div>
+</div>
+
+<div class="nav-desktop-overlay" id="desktop-nav-overlay" onclick="closeDesktopMenu()"></div>
+<div class="nav-desktop-menu" id="desktop-nav-menu">
+  <button class="modal-close" onclick="closeDesktopMenu()" style="top:.8rem;right:1rem;position:absolute">×</button>
+  <div class="desktop-menu-title">Menu</div>
+  <button class="desktop-menu-item" id="desktop-nav-login" onclick="closeDesktopMenu();openModal('login')" data-i18n="auth_login">Connexion</button>
+  <button class="desktop-menu-item" id="desktop-nav-logout" onclick="closeDesktopMenu();doLogout()" data-i18n="nav_logout">Déconnexion</button>
+  <button class="desktop-menu-item" onclick="closeDesktopMenu();showPage('about')">À propos</button>
+  <button class="desktop-menu-item" id="desktop-nav-stats" onclick="closeDesktopMenu();showPage('mystats')" data-i18n="nav_stats">Mes statistiques</button>
+  <button class="desktop-menu-item" id="desktop-nav-write" onclick="closeDesktopMenu();showPage('write')">Écrire un article</button>
 </div>
 
 <!-- MODAL AUTH -->
@@ -182,7 +194,12 @@
 
 <nav>
   <div class="nav-top">
-    <div class="nav-date" id="nav-date"></div>
+    <div class="nav-date-group">
+      <button class="nav-desktop-hamburger" id="desktop-hamburger" onclick="toggleDesktopMenu()" aria-label="Ouvrir le menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-date" id="nav-date"></div>
+    </div>
     <div class="logo-wrap" onclick="filterCat(document.querySelector('.cat'),'all');showPage('home')">
       <div class="logo-e">E</div>
       <div class="logo-text">Economist</div>
@@ -222,6 +239,13 @@
   </div>
 </nav>
 
+<div id="page-about" class="page">
+  <section class="about-page">
+    <div class="about-k">À propos</div>
+    <h1>Economist</h1>
+    <p>Un espace indépendant pour lire, comprendre et partager les grandes transformations économiques et sociales.</p>
+  </section>
+</div>
 <div id="page-home" class="page active"><div id="home-content"></div></div>
 <div id="page-article" class="page"><div class="article-page" id="article-content"></div></div>
 
