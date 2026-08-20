@@ -345,7 +345,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .foot-copy > div:first-child{order:2;}
   .foot-links{order:1;justify-content:flex-start;gap:1.2rem;width:100%;margin-bottom:1rem;}
   .foot-link{font-size:9px;}
-  .nav-logo-image{width:88px;height:54px}
+  .nav-logo-image{width:88px;height:54px;transform:translateX(-8px)}
 }
 @media(max-width:500px){
   .nav-top{padding:0 .8rem}
