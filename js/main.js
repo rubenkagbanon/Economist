@@ -39,6 +39,7 @@ async function init(){
   }
 
   applyTranslations();
+  translateLegalPages();
   updateLangButton();
   setNavDate();
   renderNav();

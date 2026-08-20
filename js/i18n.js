@@ -58,7 +58,7 @@ const I18N = {
     search_label:"Rechercher", search_placeholder:"Articles, auteurs…", search_users:"Utilisateurs", search_articles:"Articles", search_empty:"Aucun résultat",
     editor_paragraph:"Paragraphe", editor_h1:"Titre H1", editor_h2:"Sous-titre H2", editor_h3:"Sous-titre H3", editor_image:"Image", editor_quote:"Citation", editor_separator:"Séparateur", editor_info:"Info", editor_sources:"Sources", editor_credits:"Crédits",
     editor_choose:"Choisir le type de bloc", editor_add_here:"+ Ajouter ici", editor_add_title:"Insérer un bloc à cet emplacement",
-    loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés."
+    loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés.", privacy_search:"Rechercher dans la politique de confidentialité", rules_search:"Rechercher dans les conditions d’utilisation"
   },
   en: {
     auth_welcome:"Welcome", auth_sync:"Your account is synced across all your devices.",
@@ -113,7 +113,7 @@ const I18N = {
     search_label:"Search", search_placeholder:"Articles, authors…", search_users:"Users", search_articles:"Articles", search_empty:"No results",
     editor_paragraph:"Paragraph", editor_h1:"H1 title", editor_h2:"H2 subtitle", editor_h3:"H3 subtitle", editor_image:"Image", editor_quote:"Quote", editor_separator:"Separator", editor_info:"Info", editor_sources:"Sources", editor_credits:"Credits",
     editor_choose:"Choose a block type", editor_add_here:"+ Add here", editor_add_title:"Insert a block at this position",
-    loading:"Economist · Connecting to database…", footer_rights:"All rights reserved."
+    loading:"Economist · Connecting to database…", footer_rights:"All rights reserved.", privacy_search:"Search the privacy policy", rules_search:"Search the Terms of Use"
   }
 };
 
@@ -159,6 +159,67 @@ function applyTranslations(){
 function updateLangButton(){
   const btn=document.getElementById('lang-toggle');
   if(btn) btn.textContent = _lang==='fr' ? 'EN' : 'FR';
+  document.querySelectorAll('.help-lang').forEach(helpButton=>{
+    helpButton.textContent = _lang==='fr' ? 'EN' : 'FR';
+  });
+}
+const legalFrenchContent = new Map();
+function setLegalText(selector, translations){
+  document.querySelectorAll(selector).forEach((el,index)=>{
+    if(!legalFrenchContent.has(el)) legalFrenchContent.set(el, el.innerHTML);
+    if(_lang==='en' && translations[index]!==undefined) el.innerHTML=translations[index];
+    if(_lang==='fr') el.innerHTML=legalFrenchContent.get(el);
+  });
+}
+function translateLegalPages(){
+  setLegalText('.help-kicker', ['Help Center','Help Center']);
+  setLegalText('.help-back', ['Back to site','Back to site']);
+  setLegalText('.help-sidebar-label', ['Economist Help','Economist Help']);
+  setLegalText('#privacy-article .help-article-kicker', ['Privacy and data']);
+  setLegalText('#rules-article .help-article-kicker', ['Rules and policies']);
+  setLegalText('#privacy-article > h2', ['Privacy Policy']);
+  setLegalText('#rules-article > h2', ['Terms of Use']);
+  setLegalText('#privacy-article .help-article-lead', ['At Economist, we want you to understand what information is used to operate the platform, publish articles and protect your account.']);
+  setLegalText('#rules-article .help-article-lead', ['These terms explain how to use Economist, publish content and participate responsibly on the platform.']);
+  setLegalText('.help-updated', ['Last updated: August 20, 2026','Last updated: August 20, 2026']);
+  setLegalText('.help-callout strong', ['In brief','In brief']);
+  setLegalText('#privacy-article .help-callout p', ['This policy explains what information Economist receives, how it is used and what choices you have to manage your data.']);
+  setLegalText('#rules-article .help-callout p', ['Economist is an editorial space covering news and analysis across several fields. By using the service, you agree to respect other users, copyrights and the publishing rules below.']);
+  setLegalText('#privacy-article .help-sidebar a', ['Privacy Policy','Information collected','How we use information','Sharing and third-party services','Your rights','Contact']);
+  setLegalText('#rules-article .help-sidebar a', ['Terms of Use','Account and access','Content and rights','Safety and moderation','Contact']);
+  setLegalText('#privacy-article .help-section h2', ['Purpose of this policy','Information collected','How we use information','Sharing and third-party services','Retention and security','Your rights','Changes to this policy','Contact us']);
+  setLegalText('#privacy-article .help-section h3', ['Information you provide','Usage-related information','Google sign-in']);
+  setLegalText('#privacy-article .help-section p', [
+    'This policy applies to the Economist website and its reading, search, account creation and article publishing features.',
+    'It explains the information we receive, how it is used and the choices available to you. It does not replace the service rules available on the <a href="/terms" onclick="event.preventDefault();showPage(\'rules\')">Terms of Use</a> page.',
+    'When you create or update an account, we may receive your first name, last name, email address, biography and profile photo. When you publish, we store the title, deck, text, images, sources and credits associated with the article.',
+    'The service may record information needed to operate, such as your sign-in session, selected language, visual theme and article reading statistics.',
+    'If you choose Google OAuth, Supabase Auth processes the information needed to sign you in, including your email address and public Google profile information.',
+    'We use this information to create and secure accounts, display profiles and articles, enable search, manage publishing rights, measure readership and improve Economist.',
+    'User-published content may be publicly visible depending on the site features. Do not publish personal information you want to keep private.',
+    'We may use service providers needed to operate the platform, including Supabase for authentication and application storage, Google for OAuth sign-in and EmailJS for certain emails configured by the administrator.',
+    'We do not sell your personal information. We may disclose information when required by law, to protect the service or to respond to a valid legal request.',
+    'We retain information as long as necessary to provide the service, maintain published articles, meet our obligations and resolve disputes. Retention periods may vary by data type and purpose.',
+    'We apply reasonable security measures. However, no online service can guarantee absolute protection against every risk.',
+    'Depending on your situation and applicable law, you may request access to, correction of or deletion of your data, as well as information about its processing.',
+    'To exercise these rights, contact the Economist team using the email address linked to your account. We may request additional information to verify your identity.',
+    'We may update this policy when the service changes or regulations require it. The update date at the top of this page identifies the current version.',
+    'For questions about this policy or your data, contact the Economist team through the service administration email address.'
+  ]);
+  setLegalText('#rules-article .help-section h3', ['1. Account and access','2. Content and rights','3. Safety and moderation','4. How the service works','5. Personal data','6. Contact']);
+  setLegalText('#rules-article .help-section h4', ['Authorized publishing','Accuracy and transparency','Our actions']);
+  setLegalText('#rules-article .help-section p', [
+    'You must provide accurate information when creating your account and protect your credentials. You may not use another person’s account, share restricted access or attempt to bypass the service controls.',
+    'Access to writing and publishing may require approval or a code provided by Economist. This control helps preserve the quality and security of the platform.',
+    'You remain responsible for the text, images, sources and links you add. You must have the necessary permissions and respect copyrights, trademarks and the privacy of people mentioned.',
+    'Articles should be written in good faith. When appropriate, cite your sources and clearly distinguish facts, analysis, opinions and content generated or assisted by a tool.',
+    'You may not publish illegal, fraudulent, defamatory, hateful, misleading or harmful content, content that violates another person’s rights, or content intended to disrupt the service.',
+    'Economist may hide or remove content, limit a feature or suspend an account when a rule is broken, a security risk is identified or a legal obligation requires it.',
+    'The service may change, be updated or experience temporary interruptions. Reading statistics, recommendations and article visibility may vary as the platform operates.',
+    'Economist does not guarantee that every piece of content will be published, recommended or available without interruption.',
+    'Data related to your account and use of the service is handled according to our <a href="/privacy" onclick="event.preventDefault();showPage(\'privacy\')">Privacy Policy</a>.',
+    'If you have a question about these terms or want to report content, contact the Economist team through the service administration email address.'
+  ]);
 }
 function refreshCurrentPage(){
   const activePage=document.querySelector('.page.active');
@@ -173,6 +234,7 @@ function toggleLang(){
   try{ localStorage.setItem('eco_lang', _lang); }catch(e){}
   updateLangButton();
   applyTranslations();
+  translateLegalPages();
   if(typeof setNavDate==='function') setNavDate();
   if(typeof renderNav==='function') renderNav();
   refreshCurrentPage();
