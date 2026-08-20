@@ -49,7 +49,7 @@ async function init(){
 
   try{
     const savedPage=localStorage.getItem('eco_page');
-    if(!routePage && savedPage && savedPage!=='home' && document.getElementById('page-'+savedPage)) showPage(savedPage);
+    if(!routePage && savedPage && !['home','privacy','rules'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
   }catch(e){}
 
   document.getElementById('loading-screen').classList.add('hidden');
