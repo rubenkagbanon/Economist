@@ -160,6 +160,9 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 /* PAGES */
 .page{display:none;position:relative;z-index:1}
 .page.active{display:block;flex:1}
+.home-intro{max-width:1200px;margin:0 auto;padding:2.5rem 3.5rem 0;position:relative;z-index:1}
+.home-intro h2{font-family:'Inter',var(--sans);font-size:1.35rem;font-weight:500;line-height:1.3;margin-bottom:.55rem}
+.home-intro p{max-width:760px;font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.75;color:var(--txt-mut);font-weight:300}
 
 /* EMPTY STATE */
 .empty-anim{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 2.8rem;height:48px;}
@@ -221,7 +224,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .propose-page{max-width:600px;margin:0 auto;padding:5rem 2rem;position:relative;z-index:1}
 .propose-page h2,.write-page h2{font-family:'Inter',var(--sans);font-size:2.2rem;font-weight:500;margin-bottom:.5rem}
 .my-stats-page h2,.admin-page h2{font-family:var(--serif);font-size:2.2rem;font-weight:400;margin-bottom:.5rem}
-.propose-page h2 em,.write-page h2 em,.my-stats-page h2 em,.admin-page h2 em{font-style:italic;color:var(--rouge)}
+.propose-page h2 em,.write-page h2 em{font-style:normal;color:var(--rouge)}
+.my-stats-page h2 em,.admin-page h2 em{font-style:italic;color:var(--rouge)}
 .propose-sub,.write-sub{font-family:var(--sans);font-size:.9rem;color:var(--gris);margin-bottom:3rem;font-weight:300;line-height:1.65}
 .reg-card{border:.5px solid var(--gris-clair);padding:2.5rem;margin-bottom:1.5rem}
 .reg-section{font-family:var(--sans);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--rouge);margin-bottom:1.5rem;padding-bottom:.6rem;border-bottom:.5px solid var(--gris-clair);}
@@ -350,6 +354,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .nav-hamburger{display:flex}
   .nav-actions .btn-red,.nav-actions .btn-outline,.nav-actions .nav-user{display:none}
   .sec-wrap{padding:2rem 1rem}
+  .home-intro{padding:2rem 1rem 0}
   .write-page,.article-page,.propose-page,.profile-page,.my-stats-page,.admin-page{padding:2rem 1rem}
   .form-two-col{grid-template-columns:1fr}
   .grid-articles{grid-template-columns:1fr;gap:2rem}
