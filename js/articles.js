@@ -157,7 +157,7 @@ function renderHome(cat){
 async function openArticle(id){
   const a=articles.find(x=>x.id===id); if(!a)return;
   a.reads=(a.reads||0)+1;
-  await saveArticle(a);
+  saveArticle(a);
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=users.find(u=>u.first+' '+u.last===a.author);
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);

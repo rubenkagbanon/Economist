@@ -14,6 +14,8 @@ let articles = [], users = [], currentUser = null, lastPublishedId = null;
 let currentActiveCat = 'all';
 let _sb;
 let dbReady = false;
+let dataLoaded = false;
+let dataLoadPromise = null;
 
 // ═══════════════ SUPABASE INIT ═══════════════
 document.addEventListener('db-ready', () => {
@@ -52,15 +54,20 @@ async function dbDelete(path) {
 }
 
 // ═══════════════ LOAD DATA ═══════════════
-async function loadData() {
-  const [arts, usrs] = await Promise.all([
-    dbGet('articles'),
-    dbGet('users')
-  ]);
-  articles = arts ? Object.values(arts) : [];
-  // Normaliser : trier par id
-  articles.sort((a,b) => (a.id||0) - (b.id||0));
-  users    = usrs ? Object.values(usrs) : [];
+function loadData(force=false) {
+  if(!force && dataLoaded)return Promise.resolve();
+  if(dataLoadPromise)return dataLoadPromise;
+  dataLoadPromise=(async()=>{
+    const [arts, usrs] = await Promise.all([
+      dbGet('articles'),
+      dbGet('users')
+    ]);
+    articles = arts ? Object.values(arts) : [];
+    articles.sort((a,b) => (a.id||0) - (b.id||0));
+    users    = usrs ? Object.values(usrs) : [];
+    dataLoaded=true;
+  })().finally(()=>{ dataLoadPromise=null; });
+  return dataLoadPromise;
 }
 
 async function saveArticle(a) {
