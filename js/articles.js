@@ -62,7 +62,7 @@ function renderHome(cat){
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
         ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
         <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${tCat(hero.cat)}</div>
-        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:400;line-height:1.2;margin-bottom:.8rem">${hero.title}</h1>
+        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem">${hero.title}</h1>
         <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${hero.deck}</p>
         <div style="display:flex;flex-wrap:wrap;gap:.6rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
       </div></div>
@@ -73,7 +73,7 @@ function renderHome(cat){
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
           ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${tCat(hero.cat)}</div>
-          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:400;line-height:1.15;margin-bottom:1rem">${hero.title}</h1>
+          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem">${hero.title}</h1>
           <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${hero.deck}</p>
           <div style="display:flex;align-items:center;gap:1rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
         </div>
@@ -82,7 +82,7 @@ function renderHome(cat){
           ${rest.slice(0,4).map(a=>`<div style="padding:1.1rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;display:flex;gap:.9rem;align-items:flex-start" onclick="openArticle(${a.id})">
             ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img src="${a.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
             <div style="flex:1"><div style="font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);margin-bottom:.35rem">${tCat(a.cat)}</div>
-            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''">${a.title}</div>
+            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''">${a.title}</div>
             <div style="font-family:var(--sans);font-size:9.5px;color:var(--gris)">${tDate(a.date)}</div></div>
           </div>`).join('')}
         </div>
