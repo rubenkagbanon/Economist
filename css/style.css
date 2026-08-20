@@ -94,8 +94,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .nav-desktop-menu.open{transform:translateX(0)}
 .nav-desktop-overlay{display:none;position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.25)}
 .nav-desktop-overlay.open{display:block}
-.desktop-menu-title{font-family:var(--serif);font-size:1.8rem;margin-bottom:1.2rem}
-.desktop-menu-item{display:block;width:100%;padding:.9rem 0;border:0;border-bottom:.5px solid var(--gris-clair);background:none;color:var(--noir);font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-align:left;text-transform:uppercase;cursor:pointer}
+.desktop-menu-title{font-family:'Roboto Slab',Georgia,serif;font-size:1.8rem;margin-bottom:1.2rem}
+.desktop-menu-item{display:block;width:100%;padding:.9rem 0;border:0;border-bottom:.5px solid var(--gris-clair);background:none;color:var(--noir);font-family:'Roboto Slab',Georgia,serif;font-size:11px;letter-spacing:.2em;text-align:left;text-transform:uppercase;cursor:pointer}
 .desktop-menu-item:hover{color:var(--rouge)}
 .nav-date{font-family:var(--sans);font-size:10.5px;letter-spacing:.18em;color:var(--gris);text-transform:uppercase}
 .logo-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
@@ -124,7 +124,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .nav-mobile-menu.open{transform:translateX(0)}
 .nav-mobile-overlay{display:none;position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.25)}
 .nav-mobile-overlay.open{display:block}
-.nav-mobile-item{font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:block;padding:.9rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;color:var(--noir);transition:color .2s;}
+.nav-mobile-item{font-family:'Roboto Slab',Georgia,serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:block;padding:.9rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;color:var(--noir);transition:color .2s;}
 .nav-mobile-item:hover{color:var(--rouge)}
 .nav-mobile-actions{margin-top:1.5rem;display:flex;flex-direction:column;gap:.8rem}
 .about-page{max-width:680px;margin:0 auto;padding:6rem 2rem;position:relative;z-index:1}
