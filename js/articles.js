@@ -7,7 +7,13 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(!pg)return;
   pg.classList.add('active');
-  const route=name==='privacy'?'/privacy':name==='rules'?'/rules':'/';
+  document.title=name==='rules'
+    ? 'Economist | Conditions d’utilisation'
+    : name==='privacy'
+      ? 'Economist | Politique de confidentialité'
+      : 'Economist | Actualités et analyses dans plusieurs domaines';
+  document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
+  const route=name==='privacy'?'/privacy':name==='rules'?'/terms':'/';
   if(window.location.pathname!==route){
     try{ window.history.pushState({page:name},'',route); }catch(e){}
   }
@@ -23,8 +29,20 @@ function showPage(name){
 function pageFromPath(){
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';
-  if(path==='/rules')return 'rules';
+  if(path==='/terms')return 'rules';
   return null;
+}
+function filterRules(query){
+  const term=(query||'').trim().toLowerCase();
+  document.querySelectorAll('#rules-article .help-section').forEach(section=>{
+    section.style.display=!term||section.textContent.toLowerCase().includes(term)?'':'none';
+  });
+}
+function filterPrivacy(query){
+  const term=(query||'').trim().toLowerCase();
+  document.querySelectorAll('#privacy-article > section').forEach(section=>{
+    section.style.display=!term||section.textContent.toLowerCase().includes(term)?'':'none';
+  });
 }
 window.addEventListener('popstate',()=>{
   const page=pageFromPath();

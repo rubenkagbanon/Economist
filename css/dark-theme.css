@@ -110,3 +110,16 @@
 
 /* ── Mot de passe oublié ── */
 [data-theme="dark"] .m-link{color:var(--rouge)}
+[data-theme="dark"] .help-center-page{background:#111;color:#f5f4f0}
+[data-theme="dark"] .help-header{background:#111;border-color:#2a2a2a}
+[data-theme="dark"] .help-brand{color:#f5f4f0}.help-brand img{border-color:#8b0000}
+[data-theme="dark"] .help-back,[data-theme="dark"] .help-lang{color:#aaa}
+[data-theme="dark"] .help-search-hero{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .help-search-box{background:#151515;border-color:#333;color:#f5f4f0}
+[data-theme="dark"] .help-search-box input{color:#f5f4f0}
+[data-theme="dark"] .help-sidebar{border-color:#333}.help-sidebar a{color:#aaa}
+[data-theme="dark"] .help-sidebar-label{color:#aaa}
+[data-theme="dark"] .help-article-lead,[data-theme="dark"] .help-section p{color:#d0cec8}
+[data-theme="dark"] .help-section{border-color:#333}
+[data-theme="dark"] .help-callout{background:#f6f6f3;color:#1d1d1f}
+[data-theme="dark"] .help-callout p{color:#444}

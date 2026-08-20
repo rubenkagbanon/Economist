@@ -18,7 +18,7 @@ const I18N = {
     cat_ia:"IA", cat_data:"Data Science",
 
     nav_propose:"Proposer un article", nav_write:"Écrire un article", nav_stats:"Mes statistiques", nav_about:"À propos",
-    nav_admin:"Admin", nav_login:"S'abonner / Connexion", nav_logout:"Déconnexion",
+    nav_admin:"Admin", nav_login:"S'abonner / Connexion", nav_logout:"Déconnexion", nav_privacy:"Confidentialité", nav_rules:"Conditions d’utilisation",
 
     lbl_rubrique:"Rubrique *", lbl_corps:"Corps de l'article *",
 
@@ -73,7 +73,7 @@ const I18N = {
     cat_ia:"AI", cat_data:"Data Science",
 
     nav_propose:"Submit an article", nav_write:"Write an article", nav_stats:"My statistics", nav_about:"About",
-    nav_admin:"Admin", nav_login:"Subscribe / Log in", nav_logout:"Log out",
+    nav_admin:"Admin", nav_login:"Subscribe / Log in", nav_logout:"Log out", nav_privacy:"Privacy", nav_rules:"Terms of Use",
 
     lbl_rubrique:"Category *", lbl_corps:"Article body *",
 
