@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Economist</title>
+  <script>
+    fetch('/index.html')
+      .then(response => response.text())
+      .then(html => {
+        html = html.replace('<head>', '<head><base href="/">');
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(() => {
+        document.body.innerHTML = '<p>Economist est momentanément indisponible.</p>';
+      });
+  </script>
+</head>
+<body></body>
+</html>

@@ -13,7 +13,8 @@ function showPage(name){
       ? 'Economist | Politique de confidentialité'
       : 'Economist | Actualités et analyses dans plusieurs domaines';
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
-  const route=name==='privacy'?'/privacy':name==='rules'?'/terms':'/';
+  const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
+  const route=name==='privacy'?'/privacy':name==='rules'?'/terms':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
   if(window.location.pathname!==route){
     try{ window.history.pushState({page:name},'',route); }catch(e){}
   }
@@ -30,7 +31,32 @@ function pageFromPath(){
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';
   if(path==='/terms')return 'rules';
+  if(path!=='/')return 'profile';
   return null;
+}
+function profileSlug(user){
+  return `${user.first||''}${user.last||''}`
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+function profileEmailFromPath(){
+  const path=window.location.pathname.replace(/^\/+|\/+$/g,'');
+  if(!path||path==='privacy'||path==='terms')return null;
+  const user=users.find(u=>profileSlug(u)===path.toLowerCase());
+  return user?.email||null;
+}
+function shareProfile(email){
+  const user=users.find(u=>u.email===email);
+  if(!user)return;
+  const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
+  const profileUrl=new URL(`/${profileSlug(user)}/`,siteOrigin);
+  const shareData={title:`${user?.first||''} ${user?.last||''}`.trim(),url:profileUrl.href};
+  if(navigator.share){
+    navigator.share(shareData).catch(()=>{});
+    return;
+  }
+  if(!navigator.clipboard?.writeText){ showToast(t('profile_share_error')); return; }
+  navigator.clipboard.writeText(profileUrl.href).then(()=>showToast(t('profile_shared'))).catch(()=>showToast(t('profile_share_error')));
 }
 function filterRules(query){
   const term=(query||'').trim().toLowerCase();
@@ -172,7 +198,10 @@ function openProfile(email){
         <div class="profile-meta">${t('profile_member')} ${u.joined||'—'}${userArticles.length?` · ${userArticles.length} article${userArticles.length>1?'s':''} publié${userArticles.length>1?'s':''}`:' · '+t('profile_reader')}</div>
         ${u.bio?`<div class="profile-bio">"${u.bio}"</div>`:''}
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
-        ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}
+        <div class="profile-actions">
+          ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}
+          <button class="profile-share-btn" onclick="shareProfile('${u.email}')">${t('profile_share')}</button>
+        </div>
       </div>
     </div>
     ${userArticles.length?`<div class="stats-section-title">${t('profile_arts')}</div><div class="grid-articles">${userArticles.map(a=>artCardHtml(a)).join('')}</div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--gris);font-style:italic;padding:3rem 0">${t('profile_none')}</div>`}`;

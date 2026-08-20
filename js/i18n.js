@@ -14,7 +14,7 @@ const I18N = {
     auth_err_match:"Les mots de passe ne correspondent pas.", auth_err_email:"Cet email est déjà utilisé.",
 
     cat_une:"À la une", cat_eco:"Économie", cat_fin:"Finance", cat_pol:"Politiques", cat_soc:"Sociologie",
-    cat_dro:"Droit", cat_tec:"Technologies", cat_afr:"Afrique", cat_mon:"Monde", cat_ecol:"Écologie",
+    cat_dro:"Droit", cat_tec:"Technologies", cat_health:"Santé", cat_ecol:"Écologie",
     cat_ia:"IA", cat_data:"Data Science",
 
     nav_propose:"Proposer un article", nav_write:"Écrire un article", nav_stats:"Mes statistiques", nav_about:"À propos",
@@ -46,7 +46,8 @@ const I18N = {
     del_confirm:"Supprimer définitivement cet article ?", del_done:"Article supprimé.",
 
     profile_not_found:"Profil introuvable.", profile_member:"Membre depuis le", profile_reader:"Lecteur",
-    profile_writer:"Rédacteur", profile_edit:"Modifier mon profil", profile_arts:"Articles publiés",
+    profile_writer:"Rédacteur", profile_edit:"Modifier mon profil", profile_share:"Partager le profil",
+    profile_shared:"Lien du profil copié.", profile_share_error:"Impossible de copier le lien.", profile_arts:"Articles publiés",
     profile_none:"Aucun article publié.",
 
     write_connect:"Connectez-vous pour voir vos statistiques.",
@@ -69,7 +70,7 @@ const I18N = {
     auth_err_match:"Passwords do not match.", auth_err_email:"This email is already in use.",
 
     cat_une:"Front page", cat_eco:"Economy", cat_fin:"Finance", cat_pol:"Politics", cat_soc:"Sociology",
-    cat_dro:"Law", cat_tec:"Technology", cat_afr:"Africa", cat_mon:"World", cat_ecol:"Ecology",
+    cat_dro:"Law", cat_tec:"Technology", cat_health:"Health", cat_ecol:"Ecology",
     cat_ia:"AI", cat_data:"Data Science",
 
     nav_propose:"Submit an article", nav_write:"Write an article", nav_stats:"My statistics", nav_about:"About",
@@ -101,7 +102,8 @@ const I18N = {
     del_confirm:"Permanently delete this article?", del_done:"Article deleted.",
 
     profile_not_found:"Profile not found.", profile_member:"Member since", profile_reader:"Reader",
-    profile_writer:"Writer", profile_edit:"Edit my profile", profile_arts:"Published articles",
+    profile_writer:"Writer", profile_edit:"Edit my profile", profile_share:"Share profile",
+    profile_shared:"Profile link copied.", profile_share_error:"Unable to copy the link.", profile_arts:"Published articles",
     profile_none:"No articles published.",
 
     write_connect:"Log in to see your stats.",
@@ -120,7 +122,7 @@ const I18N = {
 // Rubriques : traduction fr → en (les articles stockent toujours le nom fr)
 const CAT_EN = {
   'Économie':'Economy', 'Finance':'Finance', 'Politiques':'Politics', 'Sociologie':'Sociology',
-  'Droit':'Law', 'Technologies':'Technology', 'Afrique':'Africa', 'Monde':'World',
+  'Droit':'Law', 'Technologies':'Technology', 'Santé':'Health',
   'Écologie':'Ecology', 'IA':'AI', 'Data Science':'Data Science'
 };
 const MONTH_EN = {

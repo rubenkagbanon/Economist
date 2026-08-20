@@ -48,6 +48,10 @@ async function init(){
   const routePage=pageFromPath();
   if(routePage) showPage(routePage);
 
+  const sharedProfile=new URLSearchParams(window.location.search).get('profile');
+  const pathProfile=profileEmailFromPath();
+  if(sharedProfile || pathProfile){ showPage('profile'); openProfile(pathProfile||sharedProfile); }
+
   try{
     const savedPage=localStorage.getItem('eco_page');
     if(!routePage && savedPage && !['home','privacy','rules'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
