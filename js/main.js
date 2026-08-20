@@ -2,6 +2,8 @@
 // main.js — onboarding + démarrage de l'app
 // ════════════════════════════════════════════════════════════
 
+let initStarted=false;
+
 function setNavDate(){
   const el=document.getElementById('nav-date'); if(!el)return;
   const locale = _lang==='en' ? 'en-US' : 'fr-FR';
@@ -16,6 +18,8 @@ function maybeShowOnboarding(){
 
 // Appelé par data.js une fois la connexion Supabase établie ('db-ready')
 async function init(){
+  if(initStarted)return;
+  initStarted=true;
   await loadData();
 
   if(_sb && _sb.auth){
@@ -74,4 +78,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateLangButton();
   setNavDate();
   initEmailJS();
+  if(!initStarted && (dbReady || window._sb)){ _sb=window._sb; dbReady=true; init(); }
 });

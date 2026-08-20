@@ -39,6 +39,9 @@ function profileSlug(user){
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .toLowerCase().replace(/[^a-z0-9]/g,'');
 }
+function profileLevelClass(level){
+  return ['licence','master','doctorat'].includes(level)?` profile-level-${level}`:'';
+}
 function profileEmailFromPath(){
   const path=window.location.pathname.replace(/^\/+|\/+$/g,'');
   if(!path||path==='privacy'||path==='terms')return null;
@@ -77,7 +80,7 @@ window.addEventListener('popstate',()=>{
 function filterCat(el,cat){
   document.querySelectorAll('.cat:not(.nav-link-item)').forEach(c=>c.classList.remove('active'));
   if(el)el.classList.add('active');
-  currentActiveCat=cat; showPage('home'); renderHome(cat);
+  currentActiveCat=cat; showPage('home');
 }
 function triggerReveal(){
   setTimeout(()=>{
@@ -189,7 +192,8 @@ function openProfile(email){
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
   const userArticles=articles.filter(a=>a.author===u.first+' '+u.last).reverse();
   const isMe=currentUser&&currentUser.email===email;
-  const avatarEl=u.avatar?`<div class="profile-avatar"><img src="${u.avatar}" alt="${u.first}"></div>`:`<div class="profile-avatar" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;
+  const avatarClass=profileLevelClass(u.level);
+  const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img src="${u.avatar}" alt="${u.first}"></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;
   document.getElementById('profile-content').innerHTML=`
     <button class="back-btn" onclick="showPage('home')">${t('home_back')}</button>
     <div class="profile-header">${avatarEl}

@@ -240,10 +240,16 @@
     <p class="modal-sub">Visible par tous les visiteurs.</p>
     <div class="avatar-upload-wrap">
       <div class="avatar-preview" id="edit-avatar-preview" onclick="document.getElementById('edit-avatar-input').click()"></div>
-      <div><div class="avatar-upload-hint">Cliquez pour changer votre photo<br><span style="font-size:.75rem">JPG, PNG — max 1Mo</span></div></div>
+      <div><div class="avatar-upload-hint">Cliquez pour changer votre photo<br><span style="font-size:.75rem">JPG, PNG — max 4Mo</span></div></div>
     </div>
     <input type="file" id="edit-avatar-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
     <div class="m-row"><label>Bio</label><textarea id="edit-bio" placeholder="Quelques mots sur vous…" style="min-height:80px"></textarea></div>
+    <fieldset class="profile-level-fieldset">
+      <legend data-i18n="profile_level">Niveau d’études</legend>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="licence" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-green"></span><span data-i18n="level_licence">Licence</span></label>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="master" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-blue"></span><span data-i18n="level_master">Master</span></label>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="doctorat" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-purple"></span><span data-i18n="level_doctorat">Doctorat / PhD</span></label>
+    </fieldset>
     <button class="btn-modal" onclick="saveProfileEdit()">Enregistrer</button>
   </div>
 </div>
@@ -473,13 +479,6 @@
         <div class="help-header-actions"><button class="help-back" onclick="showPage('home')">Retour au site</button><button class="help-lang" onclick="toggleLang()">FR</button></div>
       </div>
     </header>
-    <section class="help-search-hero">
-      <div class="help-search-inner">
-        <div class="help-kicker">Centre d’aide Economist</div>
-        <h1>Comment pouvons-nous vous aider ?</h1>
-        <div class="help-search-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input id="privacy-search" type="search" data-i18n-placeholder="privacy_search" placeholder="Rechercher dans la politique de confidentialité" oninput="filterPrivacy(this.value)"></div>
-      </div>
-    </section>
       <main class="help-main">
       <aside class="help-sidebar"><div class="help-sidebar-label">Economist Help</div><a class="active" href="#privacy-scope">Politique de confidentialité</a><a href="#privacy-collect">Informations collectées</a><a href="#privacy-use">Utilisation</a><a href="#privacy-sharing">Partage et services tiers</a><a href="#privacy-rights">Vos droits</a><a href="#privacy-contact">Contact</a></aside>
       <article class="help-article" id="privacy-article">
@@ -510,13 +509,6 @@
         <div class="help-header-actions"><button class="help-back" onclick="showPage('home')">Retour au site</button><button class="help-lang" onclick="toggleLang()">FR</button></div>
       </div>
     </header>
-    <section class="help-search-hero">
-      <div class="help-search-inner">
-        <div class="help-kicker">Centre d’aide Economist</div>
-        <h1>Comment pouvons-nous vous aider ?</h1>
-        <div class="help-search-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input id="rules-search" type="search" data-i18n-placeholder="rules_search" placeholder="Rechercher dans les conditions d’utilisation" oninput="filterRules(this.value)"></div>
-      </div>
-    </section>
     <main class="help-main">
       <aside class="help-sidebar"><div class="help-sidebar-label">Economist Help</div><a class="active" href="#rules-overview">Conditions d’utilisation</a><a href="#rules-account">Compte et accès</a><a href="#rules-content">Contenus et droits</a><a href="#rules-safety">Sécurité et modération</a><a href="#rules-contact">Contact</a></aside>
       <article class="help-article" id="rules-article">

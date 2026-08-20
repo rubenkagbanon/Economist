@@ -46,7 +46,7 @@ async function doSignup(){
     errEl.textContent=t('auth_err_email');errEl.style.display='block';okEl.style.display='none';
     btn.textContent=t('auth_btn_signup');btn.disabled=false;return;
   }
-  const u={first,last,email,pwd,joined:today(),avatar:'',bio:''};
+  const u={first,last,email,pwd,joined:today(),avatar:'',bio:'',level:''};
   users.push(u); await saveUser(u);
   emailSendWelcome(u.email,u.first);
   currentUser=u; saveLocalSession(u.email);
@@ -69,7 +69,7 @@ async function syncGoogleUserFromSession(session){
 
   let u = users.find(x => (x.email||'').toLowerCase() === email);
   if(!u){
-    u={first,last,email,pwd:'google-oauth',joined:today(),avatar,bio:'',authProvider:'google'};
+    u={first,last,email,pwd:'google-oauth',joined:today(),avatar,bio:'',level:'',authProvider:'google'};
     users.push(u);
     await saveUser(u);
   } else {
@@ -142,24 +142,53 @@ function openProfileEdit(){
   if(currentUser.avatar){prev.innerHTML=`<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
   else{prev.textContent=(currentUser.first[0]+(currentUser.last[0]||'')).toUpperCase();prev.style.background='var(--rouge)';}
   document.getElementById('edit-bio').value=currentUser.bio||'';
+  const selectedLevel=document.querySelector(`input[name="profile-level"][value="${currentUser.level||''}"]`);
+  document.querySelectorAll('input[name="profile-level"]').forEach(input=>{ input.checked=input===selectedLevel; });
+  updateEditAvatarLevel(currentUser.level||'');
   document.getElementById('profile-edit-modal').classList.add('open');
 }
 function closeProfileEdit(){ document.getElementById('profile-edit-modal').classList.remove('open'); }
 document.getElementById('profile-edit-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeProfileEdit(); });
 function handleAvatarUpload(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>1.5*1024*1024){showToast('Image trop lourde (max 1.5Mo)');return;}
-  const r=new FileReader();r.onload=ev=>{
-    editAvatarBase64=ev.target.result;
-    document.getElementById('edit-avatar-preview').innerHTML=`<img src="${editAvatarBase64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-  };r.readAsDataURL(file);e.target.value='';
+  if(file.size>4*1024*1024){showToast('Image trop lourde (max 4Mo)');return;}
+  const image=new Image();
+  image.onload=()=>{
+    const maxSize=800;
+    const scale=Math.min(1,maxSize/Math.max(image.width,image.height));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(image.width*scale));
+    canvas.height=Math.max(1,Math.round(image.height*scale));
+    canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+    canvas.toBlob(blob=>{
+      if(!blob){showToast('Impossible de compresser cette image');return;}
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        editAvatarBase64=ev.target.result;
+        document.getElementById('edit-avatar-preview').innerHTML=`<img src="${editAvatarBase64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      };
+      reader.readAsDataURL(blob);
+    },'image/jpeg',.82);
+    URL.revokeObjectURL(image.src);
+  };
+  image.onerror=()=>showToast('Format d’image invalide');
+  image.src=URL.createObjectURL(file);
+  e.target.value='';
+}
+function updateEditAvatarLevel(level){
+  const preview=document.getElementById('edit-avatar-preview');
+  if(!preview)return;
+  preview.classList.remove('profile-level-licence','profile-level-master','profile-level-doctorat');
+  if(level)preview.classList.add(`profile-level-${level}`);
 }
 async function saveProfileEdit(){
   if(!currentUser)return;
   const bio=document.getElementById('edit-bio').value.trim();
+  const level=document.querySelector('input[name="profile-level"]:checked')?.value||'';
   const idx=users.findIndex(u=>u.email===currentUser.email); if(idx===-1)return;
   if(editAvatarBase64) users[idx].avatar=editAvatarBase64;
   users[idx].bio=bio;
+  users[idx].level=level;
   currentUser=users[idx];
   saveLocalSession(currentUser.email);
   await saveUser(currentUser);
