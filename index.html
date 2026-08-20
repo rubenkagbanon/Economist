@@ -307,9 +307,28 @@
 
 <div id="page-about" class="page">
   <section class="about-page">
+    <button class="back-btn" onclick="showPage('home')">← Retour</button>
     <div class="about-k">À propos</div>
     <h1>Economist</h1>
-    <p>Un espace indépendant pour lire, comprendre et partager les grandes transformations économiques et sociales.</p>
+    <p class="about-lead">Une plateforme éditoriale indépendante pour comprendre l’économie, la finance et les transformations du monde.</p>
+    <div class="about-grid">
+      <div>
+        <h2>Notre mission</h2>
+        <p>Economist propose des articles d’actualité, des analyses et des points de vue accessibles. Notre objectif est d’aider chaque lecteur à mieux comprendre les faits, les idées et les décisions qui façonnent notre quotidien.</p>
+      </div>
+      <div>
+        <h2>Nos domaines</h2>
+        <p>Économie, finance, politique, sociologie, droit, technologie, Afrique, monde, écologie, intelligence artificielle et data science.</p>
+      </div>
+      <div>
+        <h2>Un espace ouvert</h2>
+        <p>Les lecteurs peuvent découvrir les articles publiés et les auteurs peuvent proposer leurs idées à la rédaction. Chaque contribution doit respecter les règles de confidentialité et les conditions d’utilisation du service.</p>
+      </div>
+      <div>
+        <h2>Lire et participer</h2>
+        <p>Consultez les rubriques depuis la navigation, recherchez un article ou un auteur, puis utilisez la page « Proposer un article » pour soumettre un sujet.</p>
+      </div>
+    </div>
   </section>
 </div>
 <div id="page-home" class="page active"><div id="home-content"></div></div>
@@ -495,7 +514,7 @@
   <div class="foot-copy">
     <div>© 2026 <span>Economist</span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
     <div class="foot-links">
-      <span class="foot-link" data-i18n="nav_about">À propos</span>
+      <span class="foot-link" onclick="showPage('about')" data-i18n="nav_about">À propos</span>
       <span class="foot-link" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</span>
       <span class="foot-link" onclick="showPage('write')" data-i18n="nav_write">Écrire</span>
       <a class="foot-link" href="/privacy" onclick="event.preventDefault();showPage('privacy')">Confidentialité</a>
