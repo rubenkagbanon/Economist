@@ -362,7 +362,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .td-title{font-family:'Oswald',Arial,sans-serif;font-size:.95rem;cursor:pointer;color:var(--rouge)}
 .td-title:hover{text-decoration:underline}
 .stats-cat-badge{font-family:var(--sans);font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);border:.5px solid rgba(139,0,0,0.25);padding:2px 7px;display:inline-block}
-.profile-page{max-width:900px;margin:0 auto;padding:4rem 2rem;position:relative;z-index:1}
+.profile-page{max-width:900px;margin:0 auto;padding:4rem 2rem;position:relative;z-index:1;font-family:'Inter',var(--sans)}
+.profile-page *{font-family:'Inter',var(--sans)!important}
 .profile-header{display:flex;align-items:center;gap:2rem;margin-bottom:3rem;padding-bottom:2rem;border-bottom:.5px solid var(--gris-clair);flex-wrap:wrap}
 .profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2rem;color:white;flex-shrink:0;overflow:hidden;border:3px solid transparent;}
 .profile-level-licence{border-color:#2e9d55}

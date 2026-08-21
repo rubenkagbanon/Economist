@@ -388,14 +388,20 @@ async function publishArticle(){
     .map(b=>stripHtml(b.html)).join('\n\n').trim();
   if(!bodyText){ showToast("Ajoutez du contenu à l'article."); return; }
   const bodyHtml = editorBlocks.map(blockToHtml).join('\n');
-  const id = articles.length ? Math.max(...articles.map(a=>a.id))+1 : 1;
-  const a = { id, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0 };
+  const {data:id,error:idError}=await _sb.rpc('next_article_id');
+  if(idError||!id){
+    showToast('Publication impossible. Réessayez.');
+    console.error('next_article_id',idError);
+    return;
+  }
+  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0 };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
   articles.push(a);
   await saveArticle(a);
   clearDraft();
   lastPublishedId=id;
   _writeUnlocked=false;
+  saveWriteUnlocked(false);
   document.getElementById('success-msg').style.display='block';
   document.getElementById('write-form').style.display='none';
   document.getElementById('code-gate').style.display='block';

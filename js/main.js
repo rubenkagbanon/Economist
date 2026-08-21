@@ -26,9 +26,6 @@ async function init(){
     const { data: { session } } = await _sb.auth.getSession();
     if(session && session.user){
       await syncGoogleUserFromSession(session);
-    } else {
-      const savedEmail=getLocalEmail();
-      if(savedEmail) currentUser = users.find(u=>u.email===savedEmail) || null;
     }
     _sb.auth.onAuthStateChange(async (_event, session) => {
       if(session && session.user){
@@ -38,8 +35,7 @@ async function init(){
       }
     });
   } else {
-    const savedEmail=getLocalEmail();
-    if(savedEmail) currentUser = users.find(u=>u.email===savedEmail) || null;
+    currentUser = null;
   }
 
   applyTranslations();

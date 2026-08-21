@@ -247,6 +247,8 @@
       <div><div class="avatar-upload-hint">Cliquez pour changer votre photo<br><span style="font-size:.75rem">JPG, PNG — max 4Mo</span></div></div>
     </div>
     <input type="file" id="edit-avatar-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+    <div class="m-row"><label>Prénom</label><input type="text" id="edit-first" autocomplete="given-name" maxlength="80"></div>
+    <div class="m-row"><label>Nom</label><input type="text" id="edit-last" autocomplete="family-name" maxlength="80"></div>
     <div class="m-row"><label>Bio</label><textarea id="edit-bio" placeholder="Quelques mots sur vous…" style="min-height:80px"></textarea></div>
     <fieldset class="profile-level-fieldset">
       <legend data-i18n="profile_level">Niveau d’études</legend>

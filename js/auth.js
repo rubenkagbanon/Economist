@@ -3,18 +3,38 @@
 // ════════════════════════════════════════════════════════════
 
 // ═══════════════ AUTH ═══════════════
+async function profileFromAuthUser(authUser){
+  const email=(authUser?.email||'').trim().toLowerCase();
+  if(!email)return null;
+  await loadData(true);
+  let user=users.find(item=>(item.email||'').toLowerCase()===email);
+  const meta=authUser.user_metadata||{};
+  if(!user){
+    const fullName=(meta.full_name||meta.name||email.split('@')[0]).trim();
+    const parts=fullName.split(/\s+/).filter(Boolean);
+    user={id:authUser.id,first:parts[0]||'Utilisateur',last:parts.slice(1).join(' ')||'',email,joined:today(),avatar:meta.avatar_url||'',bio:'',level:'',authProvider:'supabase'};
+    users.push(user);
+    await saveUser(user);
+  } else if(!user.id){
+    user.id=authUser.id;
+    await saveUser(user);
+  }
+  currentUser=user;
+  saveLocalSession(email);
+  return user;
+}
+
 async function doLogin(){
   const btn=document.getElementById('btn-login');
   const email=document.getElementById('login-email').value.trim().toLowerCase();
   const pwd  =document.getElementById('login-pwd').value;
   if(!email||!pwd)return;
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  await loadData(); // recharger depuis Supabase
-  const u=users.find(u=>u.email===email&&u.pwd===pwd);
+  const {data,error}=await _sb.auth.signInWithPassword({email,password:pwd});
   btn.textContent='Se connecter';btn.disabled=false;
-  if(!u){document.getElementById('login-err').style.display='block';return;}
+  if(error||!data.user){document.getElementById('login-err').style.display='block';return;}
+  const u=await profileFromAuthUser(data.user);
   document.getElementById('login-err').style.display='none';
-  currentUser=u; saveLocalSession(u.email);
   closeModal(); renderNav(); renderHome(currentActiveCat);
   showToast(`${t('toast_welcome')}, ${u.first} !`);
 }
@@ -41,17 +61,18 @@ async function doSignup(){
     document.getElementById('su-pwd2').focus();return;
   }
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  await loadData();
-  if(users.find(u=>u.email===email)){
-    errEl.textContent=t('auth_err_email');errEl.style.display='block';okEl.style.display='none';
+  const {data,error}=await _sb.auth.signUp({email,password:pwd,options:{data:{full_name:`${first} ${last}`}}});
+  if(error){
+    errEl.textContent=error.message||t('auth_err_email');errEl.style.display='block';okEl.style.display='none';
     btn.textContent=t('auth_btn_signup');btn.disabled=false;return;
   }
-  const u={first,last,email,pwd,joined:today(),avatar:'',bio:'',level:''};
-  users.push(u); await saveUser(u);
-  emailSendWelcome(u.email,u.first);
-  currentUser=u; saveLocalSession(u.email);
+  const u=data.user && data.session ? await profileFromAuthUser(data.user) : {first};
+  if(data.session) emailSendWelcome(email,first);
   errEl.style.display='none';okEl.style.display='block';
-  setTimeout(()=>{closeModal();renderNav();showToast(`${t('toast_created')}, ${first} !`);},1000);
+  setTimeout(()=>{
+    closeModal();
+    if(data.session){renderNav();showToast(`${t('toast_created')}, ${u.first} !`);}
+  },1000);
   btn.textContent=t('auth_btn_signup');btn.disabled=false;
 }
 
@@ -69,11 +90,12 @@ async function syncGoogleUserFromSession(session){
 
   let u = users.find(x => (x.email||'').toLowerCase() === email);
   if(!u){
-    u={first,last,email,pwd:'google-oauth',joined:today(),avatar,bio:'',level:'',authProvider:'google'};
+    u={id:session.user.id,first,last,email,joined:today(),avatar,bio:'',level:'',authProvider:'google'};
     users.push(u);
     await saveUser(u);
   } else {
     let changed = false;
+    if(!u.id){u.id=session.user.id;changed=true;}
     if(!u.first && first){u.first=first;changed=true;}
     if(!u.last && last){u.last=last;changed=true;}
     if(!u.avatar && avatar){u.avatar=avatar;changed=true;}
@@ -141,6 +163,8 @@ function openProfileEdit(){
   const prev=document.getElementById('edit-avatar-preview');
   if(currentUser.avatar){prev.innerHTML=`<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
   else{prev.textContent=(currentUser.first[0]+(currentUser.last[0]||'')).toUpperCase();prev.style.background='var(--rouge)';}
+  document.getElementById('edit-first').value=currentUser.first||'';
+  document.getElementById('edit-last').value=currentUser.last||'';
   document.getElementById('edit-bio').value=currentUser.bio||'';
   const selectedLevel=document.querySelector(`input[name="profile-level"][value="${currentUser.level||''}"]`);
   document.querySelectorAll('input[name="profile-level"]').forEach(input=>{ input.checked=input===selectedLevel; });
@@ -183,15 +207,27 @@ function updateEditAvatarLevel(level){
 }
 async function saveProfileEdit(){
   if(!currentUser)return;
+  const first=document.getElementById('edit-first').value.trim();
+  const last=document.getElementById('edit-last').value.trim();
   const bio=document.getElementById('edit-bio').value.trim();
   const level=document.querySelector('input[name="profile-level"]:checked')?.value||'';
+  if(!first||!last){showToast('Le prénom et le nom sont obligatoires.');return;}
   const idx=users.findIndex(u=>u.email===currentUser.email); if(idx===-1)return;
+  const oldAuthor=`${users[idx].first} ${users[idx].last}`;
+  const newAuthor=`${first} ${last}`;
   if(editAvatarBase64) users[idx].avatar=editAvatarBase64;
+  users[idx].first=first;
+  users[idx].last=last;
   users[idx].bio=bio;
   users[idx].level=level;
   currentUser=users[idx];
   saveLocalSession(currentUser.email);
   await saveUser(currentUser);
+  if(oldAuthor!==newAuthor){
+    const authoredArticles=articles.filter(article=>article.author===oldAuthor);
+    authoredArticles.forEach(article=>{article.author=newAuthor;});
+    await Promise.all(authoredArticles.map(article=>saveArticle(article)));
+  }
   closeProfileEdit();renderNav();openProfile(currentUser.email);
   showToast(t('toast_profile'));
 }

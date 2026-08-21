@@ -3,7 +3,35 @@
 // ════════════════════════════════════════════════════════════
 
 // ═══════════════ NAVIGATION ═══════════════
+let activeReadArticleId=null;
+let activeReadTimer=null;
+
+function cancelArticleRead(){
+  if(activeReadTimer)clearTimeout(activeReadTimer);
+  activeReadTimer=null;
+  activeReadArticleId=null;
+}
+function articleReadKey(id){
+  const visitor=currentUser?.email?.toLowerCase()||'guest';
+  return `eco_article_read_${visitor}_${id}`;
+}
+function scheduleArticleRead(id){
+  cancelArticleRead();
+  if(localStorage.getItem(articleReadKey(id)))return;
+  activeReadArticleId=id;
+  activeReadTimer=setTimeout(async()=>{
+    if(activeReadArticleId!==id)return;
+    const {error}=await _sb.rpc('record_article_read',{article_id:id});
+    if(error){console.error('record_article_read',error);return;}
+    const article=articles.find(item=>item.id===id);
+    if(article)article.reads=(article.reads||0)+1;
+    localStorage.setItem(articleReadKey(id),'1');
+    cancelArticleRead();
+  },50000);
+}
+
 function showPage(name){
+  if(name!=='article')cancelArticleRead();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(!pg)return;
   pg.classList.add('active');
@@ -156,8 +184,6 @@ function renderHome(cat){
 // ═══════════════ ARTICLE FULL ═══════════════
 async function openArticle(id){
   const a=articles.find(x=>x.id===id); if(!a)return;
-  a.reads=(a.reads||0)+1;
-  saveArticle(a);
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=users.find(u=>u.first+' '+u.last===a.author);
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
@@ -176,6 +202,7 @@ async function openArticle(id){
     ${a.img?`<div class="art-full-cover"><img src="${a.img}" alt="" onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${tCat(a.cat)} — ${tDate(a.date)}</div>`:''}
     <div class="art-full-body">${bodyContent}</div>`;
   showPage('article');
+  scheduleArticleRead(id);
 }
 
 async function confirmDeleteArticle(id){
