@@ -31,6 +31,10 @@ function scheduleArticleRead(id){
 }
 
 function showPage(name){
+  if(name==='propose' && !currentUser){
+    openModal('login');
+    return;
+  }
   if(name!=='article')cancelArticleRead();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(!pg)return;

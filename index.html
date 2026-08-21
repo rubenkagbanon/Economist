@@ -143,7 +143,7 @@
     <div id="mob-search-results" class="srd mobile-search-results"></div>
   </div>
   <div class="nav-mobile-item" onclick="navGo('home')" data-i18n="cat_une">À la une</div>
-  <div class="nav-mobile-item" onclick="navGo('propose')" data-i18n="nav_propose">Proposer un article</div>
+  <div class="nav-mobile-item" id="mob-propose-item" style="display:none" onclick="navGo('propose')" data-i18n="nav_propose">Proposer un article</div>
   <div class="nav-mobile-item" id="mob-write-item" style="display:none" onclick="navGo('write')"><span data-i18n="nav_write">Écrire</span></div>
   <div class="nav-mobile-item" id="mob-mystats-item" style="display:none" onclick="navGo('mystats')"><span data-i18n="nav_stats">Mes statistiques</span></div>
   <div class="nav-mobile-item" id="mob-logout-item" style="display:none" onclick="closeMobileMenu();doLogout()" data-i18n="nav_logout">Déconnexion</div>
@@ -307,7 +307,7 @@
     <div class="cat" onclick="filterCat(this,'IA')" data-i18n="cat_ia">IA</div>
     <div class="cat" onclick="filterCat(this,'Data Science')" data-i18n="cat_data">Data Science</div>
     <div class="nav-cats-sep"></div>
-    <div class="cat nav-link-item" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</div>
+    <div class="cat nav-link-item" id="nav-cats-propose" style="display:none" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</div>
     <div class="cat nav-link-item" id="nav-cats-write" style="display:none" onclick="showPage('write')" data-i18n="nav_write">Écrire</div>
     <div class="cat nav-link-item" id="nav-cats-mystats" style="display:none" onclick="showPage('mystats')" data-i18n="nav_stats">Mes stats</div>
     <div class="cat nav-link-item" id="nav-cats-admin" style="display:none" onclick="showPage('admin')" data-i18n="nav_admin">Admin</div>
@@ -540,7 +540,7 @@
     <div>© 2026 <span>Economist</span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
     <div class="foot-links">
       <span class="foot-link" onclick="showPage('about')" data-i18n="nav_about">À propos</span>
-      <span class="foot-link" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</span>
+      <span class="foot-link" id="footer-propose-link" style="display:none" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</span>
       <span class="foot-link" onclick="showPage('write')" data-i18n="nav_write">Écrire</span>
       <a class="foot-link" href="/privacy" onclick="event.preventDefault();showPage('privacy')" data-i18n="nav_privacy">Confidentialité</a>
       <a class="foot-link" href="/terms" onclick="event.preventDefault();showPage('rules')" data-i18n="nav_rules">Conditions d’utilisation</a>

@@ -4,6 +4,11 @@
 
 // ═══════════════ PROPOSITION D'ARTICLE ═══════════════
 async function submitRequest(){
+  if(!currentUser){
+    showToast('Connectez-vous pour proposer un article.');
+    openModal('login');
+    return;
+  }
   const first=document.getElementById('r-first').value.trim();
   const last =document.getElementById('r-last').value.trim();
   const email=document.getElementById('r-email').value.trim().toLowerCase();
