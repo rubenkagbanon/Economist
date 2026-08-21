@@ -3,20 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Economist</title>
+  <meta name="theme-color" content="#111010">
+  <title>Economist | Page introuvable</title>
+  <style>
+    :root{color-scheme:light;--ink:#080404;--muted:#77716c;--red:#8b0000;--paper:#f5f3ef;--line:#d9d4cd}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif}
+    main{width:min(680px,calc(100% - 40px));padding:48px 0;text-align:center}
+    .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:46px;color:var(--ink);text-decoration:none}
+    .brand img{width:48px;height:48px;object-fit:contain}
+    .brand span{font-family:Georgia,serif;font-size:24px;letter-spacing:.02em}
+    .code{margin:0;color:var(--red);font-size:clamp(5rem,18vw,9rem);font-weight:700;line-height:.85;letter-spacing:-.05em}
+    h1{margin:28px 0 12px;font-family:Georgia,serif;font-size:clamp(1.7rem,5vw,2.8rem);font-weight:400;line-height:1.1}
+    p{max-width:440px;margin:0 auto 28px;color:var(--muted);font-size:1rem;line-height:1.7}
+    .back{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;background:var(--red);color:#fff;text-decoration:none;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;transition:background .2s,transform .2s}
+    .back:hover{background:#650000;transform:translateY(-2px)}
+    .rule{width:54px;height:2px;margin:0 auto 26px;background:var(--red)}
+    footer{margin-top:70px;color:#aaa39c;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+    @media(max-width:520px){main{padding:30px 0}.brand{margin-bottom:35px}.brand img{width:42px;height:42px}.brand span{font-size:21px}footer{margin-top:52px}}
+  </style>
   <script>
-    fetch('/index.html')
-      .then(response => response.text())
-      .then(html => {
-        html = html.replace('<head>', '<head><base href="/">');
-        document.open();
-        document.write(html);
-        document.close();
-      })
-      .catch(() => {
-        document.body.innerHTML = '<p>Economist est momentanément indisponible.</p>';
-      });
+    fetch('/index.html').then(response => {
+      if(!response.ok) throw new Error('index unavailable');
+      return response.text();
+    }).then(html => {
+      html=html.replace('<head>','<head><base href="/">');
+      document.open();document.write(html);document.close();
+    }).catch(() => {
+      document.getElementById('fallback').removeAttribute('hidden');
+    });
   </script>
 </head>
-<body></body>
+<body>
+  <main id="fallback">
+    <a class="brand" href="/" aria-label="Retour à l’accueil Economist">
+      <img src="css/Logo.png" alt="Logo Economist">
+      <span>Economist</span>
+    </a>
+    <div class="code">404</div>
+    <div class="rule"></div>
+    <h1>Cette page n’existe pas.</h1>
+    <p>Le lien demandé semble avoir changé ou n’est plus disponible. Revenez à la une pour poursuivre votre lecture.</p>
+    <a class="back" href="/">Retour à l’accueil <span aria-hidden="true">→</span></a>
+    <footer>Actualités et analyses · Economist</footer>
+  </main>
+</body>
 </html>
