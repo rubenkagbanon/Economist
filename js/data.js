@@ -48,9 +48,10 @@ async function dbSet(path, val) {
 }
 async function dbDelete(path) {
   const { error: e1 } = await _sb.from(KV_TABLE).delete().eq('path', path);
+  if (e1) { console.error('dbDelete', path, e1); return e1; }
   const { error: e2 } = await _sb.from(KV_TABLE).delete().like('path', `${path}/%`);
-  if (e1) console.error('dbDelete', path, e1);
   if (e2) console.error('dbDelete', path, e2);
+  return e2 || null;
 }
 
 // ═══════════════ LOAD DATA ═══════════════

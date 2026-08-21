@@ -24,12 +24,10 @@ async function init(){
 
   if(_sb && _sb.auth){
     const { data: { session } } = await _sb.auth.getSession();
-    if(session && session.user){
-      await syncGoogleUserFromSession(session);
-    }
-    _sb.auth.onAuthStateChange(async (_event, session) => {
-      if(session && session.user){
-        await syncGoogleUserFromSession(session);
+    if(session && session.user) await syncGoogleUserFromSession(session);
+    _sb.auth.onAuthStateChange(async (_event, nextSession) => {
+      if(nextSession && nextSession.user){
+        await syncGoogleUserFromSession(nextSession);
         renderNav();
         if(typeof renderHome==='function') renderHome(currentActiveCat);
       }
@@ -42,6 +40,9 @@ async function init(){
   translateLegalPages();
   updateLangButton();
   setNavDate();
+  renderNav();
+  renderHome(currentActiveCat);
+
   renderNav();
   renderHome(currentActiveCat);
 
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const savedTheme=localStorage.getItem('eco_theme');
     if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   }catch(e){}
+    document.getElementById('loading-screen').classList.add('hidden');
   updateLogoForTheme();
   try{
     const savedLang=localStorage.getItem('eco_lang');

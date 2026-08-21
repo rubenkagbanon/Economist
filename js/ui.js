@@ -74,7 +74,8 @@ function closeDesktopMenu(){
 function doSearch(q, targetId){
   const el=document.getElementById(targetId); if(!el)return;
   const isMobileSearch = targetId === 'mob-search-results';
-  q=q.trim().toLowerCase();
+  const normalizeSearch = value => (value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  q=normalizeSearch(q.trim());
   if(!q){
     el.classList.remove('open');
     if(isMobileSearch) el.style.display='none';
@@ -82,13 +83,13 @@ function doSearch(q, targetId){
     return;
   }
   const userResults = users.filter(u => {
-    const firstName = (u.first||'').toLowerCase();
-    const lastName = (u.last||'').toLowerCase();
-    return firstName.includes(q) || lastName.includes(q);
+    const profileText = normalizeSearch(`${u.first||''} ${u.last||''}`);
+    return profileText.includes(q);
   }).slice(0,4);
-  const articleResults = articles.filter(a =>
-    (a.title||'').toLowerCase().includes(q) || (a.author||'').toLowerCase().includes(q)
-  ).slice(0,8);
+  const articleResults = articles.filter(a => {
+    const articleText = normalizeSearch(`${a.title||''} ${a.author||''}`);
+    return articleText.includes(q);
+  }).slice(0,8);
   if(!userResults.length && !articleResults.length){
     el.innerHTML = `<div class="srd-section">Aucun résultat</div>`;
   } else {
