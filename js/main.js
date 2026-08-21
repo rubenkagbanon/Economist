@@ -15,14 +15,32 @@ function maybeShowOnboarding(){
   try{ dismissed = localStorage.getItem('eco_onboard_dismissed')==='1'; }catch(e){}
   if(!dismissed) document.getElementById('onboard-overlay').classList.add('open');
 }
+function setLoadingStatus(message){
+  const el=document.getElementById('loading-text');
+  if(el)el.textContent=`Economist · ${message}`;
+}
+function waitForPageReady(){
+  const images=[...document.images].filter(image=>!image.complete);
+  const imagePromise=Promise.all(images.map(image=>new Promise(resolve=>{
+    image.addEventListener('load',resolve,{once:true});
+    image.addEventListener('error',resolve,{once:true});
+  })));
+  const fontPromise=document.fonts?.ready||Promise.resolve();
+  return Promise.race([
+    Promise.all([imagePromise,fontPromise,new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))]),
+    new Promise(resolve=>setTimeout(resolve,3000))
+  ]);
+}
 
 // Appelé par data.js une fois la connexion Supabase établie ('db-ready')
 async function init(){
   if(initStarted)return;
   initStarted=true;
+  setLoadingStatus('Connexion sécurisée à Supabase…');
   await loadData();
 
   if(_sb && _sb.auth){
+    setLoadingStatus('Vérification de votre session…');
     const { data: { session } } = await _sb.auth.getSession();
     if(session && session.user) await syncGoogleUserFromSession(session);
     _sb.auth.onAuthStateChange(async (_event, nextSession) => {
@@ -36,13 +54,11 @@ async function init(){
     currentUser = null;
   }
 
+  setLoadingStatus('Préparation des articles et des profils…');
   applyTranslations();
   translateLegalPages();
   updateLangButton();
   setNavDate();
-  renderNav();
-  renderHome(currentActiveCat);
-
   renderNav();
   renderHome(currentActiveCat);
 
@@ -58,6 +74,9 @@ async function init(){
     if(!routePage && savedPage && !['home','privacy','rules'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
   }catch(e){}
 
+  setLoadingStatus('Chargement des images et des polices…');
+  await waitForPageReady();
+  setLoadingStatus('Tout est prêt.');
   document.getElementById('loading-screen').classList.add('hidden');
   maybeShowOnboarding();
 }
@@ -67,7 +86,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const savedTheme=localStorage.getItem('eco_theme');
     if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   }catch(e){}
-    document.getElementById('loading-screen').classList.add('hidden');
   updateLogoForTheme();
   try{
     const savedLang=localStorage.getItem('eco_lang');
