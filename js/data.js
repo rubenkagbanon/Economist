@@ -16,6 +16,9 @@ let _sb;
 let dbReady = false;
 let dataLoaded = false;
 let dataLoadPromise = null;
+const DATA_CACHE_KEY = 'economist_public_data_cache_v1';
+const DATA_CACHE_TTL = 10 * 60 * 1000;
+const DATA_REFRESH_MIN_AGE = 60 * 1000;
 
 // ═══════════════ SUPABASE INIT ═══════════════
 document.addEventListener('db-ready', () => {
@@ -31,6 +34,35 @@ document.addEventListener('db-ready', () => {
 // lignes dont le path commence par "articles/", comme le faisait Firebase.
 const KV_TABLE = 'kv_store';
 
+function applyData(arts, usrs){
+  articles = arts ? Object.values(arts) : [];
+  articles.sort((a,b) => (a.id||0) - (b.id||0));
+  users = usrs ? Object.values(usrs) : [];
+}
+function readDataCache(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(DATA_CACHE_KEY)||'null');
+    if(!cached || Date.now()-cached.savedAt>DATA_CACHE_TTL)return null;
+    return cached;
+  }catch(e){ return null; }
+}
+function writeDataCache(){
+  try{ localStorage.setItem(DATA_CACHE_KEY,JSON.stringify({savedAt:Date.now(),articles,users})); }catch(e){}
+}
+async function fetchData(){
+  const [{data:articleRows,error:articleError},{data:userRows,error:userError}]=await Promise.all([
+    _sb.from('articles').select('*').order('id'),
+    _sb.from('profiles').select('*')
+  ]);
+  if(articleError||userError)throw articleError||userError;
+  const arts={},usrs={};
+  articleRows.forEach(row=>{arts[row.id]={...row,bodyHtml:row.body_html};});
+  userRows.forEach(row=>{usrs[row.email]={...row,authProvider:row.auth_provider};});
+  applyData(arts, usrs);
+  dataLoaded=true;
+  writeDataCache();
+}
+
 async function dbGet(path) {
   const { data: row, error } = await _sb.from(KV_TABLE).select('value').eq('path', path).maybeSingle();
   if (error) { console.error('dbGet', path, error); return null; }
@@ -45,6 +77,7 @@ async function dbGet(path) {
 async function dbSet(path, val) {
   const { error } = await _sb.from(KV_TABLE).upsert({ path, value: val });
   if (error) console.error('dbSet', path, error);
+  return error || null;
 }
 async function dbDelete(path) {
   const { error: e1 } = await _sb.from(KV_TABLE).delete().eq('path', path);
@@ -58,34 +91,52 @@ async function dbDelete(path) {
 function loadData(force=false) {
   if(!force && dataLoaded)return Promise.resolve();
   if(dataLoadPromise)return dataLoadPromise;
-  dataLoadPromise=(async()=>{
-    const [arts, usrs] = await Promise.all([
-      dbGet('articles'),
-      dbGet('users')
-    ]);
-    articles = arts ? Object.values(arts) : [];
-    articles.sort((a,b) => (a.id||0) - (b.id||0));
-    users    = usrs ? Object.values(usrs) : [];
-    dataLoaded=true;
-  })().finally(()=>{ dataLoadPromise=null; });
+  if(!force){
+    const cached=readDataCache();
+    if(cached){
+      applyData(cached.articles,cached.users);
+      dataLoaded=true;
+      if(Date.now()-cached.savedAt<DATA_REFRESH_MIN_AGE)return Promise.resolve();
+      dataLoadPromise=fetchData().then(()=>{
+        if(typeof renderHome==='function')renderHome(currentActiveCat);
+      }).catch(error=>console.error('data refresh',error)).finally(()=>{dataLoadPromise=null;});
+      return Promise.resolve();
+    }
+  }
+  dataLoadPromise=fetchData().finally(()=>{dataLoadPromise=null;});
   return dataLoadPromise;
 }
 
 async function saveArticle(a) {
-  await dbSet(`articles/${a.id}`, a);
+  const {error}=await _sb.from('articles').upsert({
+    id:a.id,owner_id:a.owner_id,title:a.title,deck:a.deck,cat:a.cat,author:a.author,
+    img:a.img,body:a.body,body_html:a.bodyHtml,date:a.date,reads:a.reads||0
+  });
+  if(error)console.error('saveArticle',error);
+  writeDataCache();
+  return error || null;
 }
 async function deleteArticleDB(id) {
-  await dbDelete(`articles/${id}`);
+  const {error}=await _sb.from('articles').delete().eq('id',id);
+  if(!error)writeDataCache();
+  return error;
 }
 // Clé de path = email encodé (les emails contiennent des caractères interdits par certains systèmes, comme "." et "@")
 function userKey(email){
   return email.replace(/\./g,'_').replace(/@/g,'__at__');
 }
 async function saveUser(u) {
-  await dbSet(`users/${userKey(u.email)}`, u);
+  const {error}=await _sb.from('profiles').upsert({
+    id:u.id,email:u.email,first:u.first,last:u.last,joined:u.joined,avatar:u.avatar||'',bio:u.bio||'',level:u.level||'',auth_provider:u.authProvider||''
+  });
+  if(error)console.error('saveUser',error);
+  else writeDataCache();
+  return error || null;
 }
 async function deleteUserDB(email) {
-  await dbDelete(`users/${userKey(email)}`);
+  const {error}=await _sb.from('profiles').delete().eq('email',email);
+  if(!error)writeDataCache();
+  return error;
 }
 
 // ═══════════════ SESSION ═══════════════

@@ -74,23 +74,30 @@ function closeDesktopMenu(){
 }
 
 // ═══════════════ SEARCH (desktop + mobile share this) ═══════════════
+const searchTimers={};
 function doSearch(q, targetId){
   const el=document.getElementById(targetId); if(!el)return;
   const isMobileSearch = targetId === 'mob-search-results';
   const normalizeSearch = value => (value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   q=normalizeSearch(q.trim());
+  clearTimeout(searchTimers[targetId]);
   if(!q){
     el.classList.remove('open');
     if(isMobileSearch) el.style.display='none';
     el.innerHTML='';
     return;
   }
+  searchTimers[targetId]=setTimeout(()=>renderSearchResults(q,targetId),180);
+}
+function renderSearchResults(q,targetId){
+  const el=document.getElementById(targetId); if(!el)return;
+  const isMobileSearch = targetId === 'mob-search-results';
   const userResults = users.filter(u => {
     const profileText = normalizeSearch(`${u.first||''} ${u.last||''}`);
     return profileText.includes(q);
   }).slice(0,4);
   const articleResults = articles.filter(a => {
-    const articleText = normalizeSearch(`${a.title||''} ${a.author||''}`);
+    const articleText = normalizeSearch(a.title||'');
     return articleText.includes(q);
   }).slice(0,8);
   if(!userResults.length && !articleResults.length){

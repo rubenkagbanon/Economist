@@ -20,7 +20,11 @@ function setLoadingStatus(message){
   if(el)el.textContent=`Economist · ${message}`;
 }
 function waitForPageReady(){
-  const images=[...document.images].filter(image=>!image.complete);
+  const images=[...document.images].filter(image=>{
+    if(image.complete)return false;
+    const bounds=image.getBoundingClientRect();
+    return bounds.top<window.innerHeight*1.25;
+  });
   const imagePromise=Promise.all(images.map(image=>new Promise(resolve=>{
     image.addEventListener('load',resolve,{once:true});
     image.addEventListener('error',resolve,{once:true});
