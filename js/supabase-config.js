@@ -11,11 +11,11 @@
 // RLS de la table — voir README.md, section Supabase.
 //
 const SUPABASE_URL      = "https://soimafxvczlxdqvybkut.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvaW1hZnh2Y3pseGRxdnlia3V0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NzU2NjUsImV4cCI6MjA5OTI1MTY2NX0.xBXgIKuRPk9GdeydSBMjR2Dp0kPJuhwBE8CfqU0dUaY";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iAixQG010qsVC_c-1S6RTA_yIiXrLIB";
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 window._sb = client;
 document.dispatchEvent(new Event('db-ready'));
