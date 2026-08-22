@@ -75,10 +75,10 @@ function closeDesktopMenu(){
 
 // ═══════════════ SEARCH (desktop + mobile share this) ═══════════════
 const searchTimers={};
+const normalizeSearch = value => (value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function doSearch(q, targetId){
   const el=document.getElementById(targetId); if(!el)return;
   const isMobileSearch = targetId === 'mob-search-results';
-  const normalizeSearch = value => (value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   q=normalizeSearch(q.trim());
   clearTimeout(searchTimers[targetId]);
   if(!q){
