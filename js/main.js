@@ -41,7 +41,11 @@ async function init(){
   if(initStarted)return;
   initStarted=true;
   setLoadingStatus('Connexion sécurisée à Supabase…');
-  await loadData();
+  try{
+    await loadData();
+  }catch(error){
+    console.error('initial data load',error);
+  }
 
   if(_sb && _sb.auth){
     setLoadingStatus('Vérification de votre session…');
@@ -75,7 +79,7 @@ async function init(){
 
   try{
     const savedPage=localStorage.getItem('eco_page');
-    if(!routePage && savedPage && !['home','privacy','rules'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
+    if(!routePage && savedPage && !['home','privacy','rules','profile'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
   }catch(e){}
 
   setLoadingStatus('Chargement des images et des polices…');

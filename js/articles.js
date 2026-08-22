@@ -48,7 +48,7 @@ function showPage(name){
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
   const route=name==='privacy'?'/privacy':name==='rules'?'/terms':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
-  if(window.location.pathname!==route){
+  if(window.location.protocol!=='file:' && window.location.pathname!==route){
     try{ window.history.pushState({page:name},'',route); }catch(e){}
   }
   if(name!=='article'){
@@ -61,6 +61,7 @@ function showPage(name){
   if(name==='admin')   { loadData().then(()=>renderAdmin()); }
 }
 function pageFromPath(){
+  if(window.location.protocol==='file:')return null;
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';
   if(path==='/terms')return 'rules';
@@ -81,13 +82,24 @@ function profileEmailFromPath(){
   const user=users.find(u=>profileSlug(u)===path.toLowerCase());
   return user?.email||null;
 }
-function shareProfile(email){
+async function shareProfile(email){
   const user=users.find(u=>u.email===email);
   if(!user)return;
   const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
   const profileUrl=new URL(`/${profileSlug(user)}/`,siteOrigin);
-  const shareData={title:`${user?.first||''} ${user?.last||''}`.trim(),url:profileUrl.href};
+  const shareData={title:`${user?.first||''} ${user?.last||''}`.trim(),text:`Profil de ${user?.first||''} ${user?.last||''}`.trim(),url:profileUrl.href};
   if(navigator.share){
+    if(user.avatar && navigator.canShare){
+      try{
+        const response=await fetch(user.avatar);
+        if(response.ok){
+          const blob=await response.blob();
+          const file=new File([blob],`profil-${profileSlug(user)}.${blob.type.split('/')[1]||'jpg'}`,{type:blob.type||'image/jpeg'});
+          const withAvatar={...shareData,files:[file]};
+          if(navigator.canShare(withAvatar)){ navigator.share(withAvatar).catch(()=>{}); return; }
+        }
+      }catch(e){}
+    }
     navigator.share(shareData).catch(()=>{});
     return;
   }

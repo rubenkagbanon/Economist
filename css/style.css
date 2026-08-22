@@ -419,6 +419,16 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .foot-link{font-size:9px;}
   .nav-logo-image{width:88px;height:54px;transform:translateX(-8px)}
 }
+@media(max-width:1000px) and (min-width:901px){
+  .nav-desktop-hamburger,.nav-desktop-menu,.nav-desktop-overlay{display:none}
+  .nav-top{justify-content:space-between;padding:0 .8rem;height:58px}
+  .nav-date-group{display:none}
+  .logo-wrap{margin-left:0}
+  .nav-actions{margin-left:0}
+  .nav-search-wrap,.nav-actions .btn-red,.nav-actions .btn-outline,.nav-actions .nav-user{display:none}
+  .nav-hamburger{display:flex}
+  .nav-logo-image{width:88px;height:54px;transform:translateX(-8px)}
+}
 @media(max-width:500px){
   .nav-top{padding:0 .8rem}
   .profile-header{flex-direction:column;align-items:flex-start}
