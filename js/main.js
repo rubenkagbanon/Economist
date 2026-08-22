@@ -50,10 +50,10 @@ async function init(){
   if(_sb && _sb.auth){
     setLoadingStatus('Vérification de votre session…');
     const { data: { session } } = await _sb.auth.getSession();
-    if(session && session.user) await syncGoogleUserFromSession(session);
+    if(session && session.user) await syncAuthUserFromSession(session);
     _sb.auth.onAuthStateChange(async (_event, nextSession) => {
       if(nextSession && nextSession.user){
-        await syncGoogleUserFromSession(nextSession);
+        await syncAuthUserFromSession(nextSession);
         renderNav();
         if(typeof renderHome==='function') renderHome(currentActiveCat);
       }

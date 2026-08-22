@@ -9,7 +9,7 @@ const I18N = {
     auth_welcome:"Bienvenue", auth_sync:"Votre compte est synchronisé sur tous vos appareils.",
     auth_login:"Connexion", auth_signup:"Créer un compte", auth_email:"Email", auth_pwd:"Mot de passe",
     auth_err_login:"Email ou mot de passe incorrect.", auth_btn_login:"Se connecter",
-    auth_no_account:"Pas de compte ?", auth_ok_created:"Compte créé !", auth_btn_signup:"Créer mon compte",
+    auth_no_account:"Pas de compte ?", auth_ok_created:"Compte créé !", auth_ok_confirmation:"Compte créé ! Vérifiez votre e-mail pour confirmer votre inscription.", auth_btn_signup:"Créer mon compte",
     auth_err_fields:"Veuillez remplir tous les champs.", auth_err_short:"8 caractères minimum.",
     auth_err_match:"Les mots de passe ne correspondent pas.", auth_err_email:"Cet email est déjà utilisé.",
 
@@ -66,7 +66,7 @@ const I18N = {
     auth_welcome:"Welcome", auth_sync:"Your account is synced across all your devices.",
     auth_login:"Log in", auth_signup:"Create account", auth_email:"Email", auth_pwd:"Password",
     auth_err_login:"Incorrect email or password.", auth_btn_login:"Log in",
-    auth_no_account:"No account?", auth_ok_created:"Account created!", auth_btn_signup:"Create my account",
+    auth_no_account:"No account?", auth_ok_created:"Account created!", auth_ok_confirmation:"Account created! Check your email to confirm your registration.", auth_btn_signup:"Create my account",
     auth_err_fields:"Please fill in all fields.", auth_err_short:"8 characters minimum.",
     auth_err_match:"Passwords do not match.", auth_err_email:"This email is already in use.",
 

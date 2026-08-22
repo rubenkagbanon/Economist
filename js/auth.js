@@ -3,6 +3,11 @@
 // ════════════════════════════════════════════════════════════
 
 // ═══════════════ AUTH ═══════════════
+function getAuthRedirectUrl(){
+  if(window.location.protocol==='file:')return window.location.href.split('#')[0];
+  return `${window.location.origin}${window.location.pathname}`;
+}
+
 async function profileFromAuthUser(authUser){
   const email=(authUser?.email||'').trim().toLowerCase();
   if(!email)return null;
@@ -61,14 +66,19 @@ async function doSignup(){
     document.getElementById('su-pwd2').focus();return;
   }
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  const {data,error}=await _sb.auth.signUp({email,password:pwd,options:{data:{full_name:`${first} ${last}`}}});
+  const {data,error}=await _sb.auth.signUp({email,password:pwd,options:{
+    data:{full_name:`${first} ${last}`},
+    emailRedirectTo:getAuthRedirectUrl()
+  }});
   if(error){
     errEl.textContent=error.message||t('auth_err_email');errEl.style.display='block';okEl.style.display='none';
     btn.textContent=t('auth_btn_signup');btn.disabled=false;return;
   }
   const u=data.user && data.session ? await profileFromAuthUser(data.user) : {first};
   if(data.session) emailSendWelcome(email,first);
-  errEl.style.display='none';okEl.style.display='block';
+  errEl.style.display='none';
+  okEl.textContent=data.session ? t('auth_ok_created') : t('auth_ok_confirmation');
+  okEl.style.display='block';
   setTimeout(()=>{
     closeModal();
     if(data.session){renderNav();showToast(`${t('toast_created')}, ${u.first} !`);}
@@ -108,6 +118,12 @@ async function syncGoogleUserFromSession(session){
   return u;
 }
 
+async function syncAuthUserFromSession(session){
+  const provider=session?.user?.app_metadata?.provider;
+  if(provider==='google')return syncGoogleUserFromSession(session);
+  return profileFromAuthUser(session?.user);
+}
+
 async function doGoogleAuth(mode='login'){
   const btn=document.getElementById(mode==='signup' ? 'btn-google-signup' : 'btn-google-login');
   const label = mode==='signup' ? 'Créer mon compte avec Google' : 'Se connecter avec Google';
@@ -118,7 +134,7 @@ async function doGoogleAuth(mode='login'){
 
   try{
     if(!_sb || !_sb.auth){ throw new Error('Supabase Auth indisponible.'); }
-    const redirectTo = window.location.protocol === 'file:' ? window.location.href : `${window.location.origin}${window.location.pathname}`;
+    const redirectTo = getAuthRedirectUrl();
     const { data, error } = await _sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
