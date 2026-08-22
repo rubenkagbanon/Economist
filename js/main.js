@@ -11,6 +11,7 @@ function setNavDate(){
 }
 
 function maybeShowOnboarding(){
+  if(currentUser)return;
   let dismissed=false;
   try{ dismissed = localStorage.getItem('eco_onboard_dismissed')==='1'; }catch(e){}
   if(!dismissed) document.getElementById('onboard-overlay').classList.add('open');

@@ -122,19 +122,6 @@ async function shareProfile(email){
   const profileUrl=new URL(`/${profileSlug(user)}/`,siteOrigin);
   const shareData={title:`${user?.first||''} ${user?.last||''}`.trim(),text:`Profil de ${user?.first||''} ${user?.last||''}`.trim(),url:profileUrl.href};
   if(navigator.share){
-    const imageUrl=user.avatar||'https://www.econglobe.com/css/Logo.png';
-    if(navigator.canShare){
-      try{
-        const response=await fetch(imageUrl,{mode:'cors'});
-        if(response.ok){
-          const blob=await response.blob();
-          const extension=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
-          const file=new File([blob],`profil-${profileSlug(user)}.${extension}`,{type:blob.type||'image/png'});
-          const withImage={...shareData,files:[file]};
-          if(navigator.canShare(withImage)){ await navigator.share(withImage); return; }
-        }
-      }catch(e){}
-    }
     await navigator.share(shareData).catch(()=>{});
     return;
   }
@@ -152,19 +139,6 @@ async function shareArticle(id){
   const articleUrl=new URL(`/?article=${encodeURIComponent(article.id)}`,siteOrigin).href;
   const shareData={title:article.title,text:article.deck||`Lire l’article « ${article.title} » sur Economist.`,url:articleUrl};
   if(navigator.share){
-    const imageUrl=article.img||'https://www.econglobe.com/css/Logo.png';
-    if(navigator.canShare){
-      try{
-        const response=await fetch(imageUrl,{mode:'cors'});
-        if(response.ok){
-          const blob=await response.blob();
-          const extension=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
-          const file=new File([blob],`article-${article.id}.${extension}`,{type:blob.type||'image/png'});
-          const withImage={...shareData,files:[file]};
-          if(navigator.canShare(withImage)){await navigator.share(withImage);return;}
-        }
-      }catch(e){}
-    }
     await navigator.share(shareData).catch(()=>{});
     return;
   }

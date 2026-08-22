@@ -169,7 +169,7 @@ async function doLogout(){
   try{ if(_sb && _sb.auth){ await _sb.auth.signOut(); } }catch(e){ console.error('Google logout error:', e); }
   currentUser=null;clearLocalSession();
   _writeUnlocked=false;editorBlocks=[];
-  renderNav();showPage('home');showToast(t('toast_logout'));
+  renderNav();showPage('home');maybeShowOnboarding();showToast(t('toast_logout'));
 }
 
 // ═══════════════ PROFILE EDIT ═══════════════

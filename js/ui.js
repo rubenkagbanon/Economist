@@ -104,14 +104,14 @@ function renderSearchResults(q,targetId){
     el.innerHTML = `<div class="srd-section">Aucun résultat</div>`;
   } else {
     el.innerHTML = `${userResults.length ? `<div class="srd-section">Utilisateurs</div>${userResults.map(u => `
-      <div class="srd-item" onclick="selectSearchUser(${users.indexOf(u)},'${targetId}')">
+      <div class="srd-item" onpointerdown="event.preventDefault();selectSearchUser(${users.indexOf(u)},'${targetId}')">
         <div class="srd-cat">Profil</div>
         <div class="srd-profile-row">
           ${avHtml(u,32)}
           <div class="srd-title">${u.first||''} ${u.last||''}</div>
         </div>
       </div>`).join('')}` : ''}${articleResults.length ? `<div class="srd-section">Articles</div>${articleResults.map(a => `
-      <div class="srd-item" onclick="selectSearchResult(${a.id},'${targetId}')">
+      <div class="srd-item" onpointerdown="event.preventDefault();selectSearchResult(${a.id},'${targetId}')">
         <div class="srd-cat">${tCat(a.cat)}</div>
         <div class="srd-title">${a.title||''}</div>
         <div class="srd-author">${a.author||''}</div>
