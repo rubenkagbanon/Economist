@@ -15,13 +15,24 @@ function articleReadKey(id){
   const visitor=currentUser?.email?.toLowerCase()||'guest';
   return `eco_article_read_${visitor}_${id}`;
 }
+function getReadVisitorKey(){
+  const storageKey='eco_read_visitor_key';
+  try{
+    let key=localStorage.getItem(storageKey);
+    if(!key){
+      key=crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(storageKey,key);
+    }
+    return key;
+  }catch(e){ return null; }
+}
 function scheduleArticleRead(id){
   cancelArticleRead();
   if(localStorage.getItem(articleReadKey(id)))return;
   activeReadArticleId=id;
   activeReadTimer=setTimeout(async()=>{
     if(activeReadArticleId!==id)return;
-    const {error}=await _sb.rpc('record_article_read',{article_id:id});
+    const {error}=await _sb.rpc('record_article_read',{p_article_id:id,p_visitor_key:getReadVisitorKey()});
     if(error){console.error('record_article_read',error);return;}
       const article=articles.find(item=>item.id===id);
       if(article)article.reads=(article.reads||0)+1;
