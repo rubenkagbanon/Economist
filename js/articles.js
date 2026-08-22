@@ -249,7 +249,8 @@ function renderHome(cat){
 async function openArticle(id){
   const a=articles.find(x=>x.id===id); if(!a)return;
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
-  const authorUser=findAuthorUser(a.author);
+  const authorUser=(a.owner_id&&users.find(user=>String(user.id)===String(a.owner_id)))||findAuthorUser(a.author);
+  const authorSlug=authorUser?profileSlug(authorUser):`${a.author||''}`.trim().replace(/\s+/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
   const shareBtn=`<button onclick="shareArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid var(--gris-clair);color:var(--txt-mut);padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--rouge)';this.style.color='var(--rouge)'" onmouseout="this.style.borderColor='var(--gris-clair)';this.style.color='var(--txt-mut)'">${t('article_share')}</button>`;
   const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#8B0000;border:.5px solid #8B0000;color:#fff;padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='#700000';this.style.color='#fff'" onmouseout="this.style.background='#8B0000';this.style.color='#fff'">🗑 ${t('admin_delete')}</button>`:'';
@@ -261,7 +262,7 @@ async function openArticle(id){
     <h1 class="art-full-title">${a.title}</h1>
     <div class="art-full-deck">${a.deck}</div>
     <div class="art-full-meta">
-      <span>${t('home_par')} <span class="author-chip" onclick="${authorUser?`showPage('profile');openProfile('${authorUser.email}')`:'void(0)'}">${a.author}</span></span>
+      <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile('${authorUser.email}')`:`window.location.href=this.href`}">${a.author}</a></span>
       <span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)} ${t('home_read')}</span>
     </div>
     ${a.img?`<div class="art-full-cover"><img decoding="async" src="${a.img}" alt="" onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${tCat(a.cat)} — ${tDate(a.date)}</div>`:''}
