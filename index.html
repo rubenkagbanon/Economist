@@ -32,6 +32,7 @@
       "@type": "Organization",
       "@id": "https://www.econglobe.com/#organization",
       "name": "Economist",
+      "alternateName": "Economist EconGlobe",
       "url": "https://www.econglobe.com/",
       "logo": "https://www.econglobe.com/css/Logo.png"
     },
@@ -39,11 +40,12 @@
       "@type": "WebSite",
       "@id": "https://www.econglobe.com/#website",
       "name": "Economist",
+      "alternateName": "Economist EconGlobe",
       "url": "https://www.econglobe.com/",
       "publisher": {"@id": "https://www.econglobe.com/#organization"},
-      "inLanguage": "fr-FR",
-      "description": "Economist est une plateforme éditoriale qui aide ses lecteurs à comprendre l’actualité et les grands enjeux contemporains grâce à des articles, des analyses et des perspectives vérifiables.",
-      "keywords": "économie, finance, politique, technologie, actualité, analyses"
+      "inLanguage": ["fr-FR", "en-US"],
+      "description": "An editorial platform publishing news articles, analysis and perspectives on economics, finance, politics, data science, technology and social change.",
+      "keywords": "économie, finance, politique, sociologie, droit, technologie, santé, société, écologie, intelligence artificielle, data science"
     }
   ]
 }
@@ -66,8 +68,7 @@
 <noscript>
   <main>
     <h1>Economist</h1>
-    <p>Economist est une plateforme éditoriale qui aide ses lecteurs à comprendre l'actualité et les grands enjeux contemporains grâce à des articles, des analyses et des perspectives.</p>
-    <p>Les utilisateurs peuvent lire, rechercher et partager des articles. Les membres peuvent créer un compte et publier leurs propres analyses selon les règles de la plateforme.</p>
+    <p>Economist publie sur econglobe.com des actualités et analyses sous forme d'articles dans plusieurs domaines : data science, économie, finance, technologie, politique, droit, santé et société.</p>
     <h2>Domaines couverts</h2>
     <p>Économie, Finance, Politics, Sociology, Law, Technology, Health, Ecology, AI et Data Science.</p>
   </main>
@@ -338,13 +339,7 @@
     </div>
   </section>
 </div>
-<div id="page-home" class="page active">
-  <section class="home-intro" aria-labelledby="home-intro-title">
-    <h1 id="home-intro-title"><span>Economist</span> : actualités et analyses pour comprendre le monde.</h1>
-    <p>Articles et perspectives accessibles sur l’économie, la finance, la politique, la technologie et la société.</p>
-  </section>
-  <div id="home-content"></div>
-</div>
+<div id="page-home" class="page active"><div id="home-content"></div></div>
 <div id="page-article" class="page"><div class="article-page" id="article-content"></div></div>
 
 <div id="page-propose" class="page">
