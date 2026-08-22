@@ -111,6 +111,10 @@ function profileEmailFromPath(){
   const user=users.find(u=>profileSlug(u)===path.toLowerCase());
   return user?.email||null;
 }
+function findAuthorUser(authorName){
+  const normalized=(authorName||'').trim().replace(/\s+/g,' ').toLowerCase();
+  return users.find(user=>`${user.first||''} ${user.last||''}`.trim().replace(/\s+/g,' ').toLowerCase()===normalized)||null;
+}
 async function shareProfile(email){
   const user=users.find(u=>u.email===email);
   if(!user)return;
@@ -263,7 +267,7 @@ function renderHome(cat){
 async function openArticle(id){
   const a=articles.find(x=>x.id===id); if(!a)return;
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
-  const authorUser=users.find(u=>u.first+' '+u.last===a.author);
+  const authorUser=findAuthorUser(a.author);
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
   const shareBtn=`<button onclick="shareArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid var(--gris-clair);color:var(--txt-mut);padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--rouge)';this.style.color='var(--rouge)'" onmouseout="this.style.borderColor='var(--gris-clair)';this.style.color='var(--txt-mut)'">${t('article_share')}</button>`;
   const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#8B0000;border:.5px solid #8B0000;color:#fff;padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='#700000';this.style.color='#fff'" onmouseout="this.style.background='#8B0000';this.style.color='#fff'">🗑 ${t('admin_delete')}</button>`:'';
