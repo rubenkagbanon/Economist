@@ -72,6 +72,12 @@ async function init(){
   renderNav();
   renderHome(currentActiveCat);
 
+  const sharedArticleId=new URLSearchParams(window.location.search).get('article');
+  if(sharedArticleId){
+    const sharedArticle=articles.find(article=>String(article.id)===sharedArticleId);
+    if(sharedArticle)openArticle(sharedArticle.id);
+  }
+
   const routePage=pageFromPath();
   if(routePage) showPage(routePage);
 

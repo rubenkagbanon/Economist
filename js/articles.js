@@ -45,6 +45,7 @@ function showPage(name){
     : name==='privacy'
       ? 'Economist | Politique de confidentialité'
       : 'Economist | Actualités et analyses dans plusieurs domaines';
+  if(name!=='profile') resetProfileShareMetadata();
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
   const route=name==='privacy'?'/privacy':name==='rules'?'/terms':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
@@ -59,6 +60,34 @@ function showPage(name){
   if(name==='write')   renderWritePage();
   if(name==='mystats') { loadData().then(()=>renderMyStats()); }
   if(name==='admin')   { loadData().then(()=>renderAdmin()); }
+}
+function setProfileShareMetadata(user){
+  const title=`${user?.first||''} ${user?.last||''}`.trim()||'Profil Economist';
+  const description=user?.bio||`Profil de ${title} sur Economist.`;
+  const image=user?.avatar||'https://www.econglobe.com/css/Logo.png';
+  document.title=`${title} | Economist`;
+  document.querySelector('meta[name="description"]')?.setAttribute('content',description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content',title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content',description);
+  document.querySelector('meta[property="og:image"]')?.setAttribute('content',image);
+  document.querySelector('meta[property="og:image:alt"]')?.setAttribute('content',`Photo de profil de ${title}`);
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute('content',title);
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',description);
+  document.querySelector('meta[name="twitter:image"]')?.setAttribute('content',image);
+}
+function resetProfileShareMetadata(){
+  const defaults={
+    'meta[name="description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
+    'meta[property="og:title"]':'Economist | Actualités et analyses dans plusieurs domaines',
+    'meta[property="og:description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
+    'meta[property="og:image"]':'https://www.econglobe.com/css/Logo.png',
+    'meta[property="og:image:alt"]':'Logo Economist',
+    'meta[name="twitter:title"]':'Economist | Actualités et analyses dans plusieurs domaines',
+    'meta[name="twitter:description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
+    'meta[name="twitter:image"]':'https://www.econglobe.com/css/Logo.png'
+  };
+  document.title='Economist | Actualités et analyses dans plusieurs domaines';
+  Object.entries(defaults).forEach(([selector,value])=>document.querySelector(selector)?.setAttribute('content',value));
 }
 function pageFromPath(){
   if(window.location.protocol==='file:')return null;
@@ -89,22 +118,54 @@ async function shareProfile(email){
   const profileUrl=new URL(`/${profileSlug(user)}/`,siteOrigin);
   const shareData={title:`${user?.first||''} ${user?.last||''}`.trim(),text:`Profil de ${user?.first||''} ${user?.last||''}`.trim(),url:profileUrl.href};
   if(navigator.share){
-    if(user.avatar && navigator.canShare){
+    const imageUrl=user.avatar||'https://www.econglobe.com/css/Logo.png';
+    if(navigator.canShare){
       try{
-        const response=await fetch(user.avatar);
+        const response=await fetch(imageUrl,{mode:'cors'});
         if(response.ok){
           const blob=await response.blob();
-          const file=new File([blob],`profil-${profileSlug(user)}.${blob.type.split('/')[1]||'jpg'}`,{type:blob.type||'image/jpeg'});
-          const withAvatar={...shareData,files:[file]};
-          if(navigator.canShare(withAvatar)){ navigator.share(withAvatar).catch(()=>{}); return; }
+          const extension=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
+          const file=new File([blob],`profil-${profileSlug(user)}.${extension}`,{type:blob.type||'image/png'});
+          const withImage={...shareData,files:[file]};
+          if(navigator.canShare(withImage)){ await navigator.share(withImage); return; }
         }
       }catch(e){}
     }
-    navigator.share(shareData).catch(()=>{});
+    await navigator.share(shareData).catch(()=>{});
     return;
   }
   if(!navigator.clipboard?.writeText){ showToast(t('profile_share_error')); return; }
   navigator.clipboard.writeText(profileUrl.href).then(()=>showToast(t('profile_shared'))).catch(()=>showToast(t('profile_share_error')));
+}
+async function shareArticle(id){
+  if(!currentUser){
+    openModal('login');
+    return;
+  }
+  const article=articles.find(item=>item.id===id);
+  if(!article)return;
+  const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
+  const articleUrl=new URL(`/?article=${encodeURIComponent(article.id)}`,siteOrigin).href;
+  const shareData={title:article.title,text:article.deck||`Lire l’article « ${article.title} » sur Economist.`,url:articleUrl};
+  if(navigator.share){
+    const imageUrl=article.img||'https://www.econglobe.com/css/Logo.png';
+    if(navigator.canShare){
+      try{
+        const response=await fetch(imageUrl,{mode:'cors'});
+        if(response.ok){
+          const blob=await response.blob();
+          const extension=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
+          const file=new File([blob],`article-${article.id}.${extension}`,{type:blob.type||'image/png'});
+          const withImage={...shareData,files:[file]};
+          if(navigator.canShare(withImage)){await navigator.share(withImage);return;}
+        }
+      }catch(e){}
+    }
+    await navigator.share(shareData).catch(()=>{});
+    return;
+  }
+  if(!navigator.clipboard?.writeText){showToast(t('article_share_error'));return;}
+  navigator.clipboard.writeText(articleUrl).then(()=>showToast(t('article_shared'))).catch(()=>showToast(t('article_share_error')));
 }
 function filterRules(query){
   const term=(query||'').trim().toLowerCase();
@@ -204,10 +265,11 @@ async function openArticle(id){
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=users.find(u=>u.first+' '+u.last===a.author);
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
+  const shareBtn=`<button onclick="shareArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid var(--gris-clair);color:var(--txt-mut);padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--rouge)';this.style.color='var(--rouge)'" onmouseout="this.style.borderColor='var(--gris-clair)';this.style.color='var(--txt-mut)'">${t('article_share')}</button>`;
   const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#8B0000;border:.5px solid #8B0000;color:#fff;padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='#700000';this.style.color='#fff'" onmouseout="this.style.background='#8B0000';this.style.color='#fff'">🗑 ${t('admin_delete')}</button>`:'';
   document.getElementById('article-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
-      <button class="back-btn" style="margin-bottom:0" onclick="showPage('home')">${t('home_back')}</button>${delBtn}
+      <button class="back-btn" style="margin-bottom:0" onclick="showPage('home')">${t('home_back')}</button>${shareBtn}${delBtn}
     </div>
     <div class="art-full-k">${tCat(a.cat)}</div>
     <h1 class="art-full-title">${a.title}</h1>
@@ -235,6 +297,7 @@ async function confirmDeleteArticle(id){
 function openProfile(email){
   const u=users.find(x=>x.email===email);
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
+  setProfileShareMetadata(u);
   const userArticles=articles.filter(a=>a.author===u.first+' '+u.last).reverse();
   const isMe=currentUser&&currentUser.email===email;
   const avatarClass=profileLevelClass(u.level);

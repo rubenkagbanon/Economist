@@ -48,7 +48,7 @@ const I18N = {
     profile_not_found:"Profil introuvable.", profile_member:"Membre depuis le", profile_reader:"Lecteur",
     profile_writer:"Rédacteur", profile_edit:"Modifier mon profil", profile_share:"Partager le profil", profile_level:"Niveau d’études",
     level_licence:"Licence", level_master:"Master", level_doctorat:"Doctorat / PhD",
-    profile_shared:"Lien du profil copié.", profile_share_error:"Impossible de copier le lien.", profile_arts:"Articles publiés",
+    profile_shared:"Lien du profil copié.", profile_share_error:"Impossible de copier le lien.", article_share:"Partager", article_shared:"Lien de l’article copié.", article_share_error:"Impossible de copier le lien de l’article.", profile_arts:"Articles publiés",
     profile_none:"Aucun article publié.",
 
     write_connect:"Connectez-vous pour voir vos statistiques.",
@@ -105,7 +105,7 @@ const I18N = {
     profile_not_found:"Profile not found.", profile_member:"Member since", profile_reader:"Reader",
     profile_writer:"Writer", profile_edit:"Edit my profile", profile_share:"Share profile", profile_level:"Education level",
     level_licence:"Bachelor's degree", level_master:"Master's degree", level_doctorat:"PhD",
-    profile_shared:"Profile link copied.", profile_share_error:"Unable to copy the link.", profile_arts:"Published articles",
+    profile_shared:"Profile link copied.", profile_share_error:"Unable to copy the link.", article_share:"Share", article_shared:"Article link copied.", article_share_error:"Unable to copy the article link.", profile_arts:"Published articles",
     profile_none:"No articles published.",
 
     write_connect:"Log in to see your stats.",
