@@ -52,11 +52,13 @@ async function init(){
     const { data: { session } } = await _sb.auth.getSession();
     if(session && session.user) await syncAuthUserFromSession(session);
     _sb.auth.onAuthStateChange(async (_event, nextSession) => {
-      if(nextSession && nextSession.user){
+      if(!nextSession || !nextSession.user)return;
+      setTimeout(async ()=>{
         await syncAuthUserFromSession(nextSession);
         renderNav();
         if(typeof renderHome==='function') renderHome(currentActiveCat);
-      }
+        if(_event==='SIGNED_IN')showToast(`${t('toast_welcome')}, ${currentUser.first} !`);
+      },0);
     });
   } else {
     currentUser = null;

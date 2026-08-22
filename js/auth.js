@@ -5,7 +5,7 @@
 // ═══════════════ AUTH ═══════════════
 function getAuthRedirectUrl(){
   if(window.location.protocol==='file:')return window.location.href.split('#')[0];
-  return `${window.location.origin}${window.location.pathname}`;
+  return 'https://www.econglobe.com/';
 }
 
 async function profileFromAuthUser(authUser){
