@@ -115,6 +115,14 @@ function findAuthorUser(authorName){
   const normalized=(authorName||'').trim().replace(/\s+/g,' ').toLowerCase();
   return users.find(user=>`${user.first||''} ${user.last||''}`.trim().replace(/\s+/g,' ').toLowerCase()===normalized)||null;
 }
+function articleBelongsToUser(article,user){
+  if(article.owner_id && user.id)return String(article.owner_id)===String(user.id);
+  const articleAuthor=findAuthorUser(article.author);
+  if(articleAuthor)return String(articleAuthor.email||'').toLowerCase()===String(user.email||'').toLowerCase();
+  const authorName=(article.author||'').trim().replace(/\s+/g,' ').toLowerCase();
+  const userName=`${user.first||''} ${user.last||''}`.trim().replace(/\s+/g,' ').toLowerCase();
+  return authorName===userName;
+}
 async function shareProfile(email){
   const user=users.find(u=>u.email===email);
   if(!user)return;
@@ -276,7 +284,7 @@ function openProfile(email){
   const u=users.find(x=>x.email===email);
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
   setProfileShareMetadata(u);
-  const userArticles=articles.filter(a=>a.author===u.first+' '+u.last).reverse();
+  const userArticles=articles.filter(article=>articleBelongsToUser(article,u)).reverse();
   const isMe=currentUser&&currentUser.email===email;
   const avatarClass=profileLevelClass(u.level);
   const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img loading="lazy" decoding="async" src="${u.avatar}" alt="${u.first}"></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;

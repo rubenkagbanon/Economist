@@ -231,18 +231,22 @@ async function saveProfileEdit(){
   const idx=users.findIndex(u=>u.email===currentUser.email); if(idx===-1)return;
   const oldAuthor=`${users[idx].first} ${users[idx].last}`;
   const newAuthor=`${first} ${last}`;
-  if(editAvatarBase64) users[idx].avatar=editAvatarBase64;
-  users[idx].first=first;
-  users[idx].last=last;
-  users[idx].bio=bio;
-  users[idx].level=level;
-  currentUser=users[idx];
+  const updatedUser={...users[idx],first,last,bio,level};
+  if(editAvatarBase64)updatedUser.avatar=editAvatarBase64;
+  const profileError=await saveUser(updatedUser);
+  if(profileError){showToast('Impossible d’enregistrer le profil.');return;}
+  users[idx]=updatedUser;
+  currentUser=updatedUser;
   saveLocalSession(currentUser.email);
-  await saveUser(currentUser);
   if(oldAuthor!==newAuthor){
-    const authoredArticles=articles.filter(article=>article.author===oldAuthor);
+    const normalizedOldAuthor=oldAuthor.trim().replace(/\s+/g,' ').toLowerCase();
+    const authoredArticles=articles.filter(article=>
+      (article.owner_id && currentUser.id && String(article.owner_id)===String(currentUser.id)) ||
+      (article.author||'').trim().replace(/\s+/g,' ').toLowerCase()===normalizedOldAuthor
+    );
     authoredArticles.forEach(article=>{article.author=newAuthor;});
-    await Promise.all(authoredArticles.map(article=>saveArticle(article)));
+    const articleErrors=await Promise.all(authoredArticles.map(article=>saveArticle(article)));
+    if(articleErrors.some(Boolean)){showToast('Profil enregistré, mais certains articles n’ont pas pu être mis à jour.');return;}
   }
   closeProfileEdit();renderNav();openProfile(currentUser.email);
   showToast(t('toast_profile'));
