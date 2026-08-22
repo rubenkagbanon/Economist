@@ -88,7 +88,6 @@ async function init(){
   await waitForPageReady();
   setLoadingStatus('Tout est prêt.');
   document.getElementById('loading-screen').classList.add('hidden');
-  maybeShowOnboarding();
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
