@@ -51,6 +51,7 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(!pg)return;
   pg.classList.add('active');
+  if(name==='propose')initProposalContact();
   document.title=name==='rules'
     ? 'Economist | Conditions d’utilisation'
     : name==='privacy'

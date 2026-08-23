@@ -3,6 +3,14 @@
 // ════════════════════════════════════════════════════════════
 
 // ═══════════════ PROPOSITION D'ARTICLE ═══════════════
+function initProposalContact(){
+  if(!currentUser)return;
+  const first=document.getElementById('r-first');
+  const last=document.getElementById('r-last');
+  if(first && !first.value)first.value=currentUser.first||'';
+  if(last && !last.value)last.value=currentUser.last||'';
+}
+
 async function submitRequest(){
   if(!currentUser){
     showToast('Connectez-vous pour proposer un article.');

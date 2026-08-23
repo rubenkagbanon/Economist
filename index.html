@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>Economist | Actualités et analyses dans plusieurs domaines</title>
-<meta name="description" content="Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.">
+<title>Economist | News and analysis across disciplines</title>
+<meta name="description" content="Economist publishes news, analysis and perspectives on economics, finance, politics, technology and social change.">
 <meta name="author" content="Economist">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#111010">
 <link rel="canonical" href="https://www.econglobe.com/">
-<meta property="og:locale" content="fr_FR">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Economist">
-<meta property="og:title" content="Economist | Actualités et analyses dans plusieurs domaines">
-<meta property="og:description" content="Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.">
+<meta property="og:title" content="Economist | News and analysis across disciplines">
+<meta property="og:description" content="Economist publishes news, analysis and perspectives on economics, finance, politics, technology and social change.">
 <meta property="og:url" content="https://www.econglobe.com/">
 <meta property="og:image" content="https://www.econglobe.com/css/Logo.png">
 <meta property="og:image:width" content="567">
@@ -21,8 +22,8 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:alt" content="Logo Economist">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Economist | Actualités et analyses dans plusieurs domaines">
-<meta name="twitter:description" content="Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.">
+<meta name="twitter:title" content="Economist | News and analysis across disciplines">
+<meta name="twitter:description" content="Economist publishes news, analysis and perspectives on economics, finance, politics, technology and social change.">
 <meta name="twitter:image" content="https://www.econglobe.com/css/Logo.png">
 <script type="application/ld+json">
 {
@@ -38,13 +39,23 @@
     },
     {
       "@type": "WebSite",
-      "@id": "https://www.econglobe.com/#website",
+      "@id": "https://www.econglobe.com/#website-en",
       "name": "Economist",
       "alternateName": "Economist EconGlobe",
       "url": "https://www.econglobe.com/",
       "publisher": {"@id": "https://www.econglobe.com/#organization"},
-      "inLanguage": ["fr-FR", "en-US"],
-      "description": "An editorial platform publishing news articles, analysis and perspectives on economics, finance, politics, data science, technology and social change.",
+      "inLanguage": "en-US",
+      "description": "Economist publishes news, analysis and perspectives on economics, finance, politics, technology and social change.",
+      "keywords": "économie, finance, politique, sociologie, droit, technologie, santé, société, écologie, intelligence artificielle, data science"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.econglobe.com/#website-fr",
+      "name": "Economist",
+      "url": "https://www.econglobe.com/",
+      "publisher": {"@id": "https://www.econglobe.com/#organization"},
+      "inLanguage": "fr-FR",
+      "description": "Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.",
       "keywords": "économie, finance, politique, sociologie, droit, technologie, santé, société, écologie, intelligence artificielle, data science"
     }
   ]
@@ -176,13 +187,8 @@
           Se connecter avec Google
         </button>
       </div>
-      <div class="m-row"><label data-i18n="auth_email">Email</label><input type="email" id="login-email" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="m-row"><label data-i18n="auth_pwd">Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-        <div class="m-err" id="login-err" data-i18n="auth_err_login">Email ou mot de passe incorrect.</div></div>
-      <button class="btn-modal" id="btn-login" onclick="doLogin()" data-i18n="auth_btn_login">Se connecter</button>
-      <div style="text-align:right;margin-top:.6rem"><span class="m-link" style="font-size:.78rem" onclick="openForgotPwd()">Mot de passe oublié ?</span></div>
       <div class="m-divider"></div>
-      <span style="font-family:var(--sans);font-size:.8rem;color:var(--txt-lite)"><span data-i18n="auth_no_account">Pas de compte ?</span> <span class="m-link" onclick="switchTab('signup')" data-i18n="auth_signup">Créer un compte</span></span>
+      <span style="font-family:var(--sans);font-size:.8rem;color:var(--txt-lite)"><span data-i18n="auth_no_account">Pas de compte ?</span> <span class="m-link" onclick="switchTab('signup')" data-i18n="auth_signup">Créer un compte avec Google</span></span>
     </div>
     <div class="modal-panel" id="tab-signup">
       <div class="auth-social">
@@ -191,44 +197,8 @@
           Créer mon compte avec Google
         </button>
       </div>
-      <div class="form-two-col" style="gap:.9rem">
-        <div class="m-row"><label>Prénom</label><input type="text" id="su-first" placeholder="Jean"></div>
-        <div class="m-row"><label>Nom</label><input type="text" id="su-last" placeholder="Dupont"></div>
-      </div>
-      <div class="m-row"><label>Email</label><input type="email" id="su-email" placeholder="votre@email.com"></div>
-      <div class="m-row"><label>Mot de passe</label>
-        <div style="position:relative">
-          <input type="password" id="su-pwd" placeholder="8 caractères minimum" style="padding-right:2.5rem;width:100%">
-          <button type="button" onclick="togglePwd('su-pwd',this)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt-pale);font-size:13px;padding:0;line-height:1" title="Afficher / masquer">👁</button>
-        </div>
-      </div>
-      <div class="m-row"><label>Confirmer le mot de passe</label>
-        <div style="position:relative">
-          <input type="password" id="su-pwd2" placeholder="Répétez votre mot de passe" style="padding-right:2.5rem;width:100%">
-          <button type="button" onclick="togglePwd('su-pwd2',this)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt-pale);font-size:13px;padding:0;line-height:1" title="Afficher / masquer">👁</button>
-        </div>
-      </div>
-      <div class="m-err" id="su-err">Veuillez remplir tous les champs.</div>
-      <div class="m-ok" id="su-ok" data-i18n="auth_ok_created">Compte créé !</div>
-      <button class="btn-modal" id="btn-signup" onclick="doSignup()" data-i18n="auth_btn_signup">Créer mon compte</button>
-    </div>
-    <div class="modal-panel" id="tab-forgot">
-      <div id="fp-step1">
-        <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.4rem;line-height:1.6">Entrez l'e-mail de votre compte. Nous vous enverrons un code de vérification.</p>
-        <div class="m-row"><label>Email</label><input type="email" id="fp-email" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')sendResetCode()"></div>
-        <div class="m-err" id="fp-err">Erreur.</div>
-        <button class="btn-modal" id="btn-fp-send" onclick="sendResetCode()">Envoyer le code</button>
-      </div>
-      <div id="fp-step2" style="display:none">
-        <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.4rem;line-height:1.6">Un code a été envoyé à <strong id="fp-email-shown"></strong>. Entrez-le ci-dessous avec votre nouveau mot de passe.</p>
-        <div class="m-row"><label>Code reçu</label><input type="text" id="fp-code" placeholder="123456" maxlength="6"></div>
-        <div class="m-row"><label>Nouveau mot de passe</label><input type="password" id="fp-new-pwd" placeholder="8 caractères minimum"></div>
-        <div class="m-row"><label>Confirmer le mot de passe</label><input type="password" id="fp-new-pwd2" placeholder="Répétez votre mot de passe"></div>
-        <div class="m-err" id="fp-err2">Erreur.</div>
-        <button class="btn-modal" id="btn-fp-confirm" onclick="confirmResetPwd()">Réinitialiser le mot de passe</button>
-      </div>
       <div class="m-divider"></div>
-      <span class="m-link" onclick="switchTab('login')">← Retour à la connexion</span>
+      <span style="font-family:var(--sans);font-size:.8rem;color:var(--txt-lite)"><span data-i18n="auth_has_account">Déjà un compte ?</span> <span class="m-link" onclick="switchTab('login')" data-i18n="auth_login">Se connecter avec Google</span></span>
     </div>
   </div>
 </div>
@@ -539,8 +509,8 @@
       <span class="foot-link" onclick="showPage('about')" data-i18n="nav_about">À propos</span>
       <span class="foot-link" id="footer-propose-link" style="display:none" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</span>
       <span class="foot-link" onclick="showPage('write')" data-i18n="nav_write">Écrire</span>
-      <a class="foot-link" href="/privacy" onclick="event.preventDefault();showPage('privacy')" data-i18n="nav_privacy">Confidentialité</a>
-      <a class="foot-link" href="/terms" onclick="event.preventDefault();showPage('rules')" data-i18n="nav_rules">Conditions d’utilisation</a>
+      <a class="foot-link" href="/privacy/" onclick="event.preventDefault();showPage('privacy')" data-i18n="nav_privacy">Confidentialité</a>
+      <a class="foot-link" href="/terms/" onclick="event.preventDefault();showPage('rules')" data-i18n="nav_rules">Conditions d’utilisation</a>
     </div>
   </div>
 </footer>
