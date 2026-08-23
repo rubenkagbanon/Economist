@@ -115,7 +115,7 @@ function profileSlug(user){
     .toLowerCase().replace(/[^a-z0-9]/g,'');
 }
 function profileLevelClass(level){
-  return ['licence','master','doctorat'].includes(level)?` profile-level-${level}`:'';
+  return ['licence','master','doctorat','professor'].includes(level)?` profile-level-${level}`:'';
 }
 function profileEmailFromPath(){
   const path=window.location.pathname.replace(/^\/+|\/+$/g,'');

@@ -370,6 +370,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .profile-level-licence{border-color:#2e9d55}
 .profile-level-master{border-color:#2f70c9}
 .profile-level-doctorat{border-color:#7b3fb3}
+.profile-level-professor{border-color:#b56b35}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-name{font-family:var(--serif);font-size:2rem;font-weight:400}
 .profile-meta{font-family:var(--sans);font-size:10px;letter-spacing:.1em;color:var(--gris);margin-top:.4rem;line-height:1.8}
@@ -383,7 +384,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .profile-level-option{display:flex;align-items:center;gap:.55rem;font-family:var(--sans);font-size:.82rem;color:var(--txt-soft);margin:.55rem 0;cursor:pointer}
 .profile-level-option input{accent-color:var(--rouge);margin:0}
 .level-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
-.level-dot-green{background:#2e9d55}.level-dot-blue{background:#2f70c9}.level-dot-purple{background:#7b3fb3}
+.level-dot-green{background:#2e9d55}.level-dot-blue{background:#2f70c9}.level-dot-purple{background:#7b3fb3}.level-dot-copper{background:#b56b35}
 
 /* FOOTER */
 footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizing:border-box;position:relative;z-index:1;width:100%;margin-top:auto;}

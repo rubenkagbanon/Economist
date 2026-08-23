@@ -218,7 +218,7 @@ function handleAvatarUpload(e){
 function updateEditAvatarLevel(level){
   const preview=document.getElementById('edit-avatar-preview');
   if(!preview)return;
-  preview.classList.remove('profile-level-licence','profile-level-master','profile-level-doctorat');
+  preview.classList.remove('profile-level-licence','profile-level-master','profile-level-doctorat','profile-level-professor');
   if(level)preview.classList.add(`profile-level-${level}`);
 }
 async function saveProfileEdit(){
