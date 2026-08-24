@@ -53,7 +53,7 @@ const I18N = {
 
     write_connect:"Connectez-vous pour voir vos statistiques.",
 
-    propose_title:"Proposer un", propose_article:"article", propose_sub:"Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.", propose_contact:"Votre contact", propose_idea:"Votre idée", propose_submit:"Envoyer ma proposition →", propose_link:"Proposer un article →",
+    propose_title:"Proposer un", propose_article:"article", propose_sub:"Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.", propose_contact:"Votre contact", propose_idea:"Votre idée", propose_submit:"Envoyer ma proposition →", propose_link:"Proposer un article →", propose_first:"Prénom *", propose_first_ph:"Jean", propose_last:"Nom *", propose_last_ph:"Dupont", propose_email:"Email *", propose_email_ph:"votre@email.com", propose_email_note:"Vous recevrez votre code si votre idée est retenue.", propose_job:"Profession", propose_subject:"Sujet *", propose_motivation:"Motivation (optionnel)", propose_select:"— Sélectionner —", propose_subject_ph:"Décrivez brièvement votre idée…", propose_motivation_ph:"Pourquoi ce sujet ?", propose_job_ph:"Économiste, étudiant…",
     write_title:"Écrire un", write_article:"article", write_sub:"Connectez-vous et entrez votre code d'accès pour rédiger.", write_login_required:"Vous devez être connecté pour rédiger.", write_or:"ou", write_code_label:"Code d'accès rédacteur", write_code_prompt:"Entrez votre code reçu par e-mail.", write_no_code:"Pas de code ?", write_unlock:"Déverrouiller", write_code_error:"Code incorrect.",
 
     stats_articles:"Articles", stats_reads:"Lectures", stats_words:"Mots écrits",
@@ -113,7 +113,7 @@ const I18N = {
 
     write_connect:"Log in to see your stats.",
 
-    propose_title:"Submit an", propose_article:"article", propose_sub:"Would you like to write for Economist? Describe your idea. If selected, you will receive an access code by email.", propose_contact:"Your contact details", propose_idea:"Your idea", propose_submit:"Submit my proposal →", propose_link:"Submit an article →",
+    propose_title:"Submit an", propose_article:"article", propose_sub:"Would you like to write for Economist? Describe your idea. If selected, you will receive an access code by email.", propose_contact:"Your contact details", propose_idea:"Your idea", propose_submit:"Submit my proposal →", propose_link:"Submit an article →", propose_first:"First name *", propose_first_ph:"Jean", propose_last:"Last name *", propose_last_ph:"Smith", propose_email:"Email *", propose_email_ph:"your@email.com", propose_email_note:"You will receive your code if your idea is selected.", propose_job:"Profession", propose_subject:"Subject *", propose_motivation:"Motivation (optional)", propose_select:"— Select —", propose_subject_ph:"Briefly describe your idea…", propose_motivation_ph:"Why this topic?", propose_job_ph:"Economist, student…",
     write_title:"Write an", write_article:"article", write_sub:"Log in and enter your access code to start writing.", write_login_required:"You must be logged in to write.", write_or:"or", write_code_label:"Writer access code", write_code_prompt:"Enter the code you received by email.", write_no_code:"No code?", write_unlock:"Unlock", write_code_error:"Incorrect code.",
 
     stats_articles:"Articles", stats_reads:"Reads", stats_words:"Words written",
@@ -197,11 +197,11 @@ function translateLegalPages(){
   setLegalText('#rules-article .help-callout p', ['Economist is an editorial space covering news and analysis across several fields. By using the service, you agree to respect other users, copyrights and the publishing rules below.']);
   setLegalText('#privacy-article .help-sidebar a', ['Privacy Policy','Information collected','How we use information','Sharing and third-party services','Your rights','Contact']);
   setLegalText('#rules-article .help-sidebar a', ['Terms of Use','Account and access','Content and rights','Safety and moderation','Contact']);
-  setLegalText('#privacy-article .help-section h2', ['Purpose of this policy','Information collected','How we use information','Sharing and third-party services','Retention and security','Your rights','Changes to this policy','Contact us']);
-  setLegalText('#privacy-article .help-section h3', ['Information you provide','Usage-related information','Google sign-in']);
-  setLegalText('#privacy-article .help-section p', [
+  setLegalText('#privacy-article section h2', ['Purpose of this policy','Information collected','How we use information','Sharing and third-party services','Retention and security','Your rights','Changes to this policy','Contact us']);
+  setLegalText('#privacy-article section h3', ['Information you provide','Usage-related information','Google sign-in']);
+  setLegalText('#privacy-article section p', [
     'This policy applies to the Economist website and its reading, search, account creation and article publishing features.',
-    'It explains the information we receive, how it is used and the choices available to you. It does not replace the service rules available on the <a href="/terms" onclick="event.preventDefault();showPage(\'rules\')">Terms of Use</a> page.',
+    'It explains the information we receive, how it is used and the choices available to you. It does not replace the service rules available on the <a href="/?page=rules" onclick="event.preventDefault();showPage(\'rules\')">Terms of Use</a> page.',
     'When you create or update an account, we may receive your first name, last name, email address, biography and profile photo. When you publish, we store the title, deck, text, images, sources and credits associated with the article.',
     'The service may record information needed to operate, such as your sign-in session, selected language, visual theme and article reading statistics.',
     'If you choose Google OAuth, Supabase Auth processes the information needed to sign you in, including your email address and public Google profile information.',
@@ -216,9 +216,9 @@ function translateLegalPages(){
     'We may update this policy when the service changes or regulations require it. The update date at the top of this page identifies the current version.',
     'For questions about this policy or your data, contact the Economist team through the service administration email address.'
   ]);
-  setLegalText('#rules-article .help-section h3', ['1. Account and access','2. Content and rights','3. Safety and moderation','4. How the service works','5. Personal data','6. Contact']);
-  setLegalText('#rules-article .help-section h4', ['Authorized publishing','Accuracy and transparency','Our actions']);
-  setLegalText('#rules-article .help-section p', [
+  setLegalText('#rules-article section h3', ['1. Account and access','2. Content and rights','3. Safety and moderation','4. How the service works','5. Personal data','6. Contact']);
+  setLegalText('#rules-article section h4', ['Authorized publishing','Accuracy and transparency','Our actions']);
+  setLegalText('#rules-article section p', [
     'You must provide accurate information when creating your account and protect your credentials. You may not use another person’s account, share restricted access or attempt to bypass the service controls.',
     'Access to writing and publishing may require approval or a code provided by Economist. This control helps preserve the quality and security of the platform.',
     'You remain responsible for the text, images, sources and links you add. You must have the necessary permissions and respect copyrights, trademarks and the privacy of people mentioned.',
@@ -227,7 +227,7 @@ function translateLegalPages(){
     'Economist may hide or remove content, limit a feature or suspend an account when a rule is broken, a security risk is identified or a legal obligation requires it.',
     'The service may change, be updated or experience temporary interruptions. Reading statistics, recommendations and article visibility may vary as the platform operates.',
     'Economist does not guarantee that every piece of content will be published, recommended or available without interruption.',
-    'Data related to your account and use of the service is handled according to our <a href="/privacy" onclick="event.preventDefault();showPage(\'privacy\')">Privacy Policy</a>.',
+    'Data related to your account and use of the service is handled according to our <a href="/?page=privacy" onclick="event.preventDefault();showPage(\'privacy\')">Privacy Policy</a>.',
     'If you have a question about these terms or want to report content, contact the Economist team through the service administration email address.'
   ]);
 }

@@ -102,6 +102,8 @@ function resetProfileShareMetadata(){
   Object.entries(defaults).forEach(([selector,value])=>document.querySelector(selector)?.setAttribute('content',value));
 }
 function pageFromPath(){
+  const requestedPage=new URLSearchParams(window.location.search).get('page');
+  if(requestedPage==='privacy'||requestedPage==='rules')return requestedPage;
   if(window.location.protocol==='file:')return null;
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';

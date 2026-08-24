@@ -320,19 +320,19 @@
     <div class="reg-card">
       <div class="reg-section" data-i18n="propose_contact">Votre contact</div>
       <div class="form-two-col" style="gap:1.2rem">
-        <div class="reg-row"><label>Prénom *</label><input type="text" id="r-first" placeholder="Jean"></div>
-        <div class="reg-row"><label>Nom *</label><input type="text" id="r-last" placeholder="Dupont"></div>
+        <div class="reg-row"><label data-i18n="propose_first">Prénom *</label><input type="text" id="r-first" data-i18n-placeholder="propose_first_ph" placeholder="Jean"></div>
+        <div class="reg-row"><label data-i18n="propose_last">Nom *</label><input type="text" id="r-last" data-i18n-placeholder="propose_last_ph" placeholder="Dupont"></div>
       </div>
-      <div class="reg-row"><label>Email *</label><input type="email" id="r-email" placeholder="votre@email.com"><span class="reg-note">Vous recevrez votre code si votre idée est retenue.</span></div>
-      <div class="reg-row"><label>Profession</label><input type="text" id="r-job" placeholder="Économiste, étudiant…"></div>
+      <div class="reg-row"><label data-i18n="propose_email">Email *</label><input type="email" id="r-email" data-i18n-placeholder="propose_email_ph" placeholder="votre@email.com"><span class="reg-note" data-i18n="propose_email_note">Vous recevrez votre code si votre idée est retenue.</span></div>
+      <div class="reg-row"><label data-i18n="propose_job">Profession</label><input type="text" id="r-job" data-i18n-placeholder="propose_job_ph" placeholder="Économiste, étudiant…"></div>
     </div>
     <div class="reg-card">
       <div class="reg-section" data-i18n="propose_idea">Votre idée</div>
       <div class="reg-row"><label>Rubrique *</label>
-        <select id="r-cat"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Santé</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
+        <select id="r-cat"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Santé" data-i18n="cat_health">Santé</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option></select>
       </div>
-      <div class="reg-row"><label>Sujet *</label><textarea id="r-subject" placeholder="Décrivez brièvement votre idée…"></textarea></div>
-      <div class="reg-row"><label>Motivation (optionnel)</label><textarea id="r-why" style="min-height:80px" placeholder="Pourquoi ce sujet ?"></textarea></div>
+      <div class="reg-row"><label data-i18n="propose_subject">Sujet *</label><textarea id="r-subject" data-i18n-placeholder="propose_subject_ph" placeholder="Décrivez brièvement votre idée…"></textarea></div>
+      <div class="reg-row"><label data-i18n="propose_motivation">Motivation (optionnel)</label><textarea id="r-why" data-i18n-placeholder="propose_motivation_ph" style="min-height:80px" placeholder="Pourquoi ce sujet ?"></textarea></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
       <button class="reg-submit" onclick="submitRequest()" data-i18n="propose_submit">Envoyer ma proposition →</button>
@@ -510,8 +510,8 @@
       <span class="foot-link" onclick="showPage('about')" data-i18n="nav_about">À propos</span>
       <span class="foot-link" id="footer-propose-link" style="display:none" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</span>
       <span class="foot-link" onclick="showPage('write')" data-i18n="nav_write">Écrire</span>
-      <a class="foot-link" href="/privacy/" onclick="event.preventDefault();showPage('privacy')" data-i18n="nav_privacy">Confidentialité</a>
-      <a class="foot-link" href="/terms/" onclick="event.preventDefault();showPage('rules')" data-i18n="nav_rules">Conditions d’utilisation</a>
+      <a class="foot-link" href="/?page=privacy" onclick="event.preventDefault();showPage('privacy')" data-i18n="nav_privacy">Confidentialité</a>
+      <a class="foot-link" href="/?page=rules" onclick="event.preventDefault();showPage('rules')" data-i18n="nav_rules">Conditions d’utilisation</a>
     </div>
   </div>
 </footer>

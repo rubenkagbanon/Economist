@@ -66,8 +66,8 @@ async function init(){
   }
 
   setLoadingStatus('Préparation des articles et des profils…');
-  applyTranslations();
   translateLegalPages();
+  applyTranslations();
   updateLangButton();
   setNavDate();
   renderNav();
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const savedLang=localStorage.getItem('eco_lang');
     if(savedLang) _lang=savedLang;
   }catch(e){}
-  applyTranslations();
   translateLegalPages();
+  applyTranslations();
   updateLangButton();
   setNavDate();
   initEmailJS();
