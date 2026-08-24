@@ -50,7 +50,7 @@ const I18N = {
     home_coming:"À paraître", home_desc:"Nos rédacteurs travaillent sur de nouveaux articles.",
     home_none_all:"Aucun article publié pour l'instant.", home_none_cat:"Aucun article en «",
     home_cta:"Proposer un article →", home_alire:"À lire aussi", home_par:"Par", home_read:"de lecture",
-    home_back:"← Retour",
+    home_back:"Retour",
 
     del_confirm:"Supprimer définitivement cet article ?", del_done:"Article supprimé.",
 
@@ -119,7 +119,7 @@ const I18N = {
     home_coming:"Coming soon", home_desc:"Our writers are working on new articles.",
     home_none_all:"No articles published yet.", home_none_cat:"No articles in «",
     home_cta:"Submit an article →", home_alire:"Also worth reading", home_par:"By", home_read:"read",
-    home_back:"← Back",
+    home_back:"Back",
 
     del_confirm:"Permanently delete this article?", del_done:"Article deleted.",
 

@@ -171,11 +171,14 @@ function togglePwd(inputId, btn){
 }
 
 // ═══════════════ THEME ═══════════════
+const themeLogoSources=['css/Logo.png','css/dark logo.png'];
+themeLogoSources.forEach(src=>{ const img=new Image(); img.src=src; });
+
 function updateLogoForTheme(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   const logoSrc=isDark ? 'css/dark logo.png' : 'css/Logo.png';
   document.querySelectorAll('.loading-logo-image, .nav-logo-image').forEach(img=>{
-    img.src=logoSrc;
+    if(img.src !== new URL(logoSrc, document.baseURI).href) img.src=logoSrc;
   }); 
   const favicon=document.getElementById('site-favicon');
   if(favicon) favicon.href=logoSrc;

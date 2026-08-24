@@ -18,7 +18,7 @@ function maybeShowOnboarding(){
 }
 function setLoadingStatus(message){
   const el=document.getElementById('loading-text');
-  if(el)el.textContent=`Economist · ${message}`;
+  if(el)el.textContent='Economist · Chargement…';
 }
 function waitForPageReady(){
   const images=[...document.images].filter(image=>{
