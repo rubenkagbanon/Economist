@@ -108,6 +108,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const savedLang=localStorage.getItem('eco_lang');
     if(savedLang) _lang=savedLang;
   }catch(e){}
+  applyTranslations();
+  translateLegalPages();
   updateLangButton();
   setNavDate();
   initEmailJS();

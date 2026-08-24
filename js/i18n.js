@@ -53,6 +53,9 @@ const I18N = {
 
     write_connect:"Connectez-vous pour voir vos statistiques.",
 
+    propose_title:"Proposer un", propose_article:"article", propose_sub:"Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.", propose_contact:"Votre contact", propose_idea:"Votre idée", propose_submit:"Envoyer ma proposition →", propose_link:"Proposer un article →",
+    write_title:"Écrire un", write_article:"article", write_sub:"Connectez-vous et entrez votre code d'accès pour rédiger.", write_login_required:"Vous devez être connecté pour rédiger.", write_or:"ou", write_code_label:"Code d'accès rédacteur", write_code_prompt:"Entrez votre code reçu par e-mail.", write_no_code:"Pas de code ?", write_unlock:"Déverrouiller", write_code_error:"Code incorrect.",
+
     stats_articles:"Articles", stats_reads:"Lectures", stats_words:"Mots écrits",
     stats_avg:"Lectures / article", stats_my:"Mes articles", stats_table_titre:"Titre",
     stats_table_cat:"Rubrique", stats_table_date:"Date", stats_table_reads:"Lectures",
@@ -109,6 +112,9 @@ const I18N = {
     profile_none:"No articles published.",
 
     write_connect:"Log in to see your stats.",
+
+    propose_title:"Submit an", propose_article:"article", propose_sub:"Would you like to write for Economist? Describe your idea. If selected, you will receive an access code by email.", propose_contact:"Your contact details", propose_idea:"Your idea", propose_submit:"Submit my proposal →", propose_link:"Submit an article →",
+    write_title:"Write an", write_article:"article", write_sub:"Log in and enter your access code to start writing.", write_login_required:"You must be logged in to write.", write_or:"or", write_code_label:"Writer access code", write_code_prompt:"Enter the code you received by email.", write_no_code:"No code?", write_unlock:"Unlock", write_code_error:"Incorrect code.",
 
     stats_articles:"Articles", stats_reads:"Reads", stats_words:"Words written",
     stats_avg:"Reads / article", stats_my:"My articles", stats_table_titre:"Title",
@@ -176,7 +182,7 @@ function setLegalText(selector, translations){
   });
 }
 function translateLegalPages(){
-  setLegalText('.help-kicker', ['Help Center','Help Center']);
+  setLegalText('.help-article-kicker', ['Help Center','Help Center']);
   setLegalText('.help-back', ['Back to site','Back to site']);
   setLegalText('.help-sidebar-label', ['Economist Help','Economist Help']);
   setLegalText('#privacy-article .help-article-kicker', ['Privacy and data']);

@@ -315,10 +315,10 @@
 
 <div id="page-propose" class="page">
   <div class="propose-page">
-    <h2>Proposer un <em>article</em></h2>
-    <p class="propose-sub">Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.</p>
+    <h2><span data-i18n="propose_title">Proposer un</span> <em data-i18n="propose_article">article</em></h2>
+    <p class="propose-sub" data-i18n="propose_sub">Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.</p>
     <div class="reg-card">
-      <div class="reg-section">Votre contact</div>
+      <div class="reg-section" data-i18n="propose_contact">Votre contact</div>
       <div class="form-two-col" style="gap:1.2rem">
         <div class="reg-row"><label>Prénom *</label><input type="text" id="r-first" placeholder="Jean"></div>
         <div class="reg-row"><label>Nom *</label><input type="text" id="r-last" placeholder="Dupont"></div>
@@ -327,7 +327,7 @@
       <div class="reg-row"><label>Profession</label><input type="text" id="r-job" placeholder="Économiste, étudiant…"></div>
     </div>
     <div class="reg-card">
-      <div class="reg-section">Votre idée</div>
+      <div class="reg-section" data-i18n="propose_idea">Votre idée</div>
       <div class="reg-row"><label>Rubrique *</label>
         <select id="r-cat"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Santé</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
       </div>
@@ -335,7 +335,7 @@
       <div class="reg-row"><label>Motivation (optionnel)</label><textarea id="r-why" style="min-height:80px" placeholder="Pourquoi ce sujet ?"></textarea></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
-      <button class="reg-submit" onclick="submitRequest()">Envoyer ma proposition →</button>
+      <button class="reg-submit" onclick="submitRequest()" data-i18n="propose_submit">Envoyer ma proposition →</button>
       <span style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
     </div>
     <div class="reg-success" id="reg-success">
@@ -347,22 +347,22 @@
 
 <div id="page-write" class="page">
   <div class="write-page">
-    <h2>Écrire un <em>article</em></h2>
-    <p class="write-sub" id="write-gate-sub">Connectez-vous et entrez votre code d'accès pour rédiger.</p>
+    <h2><span data-i18n="write_title">Écrire un</span> <em data-i18n="write_article">article</em></h2>
+    <p class="write-sub" id="write-gate-sub" data-i18n="write_sub">Connectez-vous et entrez votre code d'accès pour rédiger.</p>
     <div id="write-login-gate" style="display:none;border:.5px solid var(--gris-clair);border-left:3px solid var(--rouge);padding:2rem 2.5rem;margin-bottom:2rem">
-      <p style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">Vous devez être connecté pour rédiger.</p>
-      <button class="btn-red" onclick="openModal('login')">Se connecter</button>
-      <span style="margin:0 .8rem;color:var(--txt-pale);font-family:var(--sans);font-size:.85rem">ou</span>
-      <button class="btn-outline" onclick="openModal('signup')">Créer un compte</button>
+      <p data-i18n="write_login_required" style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">Vous devez être connecté pour rédiger.</p>
+      <button class="btn-red" onclick="openModal('login')" data-i18n="auth_login">Se connecter</button>
+      <span data-i18n="write_or" style="margin:0 .8rem;color:var(--txt-pale);font-family:var(--sans);font-size:.85rem">ou</span>
+      <button class="btn-outline" onclick="openModal('signup')" data-i18n="auth_signup">Créer un compte</button>
     </div>
     <div class="gate" id="code-gate" style="display:none">
-      <div class="gate-label">Code d'accès rédacteur</div>
-      <p>Entrez votre code reçu par e-mail.<br>Pas de code ? <span style="color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('propose')">Proposer un article →</span></p>
+      <div class="gate-label" data-i18n="write_code_label">Code d'accès rédacteur</div>
+      <p><span data-i18n="write_code_prompt">Entrez votre code reçu par e-mail.</span><br><span data-i18n="write_no_code">Pas de code ?</span> <span style="color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('propose')" data-i18n="propose_link">Proposer un article →</span></p>
       <div class="gate-row">
         <input type="password" id="access-code" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkCode()">
-        <button class="btn-red" onclick="checkCode()">Déverrouiller</button>
+        <button class="btn-red" onclick="checkCode()" data-i18n="write_unlock">Déverrouiller</button>
       </div>
-      <div class="gate-err" id="gate-err">Code incorrect.</div>
+      <div class="gate-err" id="gate-err" data-i18n="write_code_error">Code incorrect.</div>
     </div>
     <div style="display:none" id="write-form">
       <div class="form-wrap">
