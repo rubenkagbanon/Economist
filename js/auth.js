@@ -236,6 +236,7 @@ async function saveProfileEdit(){
   users[idx]=updatedUser;
   currentUser=updatedUser;
   saveLocalSession(currentUser.email);
+  writeDataCache();
   const authorInput=document.getElementById('f-author');
   if(authorInput && document.getElementById('page-write')?.classList.contains('active')){
     authorInput.value=newAuthor;
