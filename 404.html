@@ -9,7 +9,7 @@
   <style>
     :root{color-scheme:light;--ink:#080404;--muted:#77716c;--red:#8b0000;--paper:#f5f3ef;--line:#d9d4cd}
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif;visibility:hidden}
     main{width:min(680px,calc(100% - 40px));padding:48px 0;text-align:center}
     .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:46px;color:var(--ink);text-decoration:none}
     .brand img{width:48px;height:48px;object-fit:contain}
@@ -31,6 +31,7 @@
       html=html.replace('<head>','<head><base href="/">');
       document.open();document.write(html);document.close();
     }).catch(() => {
+      document.body.style.visibility='visible';
       document.getElementById('fallback').removeAttribute('hidden');
     });
   </script>

@@ -60,8 +60,9 @@ function showPage(name){
   if(name!=='profile') resetProfileShareMetadata();
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
-  const route=name==='privacy'?'/privacy':name==='rules'?'/terms':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
-  if(window.location.protocol!=='file:' && window.location.pathname!==route){
+  const route=name==='privacy'?'/?page=privacy':name==='rules'?'/?page=rules':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
+  const currentUrl=window.location.pathname+window.location.search;
+  if(window.location.protocol!=='file:' && currentUrl!==route){
     try{ window.history.pushState({page:name},'',route); }catch(e){}
   }
   if(name!=='article'){

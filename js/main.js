@@ -99,6 +99,7 @@ async function init(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  initThemeSync();
   try{
     const savedTheme=localStorage.getItem('eco_theme');
     if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);

@@ -63,7 +63,7 @@ const I18N = {
     search_label:"Rechercher", search_placeholder:"Articles, auteurs…", search_users:"Utilisateurs", search_articles:"Articles", search_empty:"Aucun résultat",
     editor_paragraph:"Paragraphe", editor_h1:"Titre H1", editor_h2:"Sous-titre H2", editor_h3:"Sous-titre H3", editor_image:"Image", editor_quote:"Citation", editor_separator:"Séparateur", editor_info:"Info", editor_sources:"Sources", editor_credits:"Crédits",
     editor_choose:"Choisir le type de bloc", editor_add_here:"+ Ajouter ici", editor_add_title:"Insérer un bloc à cet emplacement",
-    loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés.", privacy_search:"Rechercher dans la politique de confidentialité", rules_search:"Rechercher dans les conditions d’utilisation"
+    loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés.", privacy_search:"Rechercher dans la politique de confidentialité", rules_search:"Rechercher dans les conditions d’utilisation", privacy_nav_title:"Politique de confidentialité", privacy_nav_collect:"Informations collectées", privacy_nav_use:"Utilisation", privacy_nav_sharing:"Partage et services tiers", privacy_nav_rights:"Vos droits", privacy_nav_contact:"Contact", rules_nav_title:"Conditions d’utilisation", rules_nav_account:"Compte et accès", rules_nav_content:"Contenus et droits", rules_nav_safety:"Sécurité et modération", rules_nav_contact:"Contact"
   },
   en: {
     auth_welcome:"Welcome", auth_sync:"Your account is synced across all your devices.",
@@ -123,7 +123,7 @@ const I18N = {
     search_label:"Search", search_placeholder:"Articles, authors…", search_users:"Users", search_articles:"Articles", search_empty:"No results",
     editor_paragraph:"Paragraph", editor_h1:"H1 title", editor_h2:"H2 subtitle", editor_h3:"H3 subtitle", editor_image:"Image", editor_quote:"Quote", editor_separator:"Separator", editor_info:"Info", editor_sources:"Sources", editor_credits:"Credits",
     editor_choose:"Choose a block type", editor_add_here:"+ Add here", editor_add_title:"Insert a block at this position",
-    loading:"Economist · Connecting to database…", footer_rights:"All rights reserved.", privacy_search:"Search the privacy policy", rules_search:"Search the Terms of Use"
+    loading:"Economist · Connecting to database…", footer_rights:"All rights reserved.", privacy_search:"Search the privacy policy", rules_search:"Search the Terms of Use", privacy_nav_title:"Privacy Policy", privacy_nav_collect:"Information collected", privacy_nav_use:"How we use information", privacy_nav_sharing:"Sharing and third-party services", privacy_nav_rights:"Your rights", privacy_nav_contact:"Contact", rules_nav_title:"Terms of Use", rules_nav_account:"Account and access", rules_nav_content:"Content and rights", rules_nav_safety:"Safety and moderation", rules_nav_contact:"Contact"
   }
 };
 

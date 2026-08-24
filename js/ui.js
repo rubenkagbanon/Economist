@@ -181,6 +181,23 @@ function updateLogoForTheme(){
   if(favicon) favicon.href=logoSrc;
 }
 
+function applySystemTheme(event){
+  let saved=null;
+  try{ saved=localStorage.getItem('eco_theme'); }catch(e){}
+  if(saved)return;
+  const isDark=event?.matches ?? window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  updateLogoForTheme();
+}
+
+function initThemeSync(){
+  const media=window.matchMedia?.('(prefers-color-scheme: dark)');
+  if(!media)return;
+  const handler=event=>applySystemTheme(event);
+  if(media.addEventListener)media.addEventListener('change',handler);
+  else if(media.addListener)media.addListener(handler);
+}
+
 function toggleTheme(){
   const html=document.documentElement;
   const dark = html.getAttribute('data-theme')==='dark';

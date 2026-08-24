@@ -94,8 +94,8 @@ async function syncGoogleUserFromSession(session){
   const meta=session.user.user_metadata || {};
   const fullName=(meta.full_name || meta.name || email.split('@')[0] || 'Google User').trim();
   const nameParts=fullName.split(/\s+/).filter(Boolean);
-  const first=nameParts[0] || 'Google';
-  const last=nameParts.slice(1).join(' ') || 'User';
+  const first=meta.profile_name_customized && meta.first_name ? meta.first_name.trim() : (nameParts[0] || 'Google');
+  const last=meta.profile_name_customized && meta.last_name ? meta.last_name.trim() : (nameParts.slice(1).join(' ') || 'User');
   const avatar=meta.avatar_url || '';
 
   let u = users.find(x => (x.email||'').toLowerCase() === email);
@@ -235,6 +235,12 @@ async function saveProfileEdit(){
   if(editAvatarBase64)updatedUser.avatar=editAvatarBase64;
   const profileError=await saveUser(updatedUser);
   if(profileError){showToast('Impossible d’enregistrer le profil.');return;}
+  if(_sb?.auth){
+    const {error:authProfileError}=await _sb.auth.updateUser({data:{
+      first_name:first,last_name:last,full_name:`${first} ${last}`,profile_name_customized:true
+    }});
+    if(authProfileError)console.error('save custom profile name',authProfileError);
+  }
   users[idx]=updatedUser;
   currentUser=updatedUser;
   saveLocalSession(currentUser.email);
