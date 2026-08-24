@@ -13,7 +13,7 @@ const I18N = {
     auth_err_fields:"Veuillez remplir tous les champs.", auth_err_short:"8 caractères minimum.",
     auth_err_match:"Les mots de passe ne correspondent pas.", auth_err_email:"Cet email est déjà utilisé.",
 
-    cat_une:"À la une", cat_eco:"Économie", cat_fin:"Finance", cat_pol:"Politiques", cat_soc:"Sociologie",
+    cat_une:"À la une", cat_eco:"Économie", cat_fin:"Finance", cat_pol:"Politiques", cat_soc:"Sociologie", cat_africa:"Afrique", cat_world:"Monde",
     cat_dro:"Droit", cat_tec:"Technologies", cat_health:"Santé", cat_ecol:"Écologie",
     cat_ia:"IA", cat_data:"Data Science",
 
@@ -54,15 +54,15 @@ const I18N = {
     write_connect:"Connectez-vous pour voir vos statistiques.",
 
     propose_title:"Proposer un", propose_article:"article", propose_sub:"Vous souhaitez écrire pour Economist ? Décrivez votre idée. Si retenue, vous recevrez un code d'accès par e-mail.", propose_contact:"Votre contact", propose_idea:"Votre idée", propose_submit:"Envoyer ma proposition →", propose_link:"Proposer un article →", propose_first:"Prénom *", propose_first_ph:"Jean", propose_last:"Nom *", propose_last_ph:"Dupont", propose_email:"Email *", propose_email_ph:"votre@email.com", propose_email_note:"Vous recevrez votre code si votre idée est retenue.", propose_job:"Profession", propose_subject:"Sujet *", propose_motivation:"Motivation (optionnel)", propose_select:"— Sélectionner —", propose_subject_ph:"Décrivez brièvement votre idée…", propose_motivation_ph:"Pourquoi ce sujet ?", propose_job_ph:"Économiste, étudiant…",
-    write_title:"Écrire un", write_article:"article", write_sub:"Connectez-vous et entrez votre code d'accès pour rédiger.", write_login_required:"Vous devez être connecté pour rédiger.", write_or:"ou", write_code_label:"Code d'accès rédacteur", write_code_prompt:"Entrez votre code reçu par e-mail.", write_no_code:"Pas de code ?", write_unlock:"Déverrouiller", write_code_error:"Code incorrect.",
+    write_title:"Écrire un", write_article:"article", write_sub:"Connectez-vous et entrez votre code d'accès pour rédiger.", write_login_required:"Vous devez être connecté pour rédiger.", write_or:"ou", write_code_label:"Code d'accès rédacteur", write_code_prompt:"Entrez votre code reçu par e-mail.", write_no_code:"Pas de code ?", write_unlock:"Déverrouiller", write_code_error:"Code incorrect.", write_author:"Auteur *", write_author_ph:"Prénom Nom", write_title_label:"Titre *", write_title_ph:"Un titre précis…", write_characters:"80 caractères", write_deck:"Chapeau *", write_deck_ph:"Résumé 2-3 lignes…", write_deck_hint:"En italique sous le titre", write_cover:"Image de couverture (optionnel)", write_upload_image:"Cliquer pour charger une image", write_image_hint:"JPG, PNG, WebP · ou URL ci-dessous", write_url_ph:"https://… (URL alternative)", write_required:"* obligatoires", write_preview:"Aperçu", write_publish:"Publier →", write_published:"Article publié.", write_visible:"Visible par tous les visiteurs du site, sur tous les appareils.", write_read_article:"Lire mon article →",
 
     stats_articles:"Articles", stats_reads:"Lectures", stats_words:"Mots écrits",
     stats_avg:"Lectures / article", stats_my:"Mes articles", stats_table_titre:"Titre",
     stats_table_cat:"Rubrique", stats_table_date:"Date", stats_table_reads:"Lectures",
     stats_table_action:"Action", stats_none:"Vous n'avez publié aucun article.",
     search_label:"Rechercher", search_placeholder:"Articles, auteurs…", search_users:"Utilisateurs", search_articles:"Articles", search_empty:"Aucun résultat",
-    editor_paragraph:"Paragraphe", editor_h1:"Titre H1", editor_h2:"Sous-titre H2", editor_h3:"Sous-titre H3", editor_image:"Image", editor_quote:"Citation", editor_separator:"Séparateur", editor_info:"Info", editor_sources:"Sources", editor_credits:"Crédits",
-    editor_choose:"Choisir le type de bloc", editor_add_here:"+ Ajouter ici", editor_add_title:"Insérer un bloc à cet emplacement",
+    editor_paragraph:"Paragraphe", editor_h1:"Titre H1", editor_h2:"Sous-titre H2", editor_h3:"Sous-titre H3", editor_image:"Image", editor_quote:"Citation", editor_separator:"Séparateur", editor_info:"Info", editor_sources:"Sources", editor_credits:"Crédits", editor_para_ph:"Écrivez un paragraphe…", editor_h1_ph:"Titre H1…", editor_h2_ph:"Sous-titre H2…", editor_h3_ph:"Sous-titre H3…", editor_quote_ph:"Citation…", editor_info_label:"Encadré d'information", editor_info_ph:"Texte de l'encadré…", editor_sources_ph:"Une source par ligne… URL ou [texte](https://lien)", editor_credits_ph:"Rédigé par…, sources…", editor_caption_ph:"Légende (optionnel)", editor_add_paragraph:"Ajouter un paragraphe de texte", editor_add_h1:"Ajouter un titre principal", editor_add_h2:"Ajouter un grand sous-titre", editor_add_h3:"Ajouter un petit sous-titre", editor_add_quote:"Ajouter une citation mise en avant", editor_add_separator:"Ajouter un séparateur visuel", editor_add_info:"Ajouter un encadré d'information", editor_add_sources:"Ajouter les sources bibliographiques", editor_add_credits:"Ajouter les crédits ou les auteurs", editor_add_image:"Ajouter une image dans l'article",
+    editor_choose:"Choisir le type de bloc", editor_add_here:"+ Ajouter ici", editor_add_title:"Insérer un bloc à cet emplacement", editor_type:"Type", editor_delete:"Supprimer ce bloc",
     loading:"Economist · Connexion à la base…", footer_rights:"Tous droits réservés.", privacy_search:"Rechercher dans la politique de confidentialité", rules_search:"Rechercher dans les conditions d’utilisation", privacy_nav_title:"Politique de confidentialité", privacy_nav_collect:"Informations collectées", privacy_nav_use:"Utilisation", privacy_nav_sharing:"Partage et services tiers", privacy_nav_rights:"Vos droits", privacy_nav_contact:"Contact", rules_nav_title:"Conditions d’utilisation", rules_nav_account:"Compte et accès", rules_nav_content:"Contenus et droits", rules_nav_safety:"Sécurité et modération", rules_nav_contact:"Contact"
   },
   en: {
@@ -73,7 +73,7 @@ const I18N = {
     auth_err_fields:"Please fill in all fields.", auth_err_short:"8 characters minimum.",
     auth_err_match:"Passwords do not match.", auth_err_email:"This email is already in use.",
 
-    cat_une:"Front page", cat_eco:"Economy", cat_fin:"Finance", cat_pol:"Politics", cat_soc:"Sociology",
+    cat_une:"Front page", cat_eco:"Economy", cat_fin:"Finance", cat_pol:"Politics", cat_soc:"Sociology", cat_africa:"Africa", cat_world:"World",
     cat_dro:"Law", cat_tec:"Technology", cat_health:"Health", cat_ecol:"Ecology",
     cat_ia:"AI", cat_data:"Data Science",
 
@@ -114,15 +114,15 @@ const I18N = {
     write_connect:"Log in to see your stats.",
 
     propose_title:"Submit an", propose_article:"article", propose_sub:"Would you like to write for Economist? Describe your idea. If selected, you will receive an access code by email.", propose_contact:"Your contact details", propose_idea:"Your idea", propose_submit:"Submit my proposal →", propose_link:"Submit an article →", propose_first:"First name *", propose_first_ph:"Jean", propose_last:"Last name *", propose_last_ph:"Smith", propose_email:"Email *", propose_email_ph:"your@email.com", propose_email_note:"You will receive your code if your idea is selected.", propose_job:"Profession", propose_subject:"Subject *", propose_motivation:"Motivation (optional)", propose_select:"— Select —", propose_subject_ph:"Briefly describe your idea…", propose_motivation_ph:"Why this topic?", propose_job_ph:"Economist, student…",
-    write_title:"Write an", write_article:"article", write_sub:"Log in and enter your access code to start writing.", write_login_required:"You must be logged in to write.", write_or:"or", write_code_label:"Writer access code", write_code_prompt:"Enter the code you received by email.", write_no_code:"No code?", write_unlock:"Unlock", write_code_error:"Incorrect code.",
+    write_title:"Write an", write_article:"article", write_sub:"Log in and enter your access code to start writing.", write_login_required:"You must be logged in to write.", write_or:"or", write_code_label:"Writer access code", write_code_prompt:"Enter the code you received by email.", write_no_code:"No code?", write_unlock:"Unlock", write_code_error:"Incorrect code.", write_author:"Author *", write_author_ph:"First name Last name", write_title_label:"Title *", write_title_ph:"A precise title…", write_characters:"80 characters", write_deck:"Deck *", write_deck_ph:"2-3 line summary…", write_deck_hint:"Italicized below the title", write_cover:"Cover image (optional)", write_upload_image:"Click to upload an image", write_image_hint:"JPG, PNG, WebP · or URL below", write_url_ph:"https://… (alternative URL)", write_required:"* required", write_preview:"Preview", write_publish:"Publish →", write_published:"Article published.", write_visible:"Visible to all visitors of the site, on all devices.", write_read_article:"Read my article →",
 
     stats_articles:"Articles", stats_reads:"Reads", stats_words:"Words written",
     stats_avg:"Reads / article", stats_my:"My articles", stats_table_titre:"Title",
     stats_table_cat:"Category", stats_table_date:"Date", stats_table_reads:"Reads",
     stats_table_action:"Action", stats_none:"You haven't published any articles yet.",
     search_label:"Search", search_placeholder:"Articles, authors…", search_users:"Users", search_articles:"Articles", search_empty:"No results",
-    editor_paragraph:"Paragraph", editor_h1:"H1 title", editor_h2:"H2 subtitle", editor_h3:"H3 subtitle", editor_image:"Image", editor_quote:"Quote", editor_separator:"Separator", editor_info:"Info", editor_sources:"Sources", editor_credits:"Credits",
-    editor_choose:"Choose a block type", editor_add_here:"+ Add here", editor_add_title:"Insert a block at this position",
+    editor_paragraph:"Paragraph", editor_h1:"H1 title", editor_h2:"H2 subtitle", editor_h3:"H3 subtitle", editor_image:"Image", editor_quote:"Quote", editor_separator:"Separator", editor_info:"Info", editor_sources:"Sources", editor_credits:"Credits", editor_para_ph:"Write a paragraph…", editor_h1_ph:"H1 title…", editor_h2_ph:"H2 subtitle…", editor_h3_ph:"H3 subtitle…", editor_quote_ph:"Quote…", editor_info_label:"Information box", editor_info_ph:"Box text…", editor_sources_ph:"One source per line… URL or [text](https://link)", editor_credits_ph:"Written by…, sources…", editor_caption_ph:"Caption (optional)", editor_add_paragraph:"Add a text paragraph", editor_add_h1:"Add a main title", editor_add_h2:"Add a large subtitle", editor_add_h3:"Add a small subtitle", editor_add_quote:"Add a highlighted quote", editor_add_separator:"Add a visual separator", editor_add_info:"Add an information box", editor_add_sources:"Add bibliographic sources", editor_add_credits:"Add credits or authors", editor_add_image:"Add an image to the article",
+    editor_choose:"Choose a block type", editor_add_here:"+ Add here", editor_add_title:"Insert a block at this position", editor_type:"Type", editor_delete:"Delete this block",
     loading:"Economist · Connecting to database…", footer_rights:"All rights reserved.", privacy_search:"Search the privacy policy", rules_search:"Search the Terms of Use", privacy_nav_title:"Privacy Policy", privacy_nav_collect:"Information collected", privacy_nav_use:"How we use information", privacy_nav_sharing:"Sharing and third-party services", privacy_nav_rights:"Your rights", privacy_nav_contact:"Contact", rules_nav_title:"Terms of Use", rules_nav_account:"Account and access", rules_nav_content:"Content and rights", rules_nav_safety:"Safety and moderation", rules_nav_contact:"Contact"
   }
 };
@@ -236,6 +236,7 @@ function refreshCurrentPage(){
   if(!activePage)return;
   const name=activePage.id.replace('page-','');
   if(name==='home') renderHome(currentActiveCat);
+  else if(name==='write' && _writeUnlocked) renderBlocks();
   else if(name==='mystats') renderMyStats();
   else if(name==='admin') renderAdmin();
 }

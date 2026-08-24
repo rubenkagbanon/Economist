@@ -201,27 +201,27 @@ function blockHtml(b,i){
   let inner='';
   switch(b.type){
     case 'paragraph':
-      inner=`<div class="block-content"><div class="block-para" contenteditable="true" data-placeholder="Écrivez un paragraphe…" oninput="updateBlockText(${i},this)" onmouseup="showFmtToolbar()" onkeyup="showFmtToolbar()">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><div class="block-para" contenteditable="true" data-placeholder="${t('editor_para_ph')}" oninput="updateBlockText(${i},this)" onmouseup="showFmtToolbar()" onkeyup="showFmtToolbar()">${b.html||''}</div></div>`; break;
     case 'h1':
-      inner=`<div class="block-content"><div class="block-h1" contenteditable="true" data-placeholder="Titre H1…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><div class="block-h1" contenteditable="true" data-placeholder="${t('editor_h1_ph')}" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'h2':
-      inner=`<div class="block-content"><div class="block-h2" contenteditable="true" data-placeholder="Sous-titre H2…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><div class="block-h2" contenteditable="true" data-placeholder="${t('editor_h2_ph')}" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'h3':
-      inner=`<div class="block-content"><div class="block-h3" contenteditable="true" data-placeholder="Sous-titre H3…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><div class="block-h3" contenteditable="true" data-placeholder="${t('editor_h3_ph')}" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'quote':
-      inner=`<div class="block-content"><div class="block-quote" contenteditable="true" data-placeholder="Citation…" oninput="updateBlockText(${i},this)" onmouseup="showFmtToolbar()" onkeyup="showFmtToolbar()">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><div class="block-quote" contenteditable="true" data-placeholder="${t('editor_quote_ph')}" oninput="updateBlockText(${i},this)" onmouseup="showFmtToolbar()" onkeyup="showFmtToolbar()">${b.html||''}</div></div>`; break;
     case 'infobox':
-      inner=`<div class="block-content"><span class="block-infobox-label">Encadré d'information</span><div class="block-infobox" contenteditable="true" data-placeholder="Texte de l'encadré…" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
+      inner=`<div class="block-content"><span class="block-infobox-label">${t('editor_info_label')}</span><div class="block-infobox" contenteditable="true" data-placeholder="${t('editor_info_ph')}" oninput="updateBlockText(${i},this)">${b.html||''}</div></div>`; break;
     case 'sources':
-      inner=`<div class="block-content"><span class="block-sources-label">Sources</span><textarea class="block-sources" placeholder="Une source par ligne… URL ou [texte](https://lien)" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
+      inner=`<div class="block-content"><span class="block-sources-label">${t('editor_sources')}</span><textarea class="block-sources" placeholder="${t('editor_sources_ph')}" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
     case 'credits':
-      inner=`<div class="block-content"><span class="block-credits-label">Crédits</span><textarea class="block-credits" placeholder="Rédigé par…, sources…" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
+      inner=`<div class="block-content"><span class="block-credits-label">${t('editor_credits')}</span><textarea class="block-credits" placeholder="${t('editor_credits_ph')}" oninput="updateBlockValue(${i},this)">${b.text||''}</textarea></div>`; break;
     case 'separator':
       inner=`<div class="block-content"><div class="block-sep">···</div></div>`; break;
     case 'image':
-      inner=`<div class="block-content"><div class="block-img-wrap"><img src="${b.src}" alt=""><input type="text" class="block-img-caption" placeholder="Légende (optionnel)" value="${(b.caption||'').replace(/"/g,'&quot;')}" oninput="updateBlockValue(${i},this)"></div></div>`; break;
+      inner=`<div class="block-content"><div class="block-img-wrap"><img src="${b.src}" alt=""><input type="text" class="block-img-caption" placeholder="${t('editor_caption_ph')}" value="${(b.caption||'').replace(/"/g,'&quot;')}" oninput="updateBlockValue(${i},this)"></div></div>`; break;
   }
-  return `<div class="block-wrap">${inner}<div class="block-actions"><button type="button" class="block-type-btn" title="Modifier le type de ce bloc" onclick="toggleBlockTypePicker(${i})">Type</button><button type="button" class="block-del" title="Supprimer ce bloc" onclick="deleteBlock(${i})">✕</button><div class="block-type-picker" id="block-type-picker-${i}" style="display:none">${blockPickerOptionsHtml('change',i)}</div></div></div>`;
+  return `<div class="block-wrap">${inner}<div class="block-actions"><button type="button" class="block-type-btn" title="${t('editor_choose')}" onclick="toggleBlockTypePicker(${i})">${t('editor_type')}</button><button type="button" class="block-del" title="${t('editor_delete')}" onclick="deleteBlock(${i})">✕</button><div class="block-type-picker" id="block-type-picker-${i}" style="display:none">${blockPickerOptionsHtml('change',i)}</div></div></div>`;
 }
 function renderBlocks(){
   const editor=document.getElementById('article-blocks');
@@ -233,10 +233,10 @@ function renderBlocks(){
 function blockPickerOptionsHtml(action,index){
   const call=type=>action==='change'?`changeBlockType(${index},'${type}')`:`insertBlockAt('${type}',${index})`;
   const button=(type,label,title)=>`<button type="button" class="tb-btn" title="${title}" onclick="${call(type)}">${label}</button>`;
-  return `${button('paragraph','¶ Paragraphe','Ajouter un paragraphe de texte')}${button('h1','H1','Ajouter un titre principal')}${button('h2','H2','Ajouter un grand sous-titre')}${button('h3','H3','Ajouter un petit sous-titre')}${button('quote','« Citation','Ajouter une citation mise en avant')}${button('separator','— —','Ajouter un séparateur visuel')}${button('infobox','ℹ Info','Ajouter un encadré d’information')}${button('sources','🔗 Sources','Ajouter les sources bibliographiques')}${button('credits','✍ Crédits','Ajouter les crédits ou les auteurs')}`;
+  return `${button('paragraph',`¶ ${t('editor_paragraph')}`,t('editor_add_paragraph'))}${button('h1','H1',t('editor_add_h1'))}${button('h2','H2',t('editor_add_h2'))}${button('h3','H3',t('editor_add_h3'))}${button('quote',`« ${t('editor_quote')}`,t('editor_add_quote'))}${button('separator',`— — ${t('editor_separator')}`,t('editor_add_separator'))}${button('infobox',`ℹ ${t('editor_info')}`,t('editor_add_info'))}${button('sources',`🔗 ${t('editor_sources')}`,t('editor_add_sources'))}${button('credits',`✍ ${t('editor_credits')}`,t('editor_add_credits'))}`;
 }
 function blockInsertPointHtml(index,isOpen=false){
-  return `<div class="block-insert-point"><button type="button" class="add-inline-block-btn" title="Insérer un bloc à cet emplacement" onclick="toggleInsertPicker(${index})">+ Ajouter ici</button><div class="block-picker-inline" id="block-picker-inline-${index}" style="display:${isOpen?'flex':'none'}"><div class="block-picker-prompt">Choisir le type de bloc</div><div class="block-picker-options">${blockPickerOptionsHtml('insert',index)}<button type="button" class="tb-btn" title="Ajouter une image dans l’article" onclick="triggerInlineImg(${index})">🖼 Image</button></div></div></div>`;
+  return `<div class="block-insert-point"><button type="button" class="add-inline-block-btn" title="${t('editor_add_title')}" onclick="toggleInsertPicker(${index})">${t('editor_add_here')}</button><div class="block-picker-inline" id="block-picker-inline-${index}" style="display:${isOpen?'flex':'none'}"><div class="block-picker-prompt">${t('editor_choose')}</div><div class="block-picker-options">${blockPickerOptionsHtml('insert',index)}<button type="button" class="tb-btn" title="${t('editor_add_image')}" onclick="triggerInlineImg(${index})">🖼 ${t('editor_image')}</button></div></div></div>`;
 }
 function updateBlockText(i,el){ editorBlocks[i].html = el.innerHTML; updateWordCount(); saveDraft(); }
 function updateBlockValue(i,el){

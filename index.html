@@ -154,7 +154,7 @@
   <button class="modal-close" onclick="closeMobileMenu()" style="top:.8rem;right:1rem;position:absolute">×</button>
   <div style="margin-bottom:1.2rem">
     <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-bottom:.5rem">Rechercher</div>
-    <input type="text" id="mob-search" placeholder="Articles, auteurs…" oninput="doMobSearch(this.value)"
+    <input type="text" id="mob-search" data-i18n-placeholder="search_placeholder" placeholder="Articles, auteurs…" oninput="doMobSearch(this.value)"
       style="width:100%;font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.65rem 1rem;outline:none;"
       onfocus="this.style.borderColor='var(--rouge)'" onblur="this.style.borderColor='var(--gris-clair)'">
     <div id="mob-search-results" class="srd mobile-search-results"></div>
@@ -377,38 +377,38 @@
       <div class="form-wrap">
         <div class="form-two-col">
           <div class="form-row"><label data-i18n="lbl_rubrique">Rubrique *</label>
-            <select id="f-cat" onchange="saveDraft()"><option value="">— Sélectionner —</option><option>Économie</option><option>Finance</option><option>Politiques</option><option>Sociologie</option><option>Droit</option><option>Technologies</option><option>Afrique</option><option>Monde</option><option>Écologie</option><option>IA</option><option>Data Science</option></select>
+            <select id="f-cat" onchange="saveDraft()"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Afrique" data-i18n="cat_africa">Afrique</option><option value="Monde" data-i18n="cat_world">Monde</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option></select>
           </div>
-          <div class="form-row"><label>Auteur *</label><input type="text" id="f-author" placeholder="Prénom Nom" oninput="saveDraft()"></div>
+          <div class="form-row"><label data-i18n="write_author">Auteur *</label><input type="text" id="f-author" data-i18n-placeholder="write_author_ph" placeholder="Prénom Nom" oninput="saveDraft()"></div>
         </div>
-        <div class="form-row"><label>Titre *</label><input type="text" id="f-title" placeholder="Un titre précis…" oninput="updateCount('f-title','tc',80)">
-          <div style="display:flex;justify-content:space-between"><span class="hint">80 caractères</span><span class="char-count" id="tc">0 / 80</span></div></div>
-        <div class="form-row"><label>Chapeau *</label><textarea id="f-deck" rows="3" placeholder="Résumé 2-3 lignes…" oninput="updateCount('f-deck','dc',250)"></textarea>
-          <div style="display:flex;justify-content:space-between"><span class="hint">En italique sous le titre</span><span class="char-count" id="dc">0 / 250</span></div></div>
-        <div class="form-row"><label>Image de couverture (optionnel)</label>
+        <div class="form-row"><label data-i18n="write_title_label">Titre *</label><input type="text" id="f-title" data-i18n-placeholder="write_title_ph" placeholder="Un titre précis…" oninput="updateCount('f-title','tc',80)">
+          <div style="display:flex;justify-content:space-between"><span class="hint" data-i18n="write_characters">80 caractères</span><span class="char-count" id="tc">0 / 80</span></div></div>
+        <div class="form-row"><label data-i18n="write_deck">Chapeau *</label><textarea id="f-deck" rows="3" data-i18n-placeholder="write_deck_ph" placeholder="Résumé 2-3 lignes…" oninput="updateCount('f-deck','dc',250)"></textarea>
+          <div style="display:flex;justify-content:space-between"><span class="hint" data-i18n="write_deck_hint">En italique sous le titre</span><span class="char-count" id="dc">0 / 250</span></div></div>
+        <div class="form-row"><label data-i18n="write_cover">Image de couverture (optionnel)</label>
           <div class="img-upload-zone" onclick="document.getElementById('f-img-file').click()">
             <div id="cover-placeholder">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span>Cliquer pour charger une image</span>
-              <span class="hint" style="margin-top:4px">JPG, PNG, WebP · ou URL ci-dessous</span>
+              <span data-i18n="write_upload_image">Cliquer pour charger une image</span>
+              <span class="hint" data-i18n="write_image_hint" style="margin-top:4px">JPG, PNG, WebP · ou URL ci-dessous</span>
             </div>
             <img id="cover-preview" style="display:none;width:100%;height:100%;object-fit:cover">
           </div>
           <input type="file" id="f-img-file" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
-          <input type="url" id="f-img" placeholder="https://… (URL alternative)" style="margin-top:.5rem;font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.6rem 1rem;outline:none;width:100%" oninput="handleCoverUrl(this.value)">
+          <input type="url" id="f-img" data-i18n-placeholder="write_url_ph" placeholder="https://… (URL alternative)" style="margin-top:.5rem;font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.6rem 1rem;outline:none;width:100%" oninput="handleCoverUrl(this.value)">
         </div>
         <div class="form-row"><label data-i18n="lbl_corps">Corps de l'article *</label>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem">
             <div class="editor-toolbar" id="legacy-block-picker" style="display:none">
-              <button type="button" class="tb-btn" onclick="insertBlock('paragraph')">¶ Paragraphe</button>
+              <button type="button" class="tb-btn" onclick="insertBlock('paragraph')">¶ <span data-i18n="editor_paragraph">Paragraphe</span></button>
               <button type="button" class="tb-btn" onclick="insertBlock('h2')">H2</button>
               <button type="button" class="tb-btn" onclick="insertBlock('h3')">H3</button>
-              <button type="button" class="tb-btn" style="background:#fff8f8;border-color:rgba(139,0,0,0.2)" onclick="triggerInlineImg()">🖼 Image</button>
-              <button type="button" class="tb-btn" onclick="insertBlock('quote')">« Citation</button>
-              <button type="button" class="tb-btn" onclick="insertBlock('separator')">— —</button>
-              <button type="button" class="tb-btn" onclick="insertBlock('infobox')" title="Encadré d'information">ℹ Info</button>
-              <button type="button" class="tb-btn" onclick="insertBlock('sources')" title="Sources bibliographiques">🔗 Sources</button>
-              <button type="button" class="tb-btn" onclick="insertBlock('credits')" title="Crédits / auteurs">✍ Crédits</button>
+              <button type="button" class="tb-btn" style="background:#fff8f8;border-color:rgba(139,0,0,0.2)" onclick="triggerInlineImg()">🖼 <span data-i18n="editor_image">Image</span></button>
+              <button type="button" class="tb-btn" onclick="insertBlock('quote')">« <span data-i18n="editor_quote">Citation</span></button>
+              <button type="button" class="tb-btn" onclick="insertBlock('separator')">— — <span data-i18n="editor_separator">Séparateur</span></button>
+              <button type="button" class="tb-btn" onclick="insertBlock('infobox')" title="Encadré d'information">ℹ <span data-i18n="editor_info">Info</span></button>
+              <button type="button" class="tb-btn" onclick="insertBlock('sources')" title="Sources bibliographiques">🔗 <span data-i18n="editor_sources">Sources</span></button>
+              <button type="button" class="tb-btn" onclick="insertBlock('credits')" title="Crédits / auteurs">✍ <span data-i18n="editor_credits">Crédits</span></button>
             </div>
             <span class="char-count" id="bc">0 mot</span>
           </div>
@@ -421,14 +421,14 @@
           <div id="article-blocks" class="article-blocks-editor"></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
-          <button class="btn-publish" type="button" onclick="previewArticle()">Aperçu</button>
-          <button class="btn-publish" id="btn-publish" onclick="publishArticle()">Publier →</button>
-          <span style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
+          <button class="btn-publish" type="button" onclick="previewArticle()" data-i18n="write_preview">Aperçu</button>
+          <button class="btn-publish" id="btn-publish" onclick="publishArticle()" data-i18n="write_publish">Publier →</button>
+          <span data-i18n="write_required" style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
         </div>
         <div class="success-msg" id="success-msg">
-          <h3>Article publié.</h3>
-          <p>Visible par tous les visiteurs du site, sur tous les appareils.</p>
-          <span class="view-link" onclick="goToNewArticle()">Lire mon article →</span>
+          <h3 data-i18n="write_published">Article publié.</h3>
+          <p data-i18n="write_visible">Visible par tous les visiteurs du site, sur tous les appareils.</p>
+          <span class="view-link" onclick="goToNewArticle()" data-i18n="write_read_article">Lire mon article →</span>
         </div>
       </div>
     </div>
