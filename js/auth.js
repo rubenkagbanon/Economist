@@ -156,7 +156,7 @@ async function doGoogleAuth(mode='login'){
     throw new Error('Impossible de démarrer la connexion Google.');
   } catch(err){
     console.error('Google OAuth error:', err);
-    showToast('Connexion Google impossible. Vérifiez la configuration OAuth Supabase.');
+    showToast(t('toast_google_error'));
   } finally{
     if(btn){
       btn.disabled=false;
@@ -191,7 +191,7 @@ function closeProfileEdit(){ document.getElementById('profile-edit-modal').class
 document.getElementById('profile-edit-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeProfileEdit(); });
 function handleAvatarUpload(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>4*1024*1024){showToast('Image trop lourde (max 4Mo)');return;}
+  if(file.size>4*1024*1024){showToast(t('toast_image_too_large'));return;}
   const image=new Image();
   image.onload=()=>{
     const maxSize=800;
@@ -201,7 +201,7 @@ function handleAvatarUpload(e){
     canvas.height=Math.max(1,Math.round(image.height*scale));
     canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
     canvas.toBlob(blob=>{
-      if(!blob){showToast('Impossible de compresser cette image');return;}
+      if(!blob){showToast(t('toast_image_compress_error'));return;}
       const reader=new FileReader();
       reader.onload=ev=>{
         editAvatarBase64=ev.target.result;
@@ -211,7 +211,7 @@ function handleAvatarUpload(e){
     },'image/jpeg',.82);
     URL.revokeObjectURL(image.src);
   };
-  image.onerror=()=>showToast('Format d’image invalide');
+  image.onerror=()=>showToast(t('toast_invalid_image'));
   image.src=URL.createObjectURL(file);
   e.target.value='';
 }
@@ -227,14 +227,14 @@ async function saveProfileEdit(){
   const last=document.getElementById('edit-last').value.trim();
   const bio=document.getElementById('edit-bio').value.trim();
   const level=document.querySelector('input[name="profile-level"]:checked')?.value||'';
-  if(!first||!last){showToast('Le prénom et le nom sont obligatoires.');return;}
+  if(!first||!last){showToast(t('toast_profile_required'));return;}
   const idx=users.findIndex(u=>u.email===currentUser.email); if(idx===-1)return;
   const oldAuthor=`${users[idx].first} ${users[idx].last}`;
   const newAuthor=`${first} ${last}`;
   const updatedUser={...users[idx],first,last,bio,level};
   if(editAvatarBase64)updatedUser.avatar=editAvatarBase64;
   const profileError=await saveUser(updatedUser);
-  if(profileError){showToast('Impossible d’enregistrer le profil.');return;}
+  if(profileError){showToast(t('toast_profile_save_error'));return;}
   if(_sb?.auth){
     const {error:authProfileError}=await _sb.auth.updateUser({data:{
       first_name:first,last_name:last,full_name:`${first} ${last}`,profile_name_customized:true
@@ -252,7 +252,7 @@ async function saveProfileEdit(){
     );
     authoredArticles.forEach(article=>{article.author=newAuthor;});
     const articleErrors=await Promise.all(authoredArticles.map(article=>saveArticle(article)));
-    if(articleErrors.some(Boolean)){showToast('Profil enregistré, mais certains articles n’ont pas pu être mis à jour.');return;}
+    if(articleErrors.some(Boolean)){showToast(t('toast_articles_update_error'));return;}
   }
   closeProfileEdit();renderNav();openProfile(currentUser.email);
   showToast(t('toast_profile'));
@@ -289,12 +289,12 @@ async function sendResetCode(){
   const email=document.getElementById('fp-email').value.trim().toLowerCase();
   const errEl=document.getElementById('fp-err');
   errEl.style.display='none';
-  if(!email){errEl.textContent='Entrez votre e-mail.';errEl.style.display='block';return;}
+  if(!email){errEl.textContent=t('toast_enter_email');errEl.style.display='block';return;}
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
   await loadData();
   const u=users.find(x=>x.email===email);
   if(!u){
-    errEl.textContent='Aucun compte associé à cet e-mail.';errEl.style.display='block';
+    errEl.textContent=t('toast_account_missing');errEl.style.display='block';
     btn.textContent='Envoyer le code';btn.disabled=false;return;
   }
   const code=genVerifCode();
@@ -306,7 +306,7 @@ async function sendResetCode(){
   document.getElementById('fp-step2').style.display='block';
   document.getElementById('fp-email-shown').textContent=email;
   btn.textContent='Envoyer le code';btn.disabled=false;
-  showToast(sent?'Code envoyé par e-mail !':'E-mail non configuré — voir la console.');
+  showToast(sent?t('toast_reset_email_sent'):t('toast_email_not_configured'));
 }
 
 async function confirmResetPwd(){
@@ -316,22 +316,22 @@ async function confirmResetPwd(){
   const pwd2=document.getElementById('fp-new-pwd2').value;
   const errEl=document.getElementById('fp-err2');
   errEl.style.display='none';
-  if(!code||!pwd||!pwd2){errEl.textContent='Remplissez tous les champs.';errEl.style.display='block';return;}
-  if(pwd.length<8){errEl.textContent='8 caractères minimum.';errEl.style.display='block';return;}
-  if(pwd!==pwd2){errEl.textContent='Les mots de passe ne correspondent pas.';errEl.style.display='block';return;}
+  if(!code||!pwd||!pwd2){errEl.textContent=t('auth_err_fields');errEl.style.display='block';return;}
+  if(pwd.length<8){errEl.textContent=t('auth_err_short');errEl.style.display='block';return;}
+  if(pwd!==pwd2){errEl.textContent=t('auth_err_match');errEl.style.display='block';return;}
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
   const record=await dbGet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`);
   if(!record||record.used||record.code!==code||Date.now()>record.expires){
-    errEl.textContent='Code incorrect ou expiré. Redemandez un code.';errEl.style.display='block';
+    errEl.textContent=t('code_expired');errEl.style.display='block';
     btn.textContent='Réinitialiser';btn.disabled=false;return;
   }
   await loadData();
   const idx=users.findIndex(x=>x.email===_resetEmail);
-  if(idx===-1){errEl.textContent='Compte introuvable.';errEl.style.display='block';btn.textContent='Réinitialiser';btn.disabled=false;return;}
+  if(idx===-1){errEl.textContent=t('account_not_found');errEl.style.display='block';btn.textContent='Réinitialiser';btn.disabled=false;return;}
   users[idx].pwd=pwd;
   await saveUser(users[idx]);
   await dbSet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`,{...record,used:true});
-  showToast('Mot de passe mis à jour ! Connectez-vous.');
+  showToast(t('toast_password_updated'));
   closeModal();
   openModal('login');
 }

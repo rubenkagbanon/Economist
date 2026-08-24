@@ -35,6 +35,15 @@ const I18N = {
 
     toast_del_code:"Code supprimé.", toast_welcome:"Bon retour", toast_created:"Bienvenue",
     toast_logout:"Vous êtes déconnecté.", toast_profile:"Profil mis à jour.",
+    toast_google_error:"Connexion Google impossible. Vérifiez la configuration OAuth Supabase.",
+    toast_image_too_large:"Image trop lourde (max 4 Mo).", toast_image_compress_error:"Impossible de compresser cette image.", toast_invalid_image:"Format d’image invalide.",
+    toast_profile_required:"Le prénom et le nom sont obligatoires.", toast_profile_save_error:"Impossible d’enregistrer le profil.", toast_articles_update_error:"Profil enregistré, mais certains articles n’ont pas pu être mis à jour.",
+    toast_reset_email_sent:"Code envoyé par e-mail !", toast_email_not_configured:"E-mail non configuré — voir la console.", toast_password_updated:"Mot de passe mis à jour ! Connectez-vous.",
+    toast_delete_error:"Suppression impossible. Vérifiez votre connexion.", toast_required_fields:"Remplissez tous les champs obligatoires.", toast_required_fields_proposal:"Remplissez les champs obligatoires (*).", toast_add_content:"Ajoutez du contenu à l’article.", toast_publish_error:"Publication impossible. Réessayez.",
+    toast_login_required:"Connectez-vous pour proposer un article.", toast_enter_email:"Entrez votre e-mail.", toast_account_missing:"Aucun compte associé à cet e-mail.", toast_code_sent:"Code envoyé à {email}.", toast_code_not_configured:"E-mail non configuré (voir js/email.js). Code créé : {code}",
+    toast_enter_code:"Entrez un code.", toast_code_exists:"Ce code existe déjà.", toast_code_created:"Code « {code} » créé ({max} utilisations maximum).", toast_account_deleted:"Compte supprimé.",
+    code_invalid:"Code incorrect.", code_unassigned:"Ce code n’est pas associé à votre adresse e-mail.", code_exhausted:"Code épuisé.", code_expired:"Code incorrect ou expiré. Redemandez un code.", account_not_found:"Compte introuvable.",
+    confirm_delete_code:"Supprimer ce code ?", confirm_delete_proposal:"Supprimer cette proposition ?", confirm_delete_account:"Supprimer définitivement le compte {email} ?",
 
     about_intro_title:"Economist",
     about_intro_desc:"Un espace indépendant pour lire, comprendre et partager les grandes transformations économiques et sociales.",
@@ -95,6 +104,15 @@ const I18N = {
 
     toast_del_code:"Code deleted.", toast_welcome:"Welcome back", toast_created:"Welcome",
     toast_logout:"You have been logged out.", toast_profile:"Profile updated.",
+    toast_google_error:"Google sign-in failed. Check the Supabase OAuth configuration.",
+    toast_image_too_large:"Image is too large (max 4 MB).", toast_image_compress_error:"Unable to compress this image.", toast_invalid_image:"Invalid image format.",
+    toast_profile_required:"First name and last name are required.", toast_profile_save_error:"Unable to save the profile.", toast_articles_update_error:"Profile saved, but some articles could not be updated.",
+    toast_reset_email_sent:"Code sent by email!", toast_email_not_configured:"Email is not configured — see the console.", toast_password_updated:"Password updated! Log in.",
+    toast_delete_error:"Unable to delete. Check your connection.", toast_required_fields:"Please fill in all required fields.", toast_required_fields_proposal:"Please fill in the required fields (*).", toast_add_content:"Add some content to the article.", toast_publish_error:"Unable to publish. Please try again.",
+    toast_login_required:"Log in to submit an article.", toast_enter_email:"Enter your email.", toast_account_missing:"No account is associated with this email.", toast_code_sent:"Code sent to {email}.", toast_code_not_configured:"Email is not configured (see js/email.js). Code created: {code}",
+    toast_enter_code:"Enter a code.", toast_code_exists:"This code already exists.", toast_code_created:"Code “{code}” created ({max} maximum uses).", toast_account_deleted:"Account deleted.",
+    code_invalid:"Incorrect code.", code_unassigned:"This code is not associated with your email address.", code_exhausted:"Code exhausted.", code_expired:"Incorrect or expired code. Request a new code.", account_not_found:"Account not found.",
+    confirm_delete_code:"Delete this code?", confirm_delete_proposal:"Delete this proposal?", confirm_delete_account:"Permanently delete the account {email}?",
 
     about_intro_title:"Economist: understand the economy and the world",
     about_intro_desc:"An editorial platform publishing news articles, analysis and perspectives on economics, finance, politics, data science, technology and social change.",
@@ -140,6 +158,9 @@ const MONTH_EN = {
 
 function t(key){
   return (I18N[_lang] && I18N[_lang][key]) || (I18N.fr[key]) || key;
+}
+function tf(key, values={}){
+  return t(key).replace(/\{(\w+)\}/g,(_,name)=>values[name]===undefined?`{${name}}`:values[name]);
 }
 function tCat(cat){
   return _lang==='en' ? (CAT_EN[cat]||cat) : cat;

@@ -88,18 +88,18 @@ async function loadAdminCodes(){
 async function adminAddCode(){
   const val=document.getElementById('new-code-val').value.trim();
   const max=parseInt(document.getElementById('new-code-max').value)||2;
-  if(!val){showToast('Entrez un code.');return;}
+  if(!val){showToast(t('toast_enter_code'));return;}
   const key=val.replace(/[^a-zA-Z0-9]/g,'_');
   const existing=await dbGet(`${ONE_TIME_CODES_PATH}/${key}`);
-  if(existing){showToast('Ce code existe déjà.');return;}
+  if(existing){showToast(t('toast_code_exists'));return;}
   await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code:val,max,used:0});
   document.getElementById('new-code-val').value='';
-  showToast(`Code "${val}" créé (max ${max} utilisations).`);
+  showToast(tf('toast_code_created',{code:val,max}));
   loadAdminCodes();
 }
 
 async function adminDeleteCode(key){
-  if(!confirm('Supprimer ce code ?'))return;
+  if(!confirm(t('confirm_delete_code')))return;
   await dbDelete(`${ONE_TIME_CODES_PATH}/${key}`);
   showToast(t('toast_del_code'));
   loadAdminCodes();
@@ -109,12 +109,12 @@ async function adminDeleteCode(key){
 async function adminSendManualCode(){
   const emailEl=document.getElementById('manual-code-email');
   const email=emailEl.value.trim().toLowerCase();
-  if(!email){showToast('Entrez un e-mail.');return;}
+  if(!email){showToast(t('toast_enter_email'));return;}
   const code=genVerifCode();
   const key=code;
   await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email});
   const sent=await emailSendVerificationCode(email,'',code,'access');
-  showToast(sent?`Code envoyé à ${email}.`:'E-mail non configuré (voir js/email.js). Code créé: '+code);
+  showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   emailEl.value='';
   loadAdminCodes();
 }
@@ -149,20 +149,20 @@ async function adminApproveProposal(id,email,firstName){
   const sent=await emailSendVerificationCode(email,firstName,code,'access');
   const prop=await dbGet(`proposals/${id}`);
   await dbSet(`proposals/${id}`,{...prop,status:'sent'});
-  showToast(sent?`Code envoyé à ${email}.`:'É-mail non configuré — code créé: '+code);
+  showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   loadAdminProposals();loadAdminCodes();
 }
 async function adminDeleteProposal(id){
-  if(!confirm('Supprimer cette proposition ?'))return;
+  if(!confirm(t('confirm_delete_proposal')))return;
   await dbDelete(`proposals/${id}`);
   loadAdminProposals();
 }
 
 // ═══════════════ GESTION DES MEMBRES ═══════════════
 async function adminDeleteUser(email){
-  if(!confirm(`Supprimer définitivement le compte ${email} ?`))return;
+  if(!confirm(tf('confirm_delete_account',{email})))return;
   await deleteUserDB(email);
   users=users.filter(u=>u.email!==email);
-  showToast('Compte supprimé.');
+  showToast(t('toast_account_deleted'));
   renderAdmin();
 }

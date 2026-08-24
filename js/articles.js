@@ -289,7 +289,7 @@ async function openArticle(id){
 async function confirmDeleteArticle(id){
   if(!confirm(t('del_confirm')))return;
   const error=await deleteArticleDB(id);
-  if(error){showToast('Suppression impossible. Vérifiez votre connexion.');return;}
+  if(error){showToast(t('toast_delete_error'));return;}
   articles=articles.filter(a=>a.id!==id);
   showToast(t('del_done'));
   showPage('home');

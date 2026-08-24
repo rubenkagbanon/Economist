@@ -13,7 +13,7 @@ function initProposalContact(){
 
 async function submitRequest(){
   if(!currentUser){
-    showToast('Connectez-vous pour proposer un article.');
+    showToast(t('toast_login_required'));
     openModal('login');
     return;
   }
@@ -24,7 +24,7 @@ async function submitRequest(){
   const cat  =document.getElementById('r-cat').value;
   const subj =document.getElementById('r-subject').value.trim();
   const why  =document.getElementById('r-why').value.trim();
-  if(!first||!last||!email||!cat||!subj){ showToast('Remplissez les champs obligatoires (*).'); return; }
+  if(!first||!last||!email||!cat||!subj){ showToast(t('toast_required_fields_proposal')); return; }
   const btn=document.querySelector('.reg-submit');
   if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
   const id=`${Date.now()}_${Math.floor(Math.random()*1000)}`;
@@ -152,7 +152,7 @@ async function checkCode(){
   const val=input.value.trim();
   const errEl=document.getElementById('gate-err');
   errEl.style.display='none';
-  if(!val){ errEl.textContent='Entrez un code.'; errEl.style.display='block'; return; }
+  if(!val){ errEl.textContent=t('toast_enter_code'); errEl.style.display='block'; return; }
 
   if(VALID_CODES.includes(val)){
     _writeUnlocked=true;
@@ -174,18 +174,18 @@ async function checkCode(){
   }
 
   if(!entry){
-    errEl.textContent='Code incorrect.'; errEl.style.display='block';
+    errEl.textContent=t('code_invalid'); errEl.style.display='block';
     return;
   }
 
   if(entry.forEmail && currentUser && entry.forEmail.toLowerCase() !== currentUser.email.toLowerCase()){
-    errEl.textContent='Ce code n’est pas associé à votre adresse e-mail.';
+    errEl.textContent=t('code_unassigned');
     errEl.style.display='block';
     return;
   }
 
   if((entry.used||0) >= (entry.max||2)){
-    errEl.textContent='Code épuisé.'; errEl.style.display='block';
+    errEl.textContent=t('code_exhausted'); errEl.style.display='block';
     return;
   }
 
@@ -288,7 +288,7 @@ function triggerInlineImg(index=editorBlocks.length){
 }
 function handleInlineImage(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>4*1024*1024){ showToast('Image trop lourde (max 4Mo)'); return; }
+  if(file.size>4*1024*1024){ showToast(t('toast_image_too_large')); return; }
   const r=new FileReader();
   r.onload=ev=>{ editorBlocks.splice(pendingImageInsertIndex??editorBlocks.length,0,{type:'image', src:ev.target.result, caption:''}); pendingImageInsertIndex=null; closeBlockPicker(); renderBlocks(); saveDraft(); };
   r.readAsDataURL(file);
@@ -342,7 +342,7 @@ function hideCoverPreview(){
 }
 function handleCoverUpload(e){
   const file=e.target.files[0]; if(!file)return;
-  if(file.size>4*1024*1024){ showToast('Image trop lourde (max 4Mo)'); return; }
+  if(file.size>4*1024*1024){ showToast(t('toast_image_too_large')); return; }
   const r=new FileReader();
   r.onload=ev=>{ _coverData=ev.target.result; showCoverPreview(_coverData); document.getElementById('f-img').value=''; saveDraft(); };
   r.readAsDataURL(file);
@@ -375,9 +375,9 @@ function previewArticle(){
   const deck=document.getElementById('f-deck').value.trim();
   const cat=document.getElementById('f-cat').value;
   const author=document.getElementById('f-author').value.trim();
-  if(!title||!deck||!cat||!author){ showToast('Remplissez les champs obligatoires.'); return; }
+  if(!title||!deck||!cat||!author){ showToast(t('toast_required_fields')); return; }
   const bodyText=editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type)).map(b=>stripHtml(b.html)).join(' ').trim();
-  if(!bodyText){ showToast("Ajoutez du contenu à l'article."); return; }
+  if(!bodyText){ showToast(t('toast_add_content')); return; }
   document.getElementById('preview-cat').textContent=tCat(cat);
   document.getElementById('preview-title').textContent=title;
   document.getElementById('preview-deck').textContent=deck;
@@ -396,14 +396,14 @@ async function publishArticle(){
   const deck  =document.getElementById('f-deck').value.trim();
   const cat   =document.getElementById('f-cat').value;
   const author=document.getElementById('f-author').value.trim();
-  if(!title||!deck||!cat||!author){ showToast('Remplissez tous les champs obligatoires.'); return; }
+  if(!title||!deck||!cat||!author){ showToast(t('toast_required_fields')); return; }
   const bodyText = editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type))
     .map(b=>stripHtml(b.html)).join('\n\n').trim();
-  if(!bodyText){ showToast("Ajoutez du contenu à l'article."); return; }
+  if(!bodyText){ showToast(t('toast_add_content')); return; }
   const bodyHtml = editorBlocks.map(blockToHtml).join('\n');
   const {data:id,error:idError}=await _sb.rpc('next_article_id');
   if(idError||!id){
-    showToast('Publication impossible. Réessayez.');
+    showToast(t('toast_publish_error'));
     console.error('next_article_id',idError);
     return;
   }
