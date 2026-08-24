@@ -94,11 +94,12 @@ async function syncGoogleUserFromSession(session){
   const meta=session.user.user_metadata || {};
   const fullName=(meta.full_name || meta.name || email.split('@')[0] || 'Google User').trim();
   const nameParts=fullName.split(/\s+/).filter(Boolean);
-  const first=meta.profile_name_customized && meta.first_name ? meta.first_name.trim() : (nameParts[0] || 'Google');
-  const last=meta.profile_name_customized && meta.last_name ? meta.last_name.trim() : (nameParts.slice(1).join(' ') || 'User');
+  const first=nameParts[0] || 'Google';
+  const last=nameParts.slice(1).join(' ') || 'User';
   const avatar=meta.avatar_url || '';
 
-  let u = users.find(x => (x.email||'').toLowerCase() === email);
+  let u = users.find(x => String(x.id||'') === String(session.user.id)) ||
+    users.find(x => (x.email||'').toLowerCase() === email);
   if(!u){
     u={id:session.user.id,first,last,email,joined:today(),avatar,bio:'',level:'',authProvider:'google'};
     users.push(u);
@@ -106,10 +107,6 @@ async function syncGoogleUserFromSession(session){
   } else {
     let changed = false;
     if(!u.id){u.id=session.user.id;changed=true;}
-    if(!u.first && first){u.first=first;changed=true;}
-    if(!u.last && last){u.last=last;changed=true;}
-    if(!u.avatar && avatar){u.avatar=avatar;changed=true;}
-    if(!u.authProvider){u.authProvider='google';changed=true;}
     if(changed) await saveUser(u);
   }
 
@@ -228,19 +225,14 @@ async function saveProfileEdit(){
   const bio=document.getElementById('edit-bio').value.trim();
   const level=document.querySelector('input[name="profile-level"]:checked')?.value||'';
   if(!first||!last){showToast(t('toast_profile_required'));return;}
-  const idx=users.findIndex(u=>u.email===currentUser.email); if(idx===-1)return;
+  const currentEmail=(currentUser.email||'').trim().toLowerCase();
+  const idx=users.findIndex(u=>(u.email||'').trim().toLowerCase()===currentEmail); if(idx===-1)return;
   const oldAuthor=`${users[idx].first} ${users[idx].last}`;
   const newAuthor=`${first} ${last}`;
   const updatedUser={...users[idx],first,last,bio,level};
   if(editAvatarBase64)updatedUser.avatar=editAvatarBase64;
   const profileError=await saveUser(updatedUser);
   if(profileError){showToast(t('toast_profile_save_error'));return;}
-  if(_sb?.auth){
-    const {error:authProfileError}=await _sb.auth.updateUser({data:{
-      first_name:first,last_name:last,full_name:`${first} ${last}`,profile_name_customized:true
-    }});
-    if(authProfileError)console.error('save custom profile name',authProfileError);
-  }
   users[idx]=updatedUser;
   currentUser=updatedUser;
   saveLocalSession(currentUser.email);
