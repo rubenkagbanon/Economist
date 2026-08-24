@@ -212,7 +212,7 @@ function renderHome(cat){
   const all=[...articles].reverse();
   const filtered=cat==='all'?all:all.filter(a=>a.cat===cat);
   if(filtered.length===0){
-    wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><span></span><span></span><span></span></div>
+    wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="css/coming%20soon.png" alt="Coming soon"></div>
       <h2>${t('home_coming')}</h2>
       <p>${t('home_desc')}</p>
       <p>${cat==='all'?t('home_none_all'):tEmptyCategory(cat)}</p>

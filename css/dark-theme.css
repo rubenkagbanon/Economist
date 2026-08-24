@@ -75,6 +75,7 @@
 [data-theme="dark"] .art-credits-body,[data-theme="dark"] .art-sources-body{color:var(--txt-mut)}
 [data-theme="dark"] .art-sources-box{background:#161616}
 [data-theme="dark"] .empty-state p{color:var(--txt-mut)}
+[data-theme="dark"] .empty-anim img{content:url("coming%20soon%20dark.png")}
 
 /* ── Éditeur d'article ── */
 [data-theme="dark"] .article-blocks-editor{background:#1a1a1a;border-color:#2a2a2a}
