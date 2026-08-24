@@ -299,6 +299,11 @@ async function confirmDeleteArticle(id){
 function openProfile(email){
   const u=users.find(x=>x.email===email);
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
+  if(window.location.protocol!=='file:'){
+    const profilePath=`/${profileSlug(u)}/`;
+    const currentPath=window.location.pathname;
+    if(currentPath!==profilePath)try{window.history.pushState({page:'profile'},'',profilePath);}catch(e){}
+  }
   setProfileShareMetadata(u);
   const userArticles=articles.filter(article=>articleBelongsToUser(article,u)).reverse();
   const isMe=currentUser&&currentUser.email===email;

@@ -236,17 +236,29 @@ async function saveProfileEdit(){
   users[idx]=updatedUser;
   currentUser=updatedUser;
   saveLocalSession(currentUser.email);
-  if(oldAuthor!==newAuthor){
-    const normalizedOldAuthor=oldAuthor.trim().replace(/\s+/g,' ').toLowerCase();
-    const authoredArticles=articles.filter(article=>
-      (article.owner_id && currentUser.id && String(article.owner_id)===String(currentUser.id)) ||
-      (article.author||'').trim().replace(/\s+/g,' ').toLowerCase()===normalizedOldAuthor
-    );
-    authoredArticles.forEach(article=>{article.author=newAuthor;});
-    const articleErrors=await Promise.all(authoredArticles.map(article=>saveArticle(article)));
-    if(articleErrors.some(Boolean)){showToast(t('toast_articles_update_error'));return;}
+  const authorInput=document.getElementById('f-author');
+  if(authorInput && document.getElementById('page-write')?.classList.contains('active')){
+    authorInput.value=newAuthor;
+    saveDraft();
   }
-  closeProfileEdit();renderNav();openProfile(currentUser.email);
+  const normalizedOldAuthor=oldAuthor.trim().replace(/\s+/g,' ').toLowerCase();
+  const authoredArticles=articles.filter(article=>
+    (article.owner_id && currentUser.id && String(article.owner_id)===String(currentUser.id)) ||
+    (article.author||'').trim().replace(/\s+/g,' ').toLowerCase()===normalizedOldAuthor
+  );
+  const articlesToUpdate=authoredArticles.filter(article=>article.author!==newAuthor);
+  articlesToUpdate.forEach(article=>{article.author=newAuthor;});
+  const articleErrors=await Promise.all(articlesToUpdate.map(article=>saveArticle(article)));
+
+  closeProfileEdit();
+  renderNav();
+  openProfile(currentUser.email);
+  if(document.getElementById('page-home')?.classList.contains('active'))renderHome(currentActiveCat);
+  if(document.getElementById('page-mystats')?.classList.contains('active'))renderMyStats();
+  if(articleErrors.some(Boolean)){
+    showToast(t('toast_articles_update_error'));
+    return;
+  }
   showToast(t('toast_profile'));
 }
 
