@@ -189,7 +189,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .nav-cats .nav-link-item{font-family:'Roboto Slab',Georgia,serif;font-size:17px;font-weight:400;line-height:24px;font-variant:lining-nums proportional-nums;letter-spacing:normal;text-transform:none;color:var(--txt-lite)}
 .nav-search-wrap{position:relative;display:flex;align-items:center;transform:translateX(-10rem)}
 .nav-search-wrap{position:relative;display:flex;align-items:center}
-.nav-search-input{font-family:var(--sans);font-size:.82rem;font-weight:400;border:.5px solid var(--gris-clair);padding:.45rem .9rem .45rem 2rem;outline:none;transition:all .2s;width:180px;background:#eeeeeb;color:#111010;}
+.nav-search-input{font-family:'Oswald',Arial,sans-serif;font-size:.82rem;font-weight:400;border:.5px solid var(--gris-clair);padding:.45rem .9rem .45rem 2rem;outline:none;transition:all .2s;width:180px;background:#eeeeeb;color:#111010;}
 .nav-search-input::placeholder{color:#555;opacity:1}
 .nav-search-input:focus{border-color:var(--rouge);width:220px;background:white}
 .nav-search-icon{position:absolute;left:.65rem;pointer-events:none;color:var(--txt-pale)}
@@ -198,9 +198,9 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .srd-item{padding:1rem 1.2rem;border-bottom:.5px solid var(--gris-clair);cursor:pointer;transition:background .15s}
 .srd-item:hover{background:#fff8f8}
 .srd-cat{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.25rem}
-.srd-title{font-family:var(--serif);font-size:.95rem;line-height:1.3}
+.srd-title{font-family:'Oswald',Arial,sans-serif;font-size:.95rem;line-height:1.3}
 .srd-profile-row{display:flex;align-items:center;gap:.7rem}
-.srd-author{font-family:var(--sans);font-size:9.5px;color:var(--gris);margin-top:.25rem}
+.srd-author{font-family:'Oswald',Arial,sans-serif;font-size:9.5px;color:var(--gris);margin-top:.25rem}
 .srd-section{padding:.6rem 1.2rem;background:#f8f8f8;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--txt-lite);border-bottom:.5px solid var(--gris-clair)}
 .mobile-search-results{position:static;width:auto;margin-top:.4rem;max-height:240px;box-shadow:none;z-index:auto}
 
@@ -265,9 +265,11 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 /* PROPOSE */
 .propose-page{max-width:600px;margin:0 auto;padding:5rem 2rem;position:relative;z-index:1}
 .propose-page h2,.write-page h2{font-family:'Inter',var(--sans);font-size:2.2rem;font-weight:500;margin-bottom:.5rem}
-.my-stats-page h2,.admin-page h2{font-family:var(--serif);font-size:2.2rem;font-weight:400;margin-bottom:.5rem}
+.my-stats-page h2{font-family:'Roboto Slab',Georgia,serif;font-size:2.2rem;font-weight:400;color:#111010;margin-bottom:.5rem}
+.admin-page h2{font-family:var(--serif);font-size:2.2rem;font-weight:400;margin-bottom:.5rem}
 .propose-page h2 em,.write-page h2 em{font-style:normal;color:var(--rouge)}
-.my-stats-page h2 em,.admin-page h2 em{font-style:italic;color:var(--rouge)}
+.my-stats-page h2 em{font-style:normal;color:#111010}
+.admin-page h2 em{font-style:italic;color:var(--rouge)}
 .propose-sub,.write-sub{font-family:var(--sans);font-size:.9rem;color:#555;margin-bottom:3rem;font-weight:300;line-height:1.65}
 #write-login-gate p,#write-login-gate span{font-weight:700}
 .reg-card{font-family:'Inter',var(--sans);border:.5px solid var(--gris-clair);padding:2.5rem;margin-bottom:1.5rem}
@@ -351,16 +353,18 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 
 /* STATS / ADMIN / PROFILE */
 .my-stats-page,.admin-page{max-width:1100px;margin:0 auto;padding:4rem 2rem;position:relative;z-index:1}
-.my-stat-card{border:.5px solid var(--gris-clair);padding:1.8rem;text-align:center;border-top:3px solid var(--rouge);}
-.my-stat-num{font-family:var(--serif);font-size:2.4rem;font-weight:400;color:var(--rouge);line-height:1}
-.my-stat-label{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-top:.5rem}
+.my-stats-page{font-family:'Roboto Slab',Georgia,serif}
+.my-stats-page > p,.my-stats-page #my-stats-content > div[style*="font-family"]{font-family:'Roboto Slab',Georgia,serif!important}
+.my-stats-page .my-stat-card{border:.5px solid var(--gris-clair);padding:1.8rem;text-align:center;}
+.my-stats-page .my-stat-num{font-family:'Roboto Slab',Georgia,serif;font-size:2.4rem;font-weight:400;color:#111010;line-height:1}
+.my-stats-page .my-stat-label{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-top:.5rem}
 .admin-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:var(--rouge);color:white;padding:4px 12px;margin-bottom:2rem}
 .btn-danger{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,0,0,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:var(--rouge);color:white}
-.stats-section-title{font-family:var(--sans);font-size:9px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--noir);}
-.stats-table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:.88rem}
-.stats-table th{text-align:left;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);padding:.6rem 1rem;border-bottom:.5px solid var(--gris-clair);font-weight:400}
-.stats-table td{padding:.8rem 1rem;border-bottom:.5px solid var(--gris-clair);vertical-align:middle}
+.my-stats-page .stats-section-title{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--gris-clair);}
+.my-stats-page .stats-table{width:100%;border-collapse:collapse;font-family:'Roboto Slab',Georgia,serif;font-size:.88rem}
+.my-stats-page .stats-table th{font-family:'Roboto Slab',Georgia,serif;text-align:left;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);padding:.6rem 1rem;border-bottom:.5px solid var(--gris-clair);font-weight:400}
+.my-stats-page .stats-table td{padding:.8rem 1rem;border-bottom:.5px solid var(--gris-clair);vertical-align:middle}
 .stats-table tr:hover td{background:#fafafa}
 .td-title{font-family:'Oswald',Arial,sans-serif;font-size:.95rem;cursor:pointer;color:var(--rouge)}
 .td-title:hover{text-decoration:underline}
