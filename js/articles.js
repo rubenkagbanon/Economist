@@ -217,7 +217,6 @@ function renderHome(cat){
   if(filtered.length===0){
     wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="css/coming%20soon.png" alt="Coming soon"></div>
       <h2>${t('home_coming')}</h2>
-      <p>${t('home_desc')}</p>
       <p>${cat==='all'?t('home_none_all'):tEmptyCategory(cat)}</p>
       <span class="empty-cta" onclick="showPage('propose')">${t('home_cta')}</span></div>`;
     triggerReveal();return;
@@ -228,7 +227,7 @@ function renderHome(cat){
   if(isMobile){
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
-        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img decoding="async" src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img fetchpriority="high" decoding="async" src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
         <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${tCat(hero.cat)}</div>
         <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem">${hero.title}</h1>
         <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${hero.deck}</p>
@@ -239,7 +238,7 @@ function renderHome(cat){
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="display:grid;grid-template-columns:1fr 320px;border-bottom:.5px solid var(--gris-clair)">
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
-          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img decoding="async" src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img fetchpriority="high" decoding="async" src="${hero.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${tCat(hero.cat)}</div>
           <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem">${hero.title}</h1>
           <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${hero.deck}</p>

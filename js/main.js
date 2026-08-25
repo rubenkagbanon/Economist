@@ -21,19 +21,10 @@ function setLoadingStatus(message){
   if(el)el.textContent='Economist · Chargement…';
 }
 function waitForPageReady(){
-  const images=[...document.images].filter(image=>{
-    if(image.complete)return false;
-    const bounds=image.getBoundingClientRect();
-    return bounds.top<window.innerHeight*1.25;
-  });
-  const imagePromise=Promise.all(images.map(image=>new Promise(resolve=>{
-    image.addEventListener('load',resolve,{once:true});
-    image.addEventListener('error',resolve,{once:true});
-  })));
   const fontPromise=document.fonts?.ready||Promise.resolve();
   return Promise.race([
-    Promise.all([imagePromise,fontPromise,new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))]),
-    new Promise(resolve=>setTimeout(resolve,3000))
+    Promise.all([fontPromise,new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))]),
+    new Promise(resolve=>setTimeout(resolve,800))
   ]);
 }
 

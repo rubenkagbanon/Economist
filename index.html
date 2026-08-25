@@ -263,8 +263,8 @@
     <div class="nav-actions" id="nav-actions"></div>
     <div class="nav-top-controls">
       <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()" title="Traduire / Translate">FR</button>
-      <button class="ctrl-btn" id="theme-toggle" onclick="toggleTheme()" title="Thème sombre">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <button class="ctrl-btn" id="theme-toggle" onclick="toggleTheme()" title="Activer le thème sombre" aria-label="Activer le thème sombre">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
     </div>
     <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()">
@@ -324,6 +324,11 @@
         <p><span data-i18n="about_participate_2">Vous avez réalisé un travail que vous souhaitez faire connaître ?</span> <em data-i18n="about_participate_cta">Proposez-le à notre rédaction.</em> <span data-i18n="about_participate_3">Après examen, votre travail pourra être résumé et présenté sous la forme d’un article afin de permettre à davantage de personnes de le découvrir, de le comprendre et d’en tirer des enseignements.</span></p>
       </div>
     </div>
+    <section class="about-team" aria-labelledby="about-team-title">
+      <h2 id="about-team-title" data-i18n="about_team_title">L’équipe</h2>
+      <p><strong data-i18n="about_founder_label">Fondateur</strong> : <span data-i18n="about_founder_name">Sosthene Jichi</span></p>
+      <p><strong data-i18n="about_developer_label">Développeur</strong> : <span data-i18n="about_developer_name">Ruben Kagbanon</span></p>
+    </section>
   </section>
 </div>
 <div id="page-home" class="page active"><div id="home-content"></div></div>
@@ -507,7 +512,7 @@
         <h2 id="rules-overview">Conditions d’utilisation</h2>
         <p class="help-article-lead">Ces conditions expliquent comment utiliser Economist, publier du contenu et participer à la plateforme de manière responsable.</p>
         <div class="help-updated">Dernière mise à jour : 20 août 2026</div>
-        <div class="help-callout"><strong>En bref</strong><p>Economist est un espace éditorial consacré à l’actualité et aux analyses dans plusieurs domaines. En utilisant le service, vous acceptez de respecter les autres utilisateurs, les droits d’auteur et les règles de publication ci-dessous.</p></div>
+        <div class="help-callout"><strong>En bref</strong><p>Economist est une plateforme éditoriale ouverte à tous, dédiée à la mise en valeur et au partage de travaux, recherches, études, mémoires, découvertes et réflexions dans différents domaines. Les contenus proposés doivent porter sur un travail déjà réalisé par leur auteur et sont examinés avant leur éventuelle publication sur la plateforme.</p><p>En utilisant Economist, vous acceptez de respecter les autres utilisateurs, les droits d’auteur, la confidentialité, l’exactitude des informations transmises ainsi que les règles de soumission et de publication de la plateforme.</p></div>
         <section class="help-section" id="rules-account"><h3>1. Compte et accès</h3><p>Vous devez fournir des informations exactes lors de la création de votre compte et protéger vos identifiants. Vous ne pouvez pas utiliser le compte d’une autre personne, partager un accès qui vous est réservé ou tenter de contourner les contrôles du service.</p><h4>Publication autorisée</h4><p>L’accès à l’écriture et à la publication peut nécessiter une validation ou un code fourni par Economist. Ce contrôle sert à préserver la qualité et la sécurité de la plateforme.</p></section>
         <section class="help-section" id="rules-content"><h3>2. Contenus et droits</h3><p>Vous restez responsable des textes, images, sources et liens que vous ajoutez. Vous devez disposer des autorisations nécessaires et respecter les droits d’auteur, les marques et la vie privée des personnes mentionnées.</p><h4>Exactitude et transparence</h4><p>Les articles doivent être rédigés de bonne foi. Lorsque cela est nécessaire, indiquez vos sources et distinguez clairement les faits, les analyses, les opinions et les contenus générés ou assistés par un outil.</p></section>
         <section class="help-section" id="rules-safety"><h3>3. Sécurité et modération</h3><p>Il est interdit de publier des contenus illégaux, frauduleux, diffamatoires, haineux, trompeurs, portant atteinte à autrui ou destinés à perturber le fonctionnement du service.</p><h4>Nos actions</h4><p>Economist peut masquer ou supprimer un contenu, limiter une fonction ou suspendre un compte lorsqu’une règle est enfreinte, lorsqu’un risque de sécurité est identifié ou lorsqu’une obligation légale l’impose.</p></section>

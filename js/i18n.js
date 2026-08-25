@@ -51,9 +51,10 @@ const I18N = {
     about_domains_title:"Nos domaines", about_domains_1:"Economist s’intéresse à tous les travaux qui permettent de mieux comprendre notre monde et ses transformations : économie, finance, politique, sociologie, droit, technologie, santé, société, environnement, intelligence artificielle, data science, ainsi que de nombreux autres domaines.", about_domains_2:"L’économie occupe une place particulière dans notre ligne éditoriale, car comprendre comment les ressources, les institutions, les marchés et les sociétés évoluent permet aussi de mieux comprendre les choix qui façonnent notre avenir.",
     about_open_title:"Un espace ouvert", about_open_1:"Economist est ouvert à tous ceux qui souhaitent faire connaître un travail qu’ils ont déjà réalisé.", about_open_2:"Étudiant, chercheur, professionnel, institution ou particulier, chacun peut proposer un travail issu d’une recherche, d’un mémoire, d’une étude, d’une enquête, d’un projet ou de toute autre démarche apportant un contenu pertinent.", about_open_3:"Les travaux proposés sont examinés par notre équipe avant publication. Notre objectif est de préserver un espace sérieux, accessible et utile, tout en permettant à des travaux parfois peu visibles de trouver un nouveau public.",
     about_participate_title:"Lire, découvrir et participer", about_participate_1:"Explorez les articles publiés, découvrez leurs auteurs et parcourez les différentes thématiques d’Economist.", about_participate_2:"Vous avez réalisé un travail que vous souhaitez faire connaître ?", about_participate_cta:"Proposez-le à notre rédaction.", about_participate_3:"Après examen, votre travail pourra être résumé et présenté sous la forme d’un article afin de permettre à davantage de personnes de le découvrir, de le comprendre et d’en tirer des enseignements.",
+    about_team_title:"L’équipe", about_founder_label:"Fondateur", about_founder_name:"Sosthene Jichi", about_developer_label:"Développeur", about_developer_name:"Ruben Kagbanon",
     home_coming:"À paraître", home_desc:"Nos rédacteurs travaillent sur de nouveaux articles.",
     home_none_all:"Aucun article publié pour l'instant.", home_none_cat:"Aucun article en «",
-    home_cta:"Proposer un article →", home_alire:"À lire aussi", home_par:"Par", home_read:"de lecture",
+    home_cta:"Proposer un article", home_alire:"À lire aussi", home_par:"Par", home_read:"de lecture",
     home_back:"Retour",
 
     del_confirm:"Supprimer définitivement cet article ?", del_done:"Article supprimé.",
@@ -124,9 +125,10 @@ const I18N = {
     about_domains_title:"Our fields", about_domains_1:"Economist is interested in work that helps us better understand our world and its transformations: economics, finance, politics, sociology, law, technology, health, society, the environment, artificial intelligence, data science and many other fields.", about_domains_2:"Economics holds a special place in our editorial approach, because understanding how resources, institutions, markets and societies evolve also helps us understand the choices shaping our future.",
     about_open_title:"An open space", about_open_1:"Economist is open to everyone who wants to make work they have already completed known to a wider audience.", about_open_2:"Students, researchers, professionals, institutions and individuals can all propose work based on research, a dissertation, a study, an investigation, a project or any other process that produces relevant content.", about_open_3:"Proposed work is reviewed by our team before publication. Our aim is to preserve a serious, accessible and useful space, while helping work that is sometimes overlooked find a new audience.",
     about_participate_title:"Read, discover and participate", about_participate_1:"Explore published articles, discover their authors and browse Economist’s different topics.", about_participate_2:"Have you completed work you would like to share?", about_participate_cta:"Submit it to our editorial team.", about_participate_3:"After review, your work may be summarized and presented as an article, allowing more people to discover it, understand it and learn from it.",
+    about_team_title:"Team", about_founder_label:"Founder", about_founder_name:"Sosthene Jichi", about_developer_label:"Developer", about_developer_name:"Ruben Kagbanon",
     home_coming:"Coming soon", home_desc:"Our writers are working on new articles.",
     home_none_all:"No articles published yet.", home_none_cat:"No articles in «",
-    home_cta:"Submit an article →", home_alire:"Also worth reading", home_par:"By", home_read:"read",
+    home_cta:"Submit an article", home_alire:"Also worth reading", home_par:"By", home_read:"read",
     home_back:"Back",
 
     del_confirm:"Permanently delete this article?", del_done:"Article deleted.",
@@ -223,7 +225,7 @@ function translateLegalPages(){
   setLegalText('.help-updated', ['Last updated: August 20, 2026','Last updated: August 20, 2026']);
   setLegalText('.help-callout strong', ['In brief','In brief']);
   setLegalText('#privacy-article .help-callout p', ['This policy explains what information Economist receives, how it is used and what choices you have to manage your data.']);
-  setLegalText('#rules-article .help-callout p', ['Economist is an editorial space covering news and analysis across several fields. By using the service, you agree to respect other users, copyrights and the publishing rules below.']);
+  setLegalText('#rules-article .help-callout p', ['Economist is an open editorial platform dedicated to showcasing and sharing works, research, studies, dissertations, discoveries and reflections across different fields. Submitted content must concern work already completed by its author and is reviewed before possible publication on the platform.', 'By using Economist, you agree to respect other users, copyrights, privacy, the accuracy of submitted information, and the platform submission and publication rules.']);
   setLegalText('#privacy-article .help-sidebar a', ['Privacy Policy','Information collected','How we use information','Sharing and third-party services','Your rights','Contact']);
   setLegalText('#rules-article .help-sidebar a', ['Terms of Use','Account and access','Content and rights','Safety and moderation','Contact']);
   setLegalText('#privacy-article section h2', ['Purpose of this policy','Information collected','How we use information','Sharing and third-party services','Retention and security','Your rights','Changes to this policy','Contact us']);
