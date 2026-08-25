@@ -26,8 +26,8 @@ body{min-height:100vh;display:flex;flex-direction:column;background:var(--blanc)
 #planet-tr{top:-10%;right:-8%;width:520px;height:520px;}
 #planet-bl{bottom:-15%;left:-8%;width:400px;height:400px;}
 @media(max-width:768px){
-  #planet-tr{top:-8%;right:10%;width:220px;height:220px;}
-  #planet-bl{bottom:-8%;left:10%;width:180px;height:180px;}
+  #planet-tr{top:-5%;right:-20%;width:200px;height:200px;}
+  #planet-bl{bottom:-8%;left:-20%;width:160px;height:160px;}
 }
 
 /* LOADING */
@@ -399,6 +399,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
 .foot-links{display:flex;gap:2rem;flex-wrap:wrap;justify-content:flex-end;}
 .foot-link{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#bbb;cursor:pointer;transition:color .2s;text-decoration:none}
 .foot-link:hover{color:var(--rouge)}
+.foot-credits{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;max-width:1200px;margin:2rem auto 0;padding-top:1rem;border-top:.5px solid rgba(255,255,255,.2);font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#bbb}
 .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
 .revealed{opacity:1;transform:translateY(0)}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
