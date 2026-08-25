@@ -56,7 +56,7 @@ function showPage(name){
     ? 'Economist | Conditions d’utilisation'
     : name==='privacy'
       ? 'Economist | Politique de confidentialité'
-      : 'Economist | Actualités et analyses dans plusieurs domaines';
+      : 'Economist | Actualités et analyse dans plusieurs domaines';
   if(name!=='profile') resetProfileShareMetadata();
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
@@ -90,16 +90,16 @@ function setProfileShareMetadata(user){
 }
 function resetProfileShareMetadata(){
   const defaults={
-    'meta[name="description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
-    'meta[property="og:title"]':'Economist | Actualités et analyses dans plusieurs domaines',
-    'meta[property="og:description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
+    'meta[name="description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
+    'meta[property="og:title"]':'Economist | Actualités et analyse dans plusieurs domaines',
+    'meta[property="og:description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
     'meta[property="og:image"]':'https://www.econglobe.com/css/Logo.png',
     'meta[property="og:image:alt"]':'Logo Economist',
-    'meta[name="twitter:title"]':'Economist | Actualités et analyses dans plusieurs domaines',
-    'meta[name="twitter:description"]':'Economist publie des actualités, des analyses et des perspectives sur l’économie, la finance, la politique, la technologie et les transformations sociales.',
+    'meta[name="twitter:title"]':'Economist | Actualités et analyse dans plusieurs domaines',
+    'meta[name="twitter:description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
     'meta[name="twitter:image"]':'https://www.econglobe.com/css/Logo.png'
   };
-  document.title='Economist | Actualités et analyses dans plusieurs domaines';
+  document.title='Economist | Actualités et analyse dans plusieurs domaines';
   Object.entries(defaults).forEach(([selector,value])=>document.querySelector(selector)?.setAttribute('content',value));
 }
 function pageFromPath(){
