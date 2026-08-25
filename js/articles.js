@@ -212,7 +212,7 @@ function artCardHtml(a){
 
 function renderHome(cat){
   const wrap=document.getElementById('home-content');
-  const all=[...articles].reverse();
+  const all=articles.filter(article=>article.status==='published').reverse();
   const filtered=cat==='all'?all:all.filter(a=>a.cat===cat);
   if(filtered.length===0){
     wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="css/coming%20soon.png" alt="Coming soon"></div>

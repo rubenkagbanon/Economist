@@ -407,7 +407,7 @@ async function publishArticle(){
     console.error('next_article_id',idError);
     return;
   }
-  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0 };
+  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:'pending' };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
   articles.push(a);
   await saveArticle(a);

@@ -14,12 +14,16 @@ function renderAdmin(){
   const el=document.getElementById('admin-content');
   if(!isOwner()){el.innerHTML=`<div style="border:.5px solid var(--gris-clair);border-left:3px solid var(--rouge);padding:2.5rem;max-width:440px"><p style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">${t('admin_access')}</p><button class="btn-red" onclick="openModal('login')">${t('admin_btn_login')}</button></div>`;return;}
   const totalReads=articles.reduce((s,a)=>s+(a.reads||0),0);
+  const pendingArticles=articles.filter(article=>article.status==='pending').sort((a,b)=>(b.id||0)-(a.id||0));
+  const pendingMarkup=`<div class="stats-section-title">${t('admin_pending_title')}</div><div class="admin-pending-list" style="margin-bottom:3rem">${pendingArticles.length?pendingArticles.map(article=>`<div class="admin-pending-item"><div><strong>${article.title}</strong><span>${article.author} · ${tCat(article.cat)}</span><p>${article.deck||''}</p></div><div class="admin-pending-actions"><button class="btn-outline" onclick="openArticle(${article.id})">${t('admin_preview')}</button><button class="btn-red" onclick="adminPublishArticle(${article.id})">${t('admin_publish')}</button></div></div>`).join(''):`<div class="admin-pending-empty">${t('admin_pending_empty')}</div>`}</div>`;
   el.innerHTML=`<div class="admin-badge">${t('admin_badge')}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.2rem;margin-bottom:3rem">
       <div class="my-stat-card"><div class="my-stat-num">${articles.length}</div><div class="my-stat-label">${t('stats_articles')}</div></div>
       <div class="my-stat-card"><div class="my-stat-num">${users.length}</div><div class="my-stat-label">${t('admin_members')}</div></div>
       <div class="my-stat-card"><div class="my-stat-num">${totalReads}</div><div class="my-stat-label">${t('stats_reads')}</div></div>
     </div>
+
+    ${pendingMarkup}
 
     <div class="stats-section-title">✉ Envoyer un code manuellement</div>
     <div style="border:.5px solid var(--gris-clair);padding:1.5rem;margin-bottom:3rem;max-width:520px">
@@ -63,6 +67,18 @@ function renderAdmin(){
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic">${t('admin_none_members')}</div>`}`;
   loadAdminCodes();
   loadAdminProposals();
+}
+
+async function adminPublishArticle(id){
+  if(!isOwner())return;
+  const article=articles.find(item=>String(item.id)===String(id));
+  if(!article||article.status==='published')return;
+  const error=await updateArticleStatus(id,'published');
+  if(error){showToast(t('toast_publish_error'));return;}
+  article.status='published';
+  writeDataCache();
+  showToast(t('toast_article_published'));
+  renderAdmin();
 }
 
 // ═══════════════ CODES D'ACCÈS ═══════════════

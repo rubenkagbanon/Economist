@@ -35,7 +35,7 @@ document.addEventListener('db-ready', () => {
 const KV_TABLE = 'kv_store';
 
 function applyData(arts, usrs){
-  articles = arts ? Object.values(arts) : [];
+  articles = arts ? Object.values(arts).map(article=>({...article,status:article.status||'published'})) : [];
   articles.sort((a,b) => (a.id||0) - (b.id||0));
   users = usrs ? Object.values(usrs) : [];
 }
@@ -56,7 +56,7 @@ async function fetchData(){
   ]);
   if(articleError||userError)throw articleError||userError;
   const arts={},usrs={};
-  articleRows.forEach(row=>{arts[row.id]={...row,bodyHtml:row.body_html};});
+  articleRows.forEach(row=>{arts[row.id]={...row,bodyHtml:row.body_html,status:row.status||'published'};});
   userRows.forEach(row=>{usrs[row.email]={...row,authProvider:row.auth_provider};});
   applyData(arts, usrs);
   dataLoaded=true;
@@ -110,11 +110,15 @@ function loadData(force=false) {
 async function saveArticle(a) {
   const {error}=await _sb.from('articles').upsert({
     id:a.id,owner_id:a.owner_id,title:a.title,deck:a.deck,cat:a.cat,author:a.author,
-    img:a.img,body:a.body,body_html:a.bodyHtml,date:a.date,reads:a.reads||0
+    img:a.img,body:a.body,body_html:a.bodyHtml,date:a.date,reads:a.reads||0,status:a.status||'pending'
   });
   if(error)console.error('saveArticle',error);
   writeDataCache();
   return error || null;
+}
+async function updateArticleStatus(id,status){
+  const {error}=await _sb.from('articles').update({status}).eq('id',id);
+  return error||null;
 }
 async function deleteArticleDB(id) {
   const {error}=await _sb.from('articles').delete().eq('id',id);
