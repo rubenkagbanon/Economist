@@ -374,6 +374,19 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .admin-page .stats-table{width:100%;border-collapse:collapse;font-family:'Roboto Slab',Georgia,serif;font-size:.88rem}
 .admin-page .stats-table th{font-family:'Roboto Slab',Georgia,serif;text-align:left;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);padding:.6rem 1rem;border-bottom:.5px solid var(--gris-clair);font-weight:400}
 .admin-page .stats-table td{padding:.8rem 1rem;border-bottom:.5px solid var(--gris-clair);vertical-align:middle}
+.admin-page .stats-section-title{font-size:11px}
+.admin-page .admin-badge{font-size:10px}
+.admin-page #admin-proposals-list>div{padding:1.5rem 1rem!important;text-align:center}
+.admin-page #admin-proposals-list>div>div{justify-content:center!important}
+.admin-page #admin-proposals-list strong{font-size:1.15rem!important}
+.admin-page #admin-proposals-list span,.admin-page #admin-proposals-list p{font-size:.95rem!important}
+.admin-page #admin-proposals-list button{font-size:10px!important}
+.admin-page #admin-codes-list>div{padding:1rem!important;text-align:center;justify-content:center!important}
+.admin-page #admin-codes-list>div>div{justify-content:center!important;width:100%}
+.admin-page #admin-codes-list span{font-size:.95rem!important}
+.admin-page #admin-codes-list>div>div:last-child span{font-size:10px!important}
+.admin-page .stats-table th{font-size:11px}
+.admin-page .stats-table td{font-size:.95rem}
 .admin-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:var(--rouge);color:white;padding:4px 12px;margin-bottom:2rem}
 .btn-danger{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,0,0,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:var(--rouge);color:white}

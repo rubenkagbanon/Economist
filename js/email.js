@@ -93,6 +93,20 @@ async function emailSendVerificationCode(toEmail, toName, code, purpose){
   return ok;
 }
 
+async function emailNotifyArticleDecision(article, approved){
+  const authorUser=(article.owner_id&&users.find(user=>String(user.id)===String(article.owner_id)))||findAuthorUser(article.author);
+  const toEmail=authorUser?.email||'';
+  if(!toEmail)return false;
+  const firstName=authorUser?.first||article.author||'';
+  const subject=approved
+    ? '[Economist] Votre article a été publié'
+    : '[Economist] Votre article n’a pas été retenu';
+  const message=approved
+    ? `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.\n\n— Economist`
+    : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.\n\n— Economist`;
+  return sendEmail({to_email:toEmail,subject,from_name:'Economist',reply_to:OWNER_EMAIL,message});
+}
+
 // ═══════════════ BIENVENUE (nouvelle inscription) ═══════════════
 async function emailSendWelcome(toEmail, toFirstName){
   const message =

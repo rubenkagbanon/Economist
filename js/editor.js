@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 // ═══════════════ PROPOSITION D'ARTICLE ═══════════════
+let proposalSubmitting=false;
 function initProposalContact(){
   if(!currentUser)return;
   const first=document.getElementById('r-first');
@@ -12,6 +13,7 @@ function initProposalContact(){
 }
 
 async function submitRequest(){
+  if(proposalSubmitting)return;
   if(!currentUser){
     showToast(t('toast_login_required'));
     openModal('login');
@@ -25,6 +27,7 @@ async function submitRequest(){
   const subj =document.getElementById('r-subject').value.trim();
   const why  =document.getElementById('r-why').value.trim();
   if(!first||!last||!email||!cat||!subj){ showToast(t('toast_required_fields_proposal')); return; }
+  proposalSubmitting=true;
   const btn=document.querySelector('.reg-submit');
   if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
   const id=`${Date.now()}_${Math.floor(Math.random()*1000)}`;
@@ -32,6 +35,7 @@ async function submitRequest(){
   const saveError=await dbSet(`proposals/${id}`, proposal);
   if(saveError){
     showToast(`${t('toast_submit_error')} ${saveError.message||t('toast_save_error')}`,6000);
+      proposalSubmitting=false;
     if(btn){ btn.disabled=false; btn.textContent=t('propose_submit'); }
     return;
   }
@@ -41,7 +45,9 @@ async function submitRequest(){
   ['r-first','r-last','r-email','r-job','r-cat','r-subject','r-why'].forEach(fid=>{
     const el=document.getElementById(fid); if(el) el.value='';
   });
-  if(btn){ btn.disabled=false; btn.textContent='Envoyer ma proposition →'; }
+  proposalSubmitting=false;
+  if(btn){ btn.disabled=false; btn.textContent=t('propose_submit'); }
+  showToast(t('toast_submit_success'));
 }
 
 // ═══════════════ GATE (connexion + code d'accès) ═══════════════

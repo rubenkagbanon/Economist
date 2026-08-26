@@ -15,7 +15,7 @@ function renderAdmin(){
   if(!isOwner()){el.innerHTML=`<div style="border:.5px solid var(--gris-clair);border-left:3px solid var(--rouge);padding:2.5rem;max-width:440px"><p style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">${t('admin_access')}</p><button class="btn-red" onclick="openModal('login')">${t('admin_btn_login')}</button></div>`;return;}
   const totalReads=articles.reduce((s,a)=>s+(a.reads||0),0);
   const pendingArticles=articles.filter(article=>article.status==='pending').sort((a,b)=>(b.id||0)-(a.id||0));
-  const pendingMarkup=`<div class="stats-section-title">${t('admin_pending_title')}</div><div class="admin-pending-list admin-panel-space">${pendingArticles.length?pendingArticles.map(article=>`<div class="admin-pending-item"><div><strong>${article.title}</strong><span>${article.author} · ${tCat(article.cat)}</span><p>${article.deck||''}</p></div><div class="admin-pending-actions"><button class="btn-outline" onclick="openArticle(${article.id},'admin')">${t('admin_preview')}</button><button class="btn-red" onclick="adminPublishArticle(${article.id})">${t('admin_publish')}</button></div></div>`).join(''):`<div class="admin-pending-empty">${t('admin_pending_empty')}</div>`}</div>`;
+  const pendingMarkup=`<div class="stats-section-title">${t('admin_pending_title')}</div><div class="admin-pending-list admin-panel-space">${pendingArticles.length?pendingArticles.map(article=>`<div class="admin-pending-item"><div><strong>${article.title}</strong><span>${article.author} · ${tCat(article.cat)}</span><p>${article.deck||''}</p></div><div class="admin-pending-actions"><button class="btn-outline" onclick="openArticle(${article.id},'admin')">${t('admin_preview')}</button><button class="btn-red" onclick="adminPublishArticle(${article.id})">${t('admin_publish')}</button><button class="btn-danger" onclick="adminRejectArticle(${article.id})">${t('admin_delete')}</button></div></div>`).join(''):`<div class="admin-pending-empty">${t('admin_pending_empty')}</div>`}</div>`;
   el.innerHTML=`<div class="admin-badge">${t('admin_badge')}</div>
     <div class="admin-metrics">
       <div class="my-stat-card"><div class="my-stat-num">${articles.length}</div><div class="my-stat-label">${t('stats_articles')}</div></div>
@@ -77,7 +77,21 @@ async function adminPublishArticle(id){
   if(error){showToast(t('toast_publish_error'));return;}
   article.status='published';
   writeDataCache();
+  await emailNotifyArticleDecision(article,true);
   showToast(t('toast_article_published'));
+  renderAdmin();
+}
+
+async function adminRejectArticle(id){
+  if(!isOwner())return;
+  const article=articles.find(item=>String(item.id)===String(id));
+  if(!article||article.status!=='pending')return;
+  if(!confirm(t('confirm_reject_article')))return;
+  const error=await deleteArticleDB(id);
+  if(error){showToast(t('toast_delete_error'));return;}
+  articles=articles.filter(item=>String(item.id)!==String(id));
+  await emailNotifyArticleDecision(article,false);
+  showToast(t('toast_article_rejected'));
   renderAdmin();
 }
 
@@ -86,7 +100,10 @@ async function loadAdminCodes(){
   const el=document.getElementById('admin-codes-list');if(!el)return;
   const codes=await dbGet(ONE_TIME_CODES_PATH);
   if(!codes){el.textContent='Aucun code créé.';el.style.fontStyle='italic';return;}
-  const rows=Object.entries(codes).map(([k,v])=>`
+  const activeEntries=Object.entries(codes).filter(([,v])=>(v.used||0)<(v.max||2));
+  const inactiveKeys=Object.keys(codes).filter(key=>!activeEntries.some(([activeKey])=>activeKey===key));
+  await Promise.all(inactiveKeys.map(key=>dbDelete(`${ONE_TIME_CODES_PATH}/${key}`)));
+  const rows=activeEntries.map(([k,v])=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:.5px solid var(--gris-clair);gap:.8rem;flex-wrap:wrap">
       <div>
         <span style="font-family:var(--sans);font-weight:500;color:var(--noir);letter-spacing:.05em">${v.code||k}</span>
@@ -98,7 +115,7 @@ async function loadAdminCodes(){
         <button class="btn-danger" onclick="adminDeleteCode('${k}')">✕</button>
       </div>
     </div>`).join('');
-  el.innerHTML=rows||'<span>Aucun code créé.</span>';el.style.fontStyle='normal';
+  el.innerHTML=rows||'<span>Aucun code actif.</span>';el.style.fontStyle='normal';
 }
 
 async function adminAddCode(){
@@ -140,7 +157,9 @@ async function loadAdminProposals(){
   const el=document.getElementById('admin-proposals-list');if(!el)return;
   const props=await dbGet('proposals');
   if(!props){el.textContent='Aucune proposition reçue.';el.style.fontStyle='italic';return;}
-  const entries=Object.entries(props).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  const entries=Object.entries(props).filter(([,p])=>p.status!=='sent').sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  const inactiveIds=Object.keys(props).filter(id=>props[id]?.status==='sent');
+  await Promise.all(inactiveIds.map(id=>dbDelete(`proposals/${id}`)));
   el.style.fontStyle='normal';
   el.innerHTML=entries.map(([id,p])=>`
     <div style="border:.5px solid var(--gris-clair);padding:1.2rem 1.4rem;margin-bottom:.8rem">
