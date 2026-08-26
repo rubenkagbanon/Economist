@@ -260,8 +260,9 @@ function renderHome(cat){
 }
 
 // ═══════════════ ARTICLE FULL ═══════════════
-async function openArticle(id){
+async function openArticle(id,fromPage='home'){
   const a=articles.find(x=>x.id===id); if(!a)return;
+  const backPage=fromPage==='admin'?'admin':'home';
   const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=(a.owner_id&&users.find(user=>String(user.id)===String(a.owner_id)))||findAuthorUser(a.author);
   const authorSlug=authorUser?profileSlug(authorUser):`${a.author||''}`.trim().replace(/\s+/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -270,7 +271,7 @@ async function openArticle(id){
   const delBtn=canDelete?`<button onclick="confirmDeleteArticle(${a.id})" style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#8B0000;border:.5px solid #8B0000;color:#fff;padding:5px 12px;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='#700000';this.style.color='#fff'" onmouseout="this.style.background='#8B0000';this.style.color='#fff'">🗑 ${t('admin_delete')}</button>`:'';
   document.getElementById('article-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
-      <button class="back-btn" style="margin-bottom:0" onclick="showPage('home')">${t('home_back')}</button>${shareBtn}${delBtn}
+      <button class="back-btn" style="margin-bottom:0" onclick="showPage('${backPage}')">${t('home_back')}</button>${shareBtn}${delBtn}
     </div>
     <div class="art-full-k">${tCat(a.cat)}</div>
     <h1 class="art-full-title">${a.title}</h1>
@@ -282,7 +283,7 @@ async function openArticle(id){
     ${a.img?`<div class="art-full-cover"><img decoding="async" src="${a.img}" alt="" onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${tCat(a.cat)} — ${tDate(a.date)}</div>`:''}
     <div class="art-full-body">${bodyContent}</div>`;
   showPage('article');
-  scheduleArticleRead(id);
+  if(backPage==='home')scheduleArticleRead(id);
 }
 
 async function confirmDeleteArticle(id){

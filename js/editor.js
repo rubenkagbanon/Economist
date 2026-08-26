@@ -29,7 +29,12 @@ async function submitRequest(){
   if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
   const id=`${Date.now()}_${Math.floor(Math.random()*1000)}`;
   const proposal={first,last,email,job,cat,subj,why,ts:Date.now(),status:'pending'};
-  await dbSet(`proposals/${id}`, proposal);
+  const saveError=await dbSet(`proposals/${id}`, proposal);
+  if(saveError){
+    showToast(`${t('toast_submit_error')} ${saveError.message||t('toast_save_error')}`,6000);
+    if(btn){ btn.disabled=false; btn.textContent=t('propose_submit'); }
+    return;
+  }
   await emailNotifyOwnerOfProposal(proposal);
   document.getElementById('reg-email-shown').textContent=email;
   document.getElementById('reg-success').style.display='block';
@@ -392,6 +397,10 @@ function previewArticle(){
 function closeArticlePreview(){
   document.getElementById('article-preview-modal').classList.remove('open');
 }
+function notifyPublishError(error, fallback=''){
+  const detail=error?.message||fallback;
+  showToast(detail?`${t('toast_publish_error')} ${detail}`:t('toast_publish_error'),6000);
+}
 async function publishArticle(){
   const title =document.getElementById('f-title').value.trim();
   const deck  =document.getElementById('f-deck').value.trim();
@@ -404,14 +413,14 @@ async function publishArticle(){
   const bodyHtml = editorBlocks.map(blockToHtml).join('\n');
   const {data:id,error:idError}=await _sb.rpc('next_article_id');
   if(idError||!id){
-    showToast(t('toast_publish_error'));
+    notifyPublishError(idError,t('toast_id_error'));
     console.error('next_article_id',idError);
     return;
   }
   const isAdmin=isOwner();
   const ownerId=currentUser?.id||_sb.auth.currentUser?.id||'';
   if(!ownerId){
-    showToast(t('toast_publish_error'));
+    notifyPublishError(null,t('toast_user_error'));
     console.error('publishArticle: authenticated user id is missing');
     return;
   }
@@ -419,7 +428,7 @@ async function publishArticle(){
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
   const saveError=await saveArticle(a);
   if(saveError){
-    showToast(t('toast_publish_error'));
+    notifyPublishError(saveError,t('toast_save_error'));
     btn.disabled=false;
     return;
   }
@@ -433,10 +442,11 @@ async function publishArticle(){
   document.getElementById('code-gate').style.display=isAdmin?'none':'block';
   document.getElementById('gate-err').style.display='none';
 }
-function goToNewArticle(){
-  if(!lastPublishedId)return;
+function startNewArticle(){
   editorBlocks=[]; _coverData='';
   document.getElementById('success-msg').style.display='none';
   document.getElementById('btn-publish').disabled=false;
-  openArticle(lastPublishedId);
+  document.getElementById('write-form').style.display='none';
+  renderWritePage();
+  showPage('write');
 }
