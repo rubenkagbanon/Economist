@@ -63,7 +63,7 @@ function renderAdmin(){
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic;margin-bottom:2rem">${t('admin_none_art')}</div>`}
     <div class="stats-section-title">${t('admin_members')}</div>
     ${users.length?`<div class="admin-table-wrap"><table class="stats-table"><thead><tr><th>${t('admin_member_name')}</th><th>${t('admin_member_email')}</th><th>${t('admin_member_joined')}</th><th>${t('admin_member_arts')}</th><th>${t('admin_member_profile')}</th><th>Action</th></tr></thead><tbody>
-      ${users.map(u=>{const c=articles.filter(a=>a.author===u.first+' '+u.last).length;return `<tr><td>${u.first} ${u.last}</td><td style="color:var(--gris);font-family:var(--sans);font-size:.85rem">${u.email}</td><td style="font-family:var(--sans);font-size:.85rem">${u.joined||'—'}</td><td>${c}</td><td><span style="font-family:var(--sans);font-size:9.5px;color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('profile');openProfile('${u.email}')">${t('admin_view')}</span></td><td>${u.email.toLowerCase()===OWNER_EMAIL.toLowerCase()?'':`<button class="btn-danger" onclick="adminDeleteUser('${u.email}')">Supprimer</button>`}</td></tr>`;}).join('')}
+      ${users.map(u=>{const c=articles.filter(a=>a.author===u.first+' '+u.last).length;return `<tr><td>${u.first} ${u.last}</td><td style="color:var(--gris);font-family:var(--sans);font-size:.85rem">${u.email}</td><td style="font-family:var(--sans);font-size:.85rem">${u.joined||'—'}</td><td>${c}</td><td><span style="font-family:var(--sans);font-size:9.5px;color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('profile');openProfile('${u.email}')">${t('admin_view')}</span></td><td>${u.email.toLowerCase()===OWNER_EMAIL.toLowerCase()?'':`<button class="btn-danger" onclick="adminDeleteUser('${u.email}')">${t('admin_delete')}</button>`}</td></tr>`;}).join('')}
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic">${t('admin_none_members')}</div>`}`;
   loadAdminCodes();
   loadAdminProposals();
@@ -195,9 +195,13 @@ async function adminDeleteProposal(id){
 
 // ═══════════════ GESTION DES MEMBRES ═══════════════
 async function adminDeleteUser(email){
-  if(!confirm(tf('confirm_delete_account',{email})))return;
-  await deleteUserDB(email);
-  users=users.filter(u=>u.email!==email);
+  if(!isOwner())return;
+  const normalizedEmail=(email||'').trim().toLowerCase();
+  if(!normalizedEmail||normalizedEmail===OWNER_EMAIL.toLowerCase())return;
+  if(!confirm(tf('confirm_delete_account',{email:normalizedEmail})))return;
+  const error=await deleteUserDB(normalizedEmail);
+  if(error){showToast(t('toast_delete_error'));return;}
+  users=users.filter(u=>(u.email||'').toLowerCase()!==normalizedEmail);
   showToast(t('toast_account_deleted'));
   renderAdmin();
 }

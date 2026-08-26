@@ -140,9 +140,11 @@ async function saveUser(u) {
   return error || null;
 }
 async function deleteUserDB(email) {
-  const {error}=await _sb.from('profiles').delete().eq('email',email);
+  const normalizedEmail=(email||'').trim().toLowerCase();
+  if(!normalizedEmail)return new Error('Missing user email');
+  const {error}=await _sb.functions.invoke('admin-delete-user',{body:{email:normalizedEmail}});
   if(!error)writeDataCache();
-  return error;
+  return error || null;
 }
 
 // ═══════════════ SESSION ═══════════════
