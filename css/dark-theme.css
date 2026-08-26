@@ -115,6 +115,7 @@
 [data-theme="dark"] .stats-table td,[data-theme="dark"] .stats-table th{border-color:#222}
 [data-theme="dark"] .stats-table tr:hover td{background:#1e1e1e}
 [data-theme="dark"] .my-stat-card,[data-theme="dark"] .reg-card,[data-theme="dark"] .success-msg,[data-theme="dark"] .reg-success{background:#1a1a1a;border-color:#2a2a2a}
+[data-theme="dark"] .my-stats-page .my-stat-num,[data-theme="dark"] .admin-page .my-stat-num{color:#F5F4F0}
 [data-theme="dark"] .admin_access,[data-theme="dark"] .profile-bio,[data-theme="dark"] .profile-meta{color:var(--txt-soft)}
 
 /* ── Footer (toujours sombre, conservé tel quel) ── */

@@ -409,7 +409,13 @@ async function publishArticle(){
     return;
   }
   const isAdmin=isOwner();
-  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
+  const ownerId=currentUser?.id||_sb.auth.currentUser?.id||'';
+  if(!ownerId){
+    showToast(t('toast_publish_error'));
+    console.error('publishArticle: authenticated user id is missing');
+    return;
+  }
+  const a = { id, owner_id:ownerId, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
   const saveError=await saveArticle(a);
   if(saveError){
