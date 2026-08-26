@@ -44,6 +44,23 @@ async function doLogin(){
   showToast(`${t('toast_welcome')}, ${u.first} !`);
 }
 
+async function savePassword(){
+  if(!currentUser||!_sb?.auth)return;
+  const btn=document.getElementById('btn-password');
+  const errEl=document.getElementById('password-err');
+  const pwd=document.getElementById('new-password').value;
+  const pwd2=document.getElementById('confirm-password').value;
+  errEl.style.display='none';
+  if(!pwd||!pwd2){errEl.textContent=t('auth_err_fields');errEl.style.display='block';return;}
+  if(pwd.length<8){errEl.textContent=t('auth_err_short');errEl.style.display='block';return;}
+  if(pwd!==pwd2){errEl.textContent=t('auth_err_match');errEl.style.display='block';return;}
+  btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
+  const {error}=await _sb.auth.updateUser({password:pwd});
+  btn.textContent='Enregistrer le mot de passe';btn.disabled=false;
+  if(error){errEl.textContent=error.message||"Impossible d'enregistrer le mot de passe.";errEl.style.display='block';return;}
+  showToast('Mot de passe enregistré.');closeModal();
+}
+
 async function doSignup(){
   const btn=document.getElementById('btn-signup');
   const first=document.getElementById('su-first').value.trim();

@@ -21,9 +21,9 @@
   /* Paliers de gris texte, réajustés pour rester lisibles sur fond sombre */
   --txt-strong:#F0EEE9;
   --txt-soft:#D8D5D0;
-  --txt-mut:#B8B4AE;
-  --txt-lite:#938F89;
-  --txt-pale:#77736e;
+  --txt-mut:#C8C4BE;
+  --txt-lite:#A7A29A;
+  --txt-pale:#8E8982;
 }
 
 /* ── Base ── */

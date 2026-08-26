@@ -50,8 +50,10 @@ function writeDataCache(){
   try{ localStorage.setItem(DATA_CACHE_KEY,JSON.stringify({savedAt:Date.now(),articles,users})); }catch(e){}
 }
 async function fetchData(){
+  const articlesQuery=_sb.from('articles').select('*').order('id');
+  if(!isOwner())articlesQuery.or('status.eq.published,status.is.null');
   const [{data:articleRows,error:articleError},{data:userRows,error:userError}]=await Promise.all([
-    _sb.from('articles').select('*').order('id'),
+    articlesQuery,
     _sb.from('profiles').select('*')
   ]);
   if(articleError||userError)throw articleError||userError;

@@ -13,12 +13,14 @@ function renderNav(){
   toggle('nav-cats-logout', loggedIn);
   toggle('mob-write-item', loggedIn);
   toggle('mob-mystats-item', loggedIn);
+  toggle('mob-password-item', loggedIn);
   toggle('mob-logout-item', loggedIn);
   toggle('mob-admin-item', loggedIn && isOwner());
   toggle('desktop-nav-login', !loggedIn);
   toggle('desktop-nav-logout', loggedIn);
   toggle('desktop-nav-write', loggedIn);
   toggle('desktop-nav-stats', loggedIn);
+  toggle('desktop-nav-password', loggedIn);
   toggle('nav-cats-propose', loggedIn);
   toggle('mob-propose-item', loggedIn);
   toggle('footer-propose-link', loggedIn);
@@ -152,7 +154,7 @@ function closeModal(){
 }
 function switchTab(tab){
   const tabsEl = document.querySelector('.modal-tabs');
-  if(tab==='forgot'){
+  if(tab==='forgot'||tab==='password'){
     if(tabsEl) tabsEl.style.display='none';
   } else {
     if(tabsEl) tabsEl.style.display='flex';
@@ -161,6 +163,13 @@ function switchTab(tab){
     });
   }
   switchAuthPanel(tab);
+}
+function openPasswordModal(){
+  if(!currentUser){openModal('login');return;}
+  openModal('password');
+  document.getElementById('new-password').value='';
+  document.getElementById('confirm-password').value='';
+  document.getElementById('password-err').style.display='none';
 }
 function togglePwd(inputId, btn){
   const inp=document.getElementById(inputId);

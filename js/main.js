@@ -42,11 +42,15 @@ async function init(){
   if(_sb && _sb.auth){
     setLoadingStatus('Vérification de votre session…');
     const { data: { session } } = await _sb.auth.getSession();
-    if(session && session.user) await syncAuthUserFromSession(session);
+    if(session && session.user){
+      await syncAuthUserFromSession(session);
+      if(isOwner())await loadData(true);
+    }
     _sb.auth.onAuthStateChange(async (_event, nextSession) => {
       if(!nextSession || !nextSession.user)return;
       setTimeout(async ()=>{
         await syncAuthUserFromSession(nextSession);
+        if(isOwner())await loadData(true);
         renderNav();
         if(typeof renderHome==='function') renderHome(currentActiveCat);
         if(_event==='SIGNED_IN')showToast(`${t('toast_welcome')}, ${currentUser.first} !`);
