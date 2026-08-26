@@ -15,9 +15,9 @@ function renderAdmin(){
   if(!isOwner()){el.innerHTML=`<div style="border:.5px solid var(--gris-clair);border-left:3px solid var(--rouge);padding:2.5rem;max-width:440px"><p style="font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.2rem;font-weight:300">${t('admin_access')}</p><button class="btn-red" onclick="openModal('login')">${t('admin_btn_login')}</button></div>`;return;}
   const totalReads=articles.reduce((s,a)=>s+(a.reads||0),0);
   const pendingArticles=articles.filter(article=>article.status==='pending').sort((a,b)=>(b.id||0)-(a.id||0));
-  const pendingMarkup=`<div class="stats-section-title">${t('admin_pending_title')}</div><div class="admin-pending-list" style="margin-bottom:3rem">${pendingArticles.length?pendingArticles.map(article=>`<div class="admin-pending-item"><div><strong>${article.title}</strong><span>${article.author} · ${tCat(article.cat)}</span><p>${article.deck||''}</p></div><div class="admin-pending-actions"><button class="btn-outline" onclick="openArticle(${article.id})">${t('admin_preview')}</button><button class="btn-red" onclick="adminPublishArticle(${article.id})">${t('admin_publish')}</button></div></div>`).join(''):`<div class="admin-pending-empty">${t('admin_pending_empty')}</div>`}</div>`;
+  const pendingMarkup=`<div class="stats-section-title">${t('admin_pending_title')}</div><div class="admin-pending-list admin-panel-space">${pendingArticles.length?pendingArticles.map(article=>`<div class="admin-pending-item"><div><strong>${article.title}</strong><span>${article.author} · ${tCat(article.cat)}</span><p>${article.deck||''}</p></div><div class="admin-pending-actions"><button class="btn-outline" onclick="openArticle(${article.id})">${t('admin_preview')}</button><button class="btn-red" onclick="adminPublishArticle(${article.id})">${t('admin_publish')}</button></div></div>`).join(''):`<div class="admin-pending-empty">${t('admin_pending_empty')}</div>`}</div>`;
   el.innerHTML=`<div class="admin-badge">${t('admin_badge')}</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.2rem;margin-bottom:3rem">
+    <div class="admin-metrics">
       <div class="my-stat-card"><div class="my-stat-num">${articles.length}</div><div class="my-stat-label">${t('stats_articles')}</div></div>
       <div class="my-stat-card"><div class="my-stat-num">${users.length}</div><div class="my-stat-label">${t('admin_members')}</div></div>
       <div class="my-stat-card"><div class="my-stat-num">${totalReads}</div><div class="my-stat-label">${t('stats_reads')}</div></div>
@@ -26,7 +26,7 @@ function renderAdmin(){
     ${pendingMarkup}
 
     <div class="stats-section-title">✉ Envoyer un code manuellement</div>
-    <div style="border:.5px solid var(--gris-clair);padding:1.5rem;margin-bottom:3rem;max-width:520px">
+    <div class="admin-panel admin-panel-narrow">
       <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Contrôle manuel : envoyez un code d'accès rédacteur directement à n'importe quelle adresse e-mail, sans passer par une proposition.</p>
       <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end">
         <div style="display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:200px">
@@ -38,10 +38,10 @@ function renderAdmin(){
     </div>
 
     <div class="stats-section-title">📩 Propositions reçues</div>
-    <div id="admin-proposals-list" style="margin-bottom:3rem;font-family:var(--sans);font-size:.85rem;color:var(--txt-lite);font-style:italic">${t('admin_loading')}</div>
+    <div id="admin-proposals-list" class="admin-panel-space">${t('admin_loading')}</div>
 
     <div class="stats-section-title">${t('admin_codes')}</div>
-    <div style="border:.5px solid var(--gris-clair);padding:1.5rem;margin-bottom:3rem;max-width:520px">
+    <div class="admin-panel admin-panel-narrow">
       <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Créez des codes à usage limité (max 2 utilisations par défaut). Le code <strong>economist2026</strong> reste permanent et illimité.</p>
       <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem">
         <div style="display:flex;flex-direction:column;gap:.3rem;flex:1">
@@ -58,11 +58,11 @@ function renderAdmin(){
     </div>
 
     <div class="stats-section-title">${t('admin_arts')}</div>
-    ${articles.length?`<div style="overflow-x:auto;margin-bottom:3rem"><table class="stats-table"><thead><tr><th>${t('admin_table_titre')}</th><th>${t('admin_table_auteur')}</th><th>${t('admin_table_cat')}</th><th>${t('admin_table_date')}</th><th>${t('admin_table_reads')}</th><th>${t('admin_table_action')}</th></tr></thead><tbody>
+    ${articles.length?`<div class="admin-table-wrap admin-panel-space"><table class="stats-table"><thead><tr><th>${t('admin_table_titre')}</th><th>${t('admin_table_auteur')}</th><th>${t('admin_table_cat')}</th><th>${t('admin_table_date')}</th><th>${t('admin_table_reads')}</th><th>${t('admin_table_action')}</th></tr></thead><tbody>
       ${[...articles].reverse().map(a=>`<tr><td><span class="td-title" onclick="openArticle(${a.id})">${a.title}</span></td><td>${a.author}</td><td><span class="stats-cat-badge">${tCat(a.cat)}</span></td><td>${tDate(a.date)}</td><td><strong style="color:var(--rouge)">${a.reads||0}</strong></td><td><button class="btn-danger" onclick="confirmDeleteArticle(${a.id})">${t('admin_delete')}</button></td></tr>`).join('')}
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic;margin-bottom:2rem">${t('admin_none_art')}</div>`}
     <div class="stats-section-title">${t('admin_members')}</div>
-    ${users.length?`<div style="overflow-x:auto"><table class="stats-table"><thead><tr><th>${t('admin_member_name')}</th><th>${t('admin_member_email')}</th><th>${t('admin_member_joined')}</th><th>${t('admin_member_arts')}</th><th>${t('admin_member_profile')}</th><th>Action</th></tr></thead><tbody>
+    ${users.length?`<div class="admin-table-wrap"><table class="stats-table"><thead><tr><th>${t('admin_member_name')}</th><th>${t('admin_member_email')}</th><th>${t('admin_member_joined')}</th><th>${t('admin_member_arts')}</th><th>${t('admin_member_profile')}</th><th>Action</th></tr></thead><tbody>
       ${users.map(u=>{const c=articles.filter(a=>a.author===u.first+' '+u.last).length;return `<tr><td>${u.first} ${u.last}</td><td style="color:var(--gris);font-family:var(--sans);font-size:.85rem">${u.email}</td><td style="font-family:var(--sans);font-size:.85rem">${u.joined||'—'}</td><td>${c}</td><td><span style="font-family:var(--sans);font-size:9.5px;color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('profile');openProfile('${u.email}')">${t('admin_view')}</span></td><td>${u.email.toLowerCase()===OWNER_EMAIL.toLowerCase()?'':`<button class="btn-danger" onclick="adminDeleteUser('${u.email}')">Supprimer</button>`}</td></tr>`;}).join('')}
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic">${t('admin_none_members')}</div>`}`;
   loadAdminCodes();

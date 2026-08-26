@@ -105,6 +105,7 @@ function renderWritePage(){
     document.getElementById('write-login-gate').style.display='block';
     return;
   }
+  if(isOwner())_writeUnlocked=true;
   if(!_writeUnlocked){
     if(loadWriteUnlocked()){
       _writeUnlocked = true;
@@ -407,17 +408,23 @@ async function publishArticle(){
     console.error('next_article_id',idError);
     return;
   }
-  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:'pending' };
+  const isAdmin=isOwner();
+  const a = { id, owner_id:_sb.auth.currentUser?.id||'', title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
+  const saveError=await saveArticle(a);
+  if(saveError){
+    showToast(t('toast_publish_error'));
+    btn.disabled=false;
+    return;
+  }
   articles.push(a);
-  await saveArticle(a);
   clearDraft();
   lastPublishedId=id;
-  _writeUnlocked=false;
-  saveWriteUnlocked(false);
+  _writeUnlocked=isAdmin;
+  saveWriteUnlocked(isAdmin);
   document.getElementById('success-msg').style.display='block';
   document.getElementById('write-form').style.display='none';
-  document.getElementById('code-gate').style.display='block';
+  document.getElementById('code-gate').style.display=isAdmin?'none':'block';
   document.getElementById('gate-err').style.display='none';
 }
 function goToNewArticle(){

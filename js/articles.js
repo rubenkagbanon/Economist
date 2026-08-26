@@ -72,7 +72,7 @@ function showPage(name){
   if(name==='home')    { loadData().then(()=>renderHome(currentActiveCat)); }
   if(name==='write')   renderWritePage();
   if(name==='mystats') { loadData().then(()=>renderMyStats()); }
-  if(name==='admin')   { loadData().then(()=>renderAdmin()); }
+  if(name==='admin')   { loadData(true).then(()=>renderAdmin()); }
 }
 function setProfileShareMetadata(user){
   const title=`${user?.first||''} ${user?.last||''}`.trim()||'Profil Economist';

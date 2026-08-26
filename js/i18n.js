@@ -12,6 +12,10 @@ const I18N = {
     auth_no_account:"Pas de compte ?", auth_has_account:"Déjà un compte ?", auth_ok_created:"Compte créé !", auth_ok_confirmation:"Compte créé ! Vérifiez votre e-mail pour confirmer votre inscription.", auth_btn_signup:"Créer mon compte",
     auth_err_fields:"Veuillez remplir tous les champs.", auth_err_short:"8 caractères minimum.",
     auth_err_match:"Les mots de passe ne correspondent pas.", auth_err_email:"Cet email est déjà utilisé.",
+    password_manage:"Créer / modifier mon mot de passe", password_sub:"Utilisez ensuite votre e-mail et ce mot de passe pour vous connecter.",
+    password_new:"Nouveau mot de passe", password_confirm:"Confirmer le mot de passe", password_save:"Enregistrer le mot de passe",
+    password_saved:"Mot de passe enregistré.", password_save_error:"Impossible d'enregistrer le mot de passe.",
+    password_send_code:"Envoyer le code", password_reset:"Réinitialiser",
 
     cat_une:"À la une", cat_eco:"Économie", cat_fin:"Finance", cat_pol:"Politiques", cat_soc:"Sociologie", cat_africa:"Afrique", cat_world:"Monde",
     cat_dro:"Droit", cat_tec:"Technologies", cat_health:"Santé", cat_ecol:"Écologie",
@@ -86,6 +90,10 @@ const I18N = {
     auth_no_account:"No account?", auth_has_account:"Already have an account?", auth_ok_created:"Account created!", auth_ok_confirmation:"Account created! Check your email to confirm your registration.", auth_btn_signup:"Create my account",
     auth_err_fields:"Please fill in all fields.", auth_err_short:"8 characters minimum.",
     auth_err_match:"Passwords do not match.", auth_err_email:"This email is already in use.",
+    password_manage:"Create / change my password", password_sub:"Then use your email and this password to log in.",
+    password_new:"New password", password_confirm:"Confirm password", password_save:"Save password",
+    password_saved:"Password saved.", password_save_error:"Unable to save the password.",
+    password_send_code:"Send code", password_reset:"Reset password",
 
     cat_une:"Front page", cat_eco:"Economy", cat_fin:"Finance", cat_pol:"Politics", cat_soc:"Sociology", cat_africa:"Africa", cat_world:"World",
     cat_dro:"Law", cat_tec:"Technology", cat_health:"Health", cat_ecol:"Ecology",

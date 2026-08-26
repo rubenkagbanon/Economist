@@ -359,6 +359,21 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .my-stats-page .my-stat-card{border:.5px solid var(--gris-clair);padding:1.8rem;text-align:center;}
 .my-stats-page .my-stat-num{font-family:'Roboto Slab',Georgia,serif;font-size:2.4rem;font-weight:400;color:#111010;line-height:1}
 .my-stats-page .my-stat-label{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-top:.5rem}
+.admin-page{font-family:'Roboto Slab',Georgia,serif}
+.admin-page h2{font-family:'Roboto Slab',Georgia,serif;color:#111010}
+.admin-page .admin-badge{font-family:'Roboto Slab',Georgia,serif;margin-bottom:1.5rem}
+.admin-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.2rem;margin-bottom:3rem}
+.admin-page .my-stat-card{border:.5px solid var(--gris-clair);padding:1.8rem;text-align:center}
+.admin-page .my-stat-num{font-family:'Roboto Slab',Georgia,serif;font-size:2.4rem;font-weight:400;color:#111010;line-height:1}
+.admin-page .my-stat-label{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);margin-top:.5rem}
+.admin-page .stats-section-title{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--gris-clair)}
+.admin-panel{border:.5px solid var(--gris-clair);padding:1.5rem;margin-bottom:3rem}
+.admin-panel-narrow{max-width:520px}
+.admin-panel-space{margin-bottom:3rem}
+.admin-table-wrap{overflow-x:auto}
+.admin-page .stats-table{width:100%;border-collapse:collapse;font-family:'Roboto Slab',Georgia,serif;font-size:.88rem}
+.admin-page .stats-table th{font-family:'Roboto Slab',Georgia,serif;text-align:left;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);padding:.6rem 1rem;border-bottom:.5px solid var(--gris-clair);font-weight:400}
+.admin-page .stats-table td{padding:.8rem 1rem;border-bottom:.5px solid var(--gris-clair);vertical-align:middle}
 .admin-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:var(--rouge);color:white;padding:4px 12px;margin-bottom:2rem}
 .btn-danger{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:none;border:.5px solid rgba(139,0,0,0.4);color:var(--rouge);padding:5px 12px;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:var(--rouge);color:white}
@@ -527,7 +542,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .article-preview-box .art-full-deck{font-size:1rem}
   .admin-page{padding:2.25rem .9rem 3rem}
   .admin-page h2{font-size:1.9rem}
-  .admin-page #admin-content > div[style*="display:grid"]{
+  .admin-page .admin-metrics{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
     gap:.55rem!important;
     margin-bottom:2rem!important;
@@ -535,7 +550,7 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .admin-page .my-stat-card{padding:1rem .4rem}
   .admin-page .my-stat-num{font-size:1.7rem}
   .admin-page .my-stat-label{font-size:8px;letter-spacing:.1em}
-  .admin-page #admin-content > div[style*="max-width:520px"]{
+  .admin-page .admin-panel-narrow{
     max-width:none!important;
     padding:1.15rem!important;
   }

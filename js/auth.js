@@ -56,9 +56,9 @@ async function savePassword(){
   if(pwd!==pwd2){errEl.textContent=t('auth_err_match');errEl.style.display='block';return;}
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
   const {error}=await _sb.auth.updateUser({password:pwd});
-  btn.textContent='Enregistrer le mot de passe';btn.disabled=false;
-  if(error){errEl.textContent=error.message||"Impossible d'enregistrer le mot de passe.";errEl.style.display='block';return;}
-  showToast('Mot de passe enregistré.');closeModal();
+  btn.textContent=t('password_save');btn.disabled=false;
+  if(error){errEl.textContent=error.message||t('password_save_error');errEl.style.display='block';return;}
+  showToast(t('password_saved'));closeModal();
 }
 
 async function doSignup(){
@@ -317,7 +317,7 @@ async function sendResetCode(){
   const u=users.find(x=>x.email===email);
   if(!u){
     errEl.textContent=t('toast_account_missing');errEl.style.display='block';
-    btn.textContent='Envoyer le code';btn.disabled=false;return;
+    btn.textContent=t('password_send_code');btn.disabled=false;return;
   }
   const code=genVerifCode();
   const expires=Date.now()+15*60*1000; // 15 minutes
@@ -327,7 +327,7 @@ async function sendResetCode(){
   document.getElementById('fp-step1').style.display='none';
   document.getElementById('fp-step2').style.display='block';
   document.getElementById('fp-email-shown').textContent=email;
-  btn.textContent='Envoyer le code';btn.disabled=false;
+  btn.textContent=t('password_send_code');btn.disabled=false;
   showToast(sent?t('toast_reset_email_sent'):t('toast_email_not_configured'));
 }
 
@@ -345,11 +345,11 @@ async function confirmResetPwd(){
   const record=await dbGet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`);
   if(!record||record.used||record.code!==code||Date.now()>record.expires){
     errEl.textContent=t('code_expired');errEl.style.display='block';
-    btn.textContent='Réinitialiser';btn.disabled=false;return;
+    btn.textContent=t('password_reset');btn.disabled=false;return;
   }
   await loadData();
   const idx=users.findIndex(x=>x.email===_resetEmail);
-  if(idx===-1){errEl.textContent=t('account_not_found');errEl.style.display='block';btn.textContent='Réinitialiser';btn.disabled=false;return;}
+  if(idx===-1){errEl.textContent=t('account_not_found');errEl.style.display='block';btn.textContent=t('password_reset');btn.disabled=false;return;}
   users[idx].pwd=pwd;
   await saveUser(users[idx]);
   await dbSet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`,{...record,used:true});
