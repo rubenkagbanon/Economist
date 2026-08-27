@@ -178,9 +178,17 @@ async function ensureAuthProfile(authUser) {
 async function deleteUserDB(email) {
   const normalizedEmail=(email||'').trim().toLowerCase();
   if(!normalizedEmail)return new Error('Missing user email');
-  const {error}=await _sb.functions.invoke('admin-delete-user',{body:{email:normalizedEmail}});
-  if(!error)writeDataCache();
-  return error || null;
+
+  try{
+    const { data, error } = await _sb.functions.invoke('admin-delete-user', { body: { email: normalizedEmail } });
+    if (error) return error;
+    if (data?.error) return new Error(String(data.error));
+    if (!data || data.ok !== true) return new Error('Delete response was invalid');
+    writeDataCache();
+    return null;
+  } catch (error) {
+    return error || new Error('Unable to delete user');
+  }
 }
 
 // ═══════════════ SESSION ═══════════════
