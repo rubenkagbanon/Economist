@@ -19,6 +19,13 @@ async function submitRequest(){
     openModal('login');
     return;
   }
+  const { user: authUser, error: authError } = await ensureValidAuthSession();
+  if(authError || !authUser?.id){
+    renderNav();
+    showPage('home');
+    showToast(authError?.message || t('toast_login_required'));
+    return;
+  }
   const first=document.getElementById('r-first').value.trim();
   const last =document.getElementById('r-last').value.trim();
   const email=document.getElementById('r-email').value.trim().toLowerCase();
@@ -87,23 +94,43 @@ function loadDraft(){
     return null;
   }
 }
+function currentDraft(){
+  return {
+    cat: document.getElementById('f-cat')?.value || '',
+    author: document.getElementById('f-author')?.value || '',
+    title: document.getElementById('f-title')?.value || '',
+    deck: document.getElementById('f-deck')?.value || '',
+    cover: _coverData || '',
+    blocks: editorBlocks
+  };
+}
 function saveDraft(){
   if(!_writeUnlocked) return;
   const key = draftStorageKey();
   if(!key) return;
-  const draft = {
-      cat: document.getElementById('f-cat')?.value || '',
-      author: document.getElementById('f-author')?.value || '',
-      title: document.getElementById('f-title')?.value || '',
-      deck: document.getElementById('f-deck')?.value || '',
-      cover: _coverData || '',
-      blocks: editorBlocks
-  };
+  const draft = currentDraft();
   try{
     localStorage.setItem(key, JSON.stringify(draft));
   }catch(e){}
   const path=writerStatePath();
   if(path)dbSet(path,{status:'draft',draft,updatedAt:Date.now()});
+}
+async function saveDraftNow(){
+  if(!_writeUnlocked || !currentUser){
+    showToast(t('toast_login_required'));
+    return;
+  }
+  const btn=document.getElementById('btn-save-draft');
+  if(btn){btn.disabled=true;btn.textContent=t('write_saving_draft');}
+  const draft=currentDraft();
+  const key=draftStorageKey();
+  const path=writerStatePath();
+  const error=path?await dbSet(path,{status:'draft',draft,updatedAt:Date.now()}):new Error(t('toast_user_error'));
+  if(!error && key){
+    try{localStorage.setItem(key,JSON.stringify(draft));}catch(e){}
+  }
+  if(btn){btn.disabled=false;btn.textContent=t('write_save_draft');}
+  showToast(error?t('toast_save_error'):t('toast_draft_saved'),6000);
 }
 function clearDraft(){
   const key = draftStorageKey();
@@ -133,6 +160,12 @@ async function renderWritePage(){
   document.getElementById('write-form').style.display='none';
 
   if(!currentUser){
+    document.getElementById('write-login-gate').style.display='block';
+    return;
+  }
+  const { user: authUser, error: authError } = await ensureValidAuthSession();
+  if(authError || !authUser?.id){
+    renderNav();
     document.getElementById('write-login-gate').style.display='block';
     return;
   }
@@ -517,14 +550,13 @@ async function publishArticle(){
   lastPublishedId=id;
   _writeUnlocked=isAdmin;
   saveWriteUnlocked(isAdmin);
-  document.getElementById('success-msg').style.display='block';
+  showToast(t('write_published'),6000);
   document.getElementById('write-form').style.display='none';
   document.getElementById('code-gate').style.display=isAdmin?'none':'block';
   document.getElementById('gate-err').style.display='none';
 }
 function startNewArticle(){
   editorBlocks=[]; _coverData='';
-  document.getElementById('success-msg').style.display='none';
   document.getElementById('btn-publish').disabled=false;
   document.getElementById('write-form').style.display='none';
   renderWritePage();

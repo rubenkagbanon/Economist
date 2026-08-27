@@ -449,13 +449,9 @@
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
           <button class="btn-publish" type="button" onclick="previewArticle()" data-i18n="write_preview">Aperçu</button>
+          <button class="btn-outline" type="button" id="btn-save-draft" onclick="saveDraftNow()" data-i18n="write_save_draft">Sauvegarder le brouillon</button>
           <button class="btn-publish" id="btn-publish" onclick="publishArticle()" data-i18n="write_publish">Publier →</button>
           <span data-i18n="write_required" style="font-family:var(--sans);font-size:.78rem;color:var(--txt-pale)">* obligatoires</span>
-        </div>
-        <div class="success-msg" id="success-msg">
-          <h3 data-i18n="write_published">Article publié.</h3>
-          <p data-i18n="write_visible">Visible par tous les visiteurs du site, sur tous les appareils.</p>
-          <span class="view-link" onclick="startNewArticle()" data-i18n="write_read_article">Écrire un autre article →</span>
         </div>
       </div>
     </div>
