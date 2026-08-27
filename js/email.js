@@ -62,7 +62,7 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why}){
     (why?`Motivation :\n${why}\n`:'');
   const ok = await sendEmail({
     to_email: OWNER_EMAIL,
-    subject: `[Economist] Proposition — ${first} ${last}`,
+    subject: ` Proposition — ${first} ${last}`,
     from_name: `${first} ${last}`,
     reply_to: email,
     message
@@ -71,7 +71,7 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why}){
   // un brouillon mailto pour ne jamais perdre la proposition.
   if(!ok){
     const body = encodeURIComponent(message);
-    window.open(`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(`[Economist] Proposition — ${first} ${last}`)}&body=${body}`,'_blank');
+    window.open(`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(` Proposition — ${first} ${last}`)}&body=${body}`,'_blank');
   }
   return ok;
 }
@@ -100,8 +100,8 @@ async function emailNotifyArticleDecision(article, approved){
   if(!toEmail)return false;
   const firstName=authorUser?.first||article.author||'';
   const subject=approved
-    ? '[Economist] Votre article a été publié'
-    : '[Economist] Votre article n’a pas été retenu';
+    ? ' Votre article a été publié'
+    : ' Votre article n’a pas été retenu';
   const message=approved
     ? `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.`
     : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.`;

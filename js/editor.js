@@ -195,7 +195,7 @@ async function renderWritePage(){
   if(writerSyncTimer)clearInterval(writerSyncTimer);
   writerSyncTimer=setInterval(syncSubmittedWriterState,5000);
   if(editorBlocks.length===0){
-    const draft = loadDraft()||writerState?.draft;
+    const draft = writerState?.draft||loadDraft();
     if(draft && Array.isArray(draft.blocks) && draft.blocks.length){
       editorBlocks = draft.blocks;
       document.getElementById('f-cat').value = draft.cat || '';
