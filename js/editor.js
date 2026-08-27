@@ -417,6 +417,16 @@ async function publishArticle(){
     .map(b=>stripHtml(b.html)).join('\n\n').trim();
   if(!bodyText){ showToast(t('toast_add_content')); return; }
   const bodyHtml = editorBlocks.map(blockToHtml).join('\n');
+  if(!_sb?.auth){
+    notifyPublishError(null,t('toast_user_error'));
+    return;
+  }
+  const {data:authData,error:authError}=await _sb.auth.getUser();
+  const authUser=authData?.user;
+  if(authError||!authUser?.id){
+    notifyPublishError(authError,t('toast_user_error'));
+    return;
+  }
   const {data:id,error:idError}=await _sb.rpc('next_article_id');
   if(idError||!id){
     notifyPublishError(idError,t('toast_id_error'));
@@ -424,15 +434,15 @@ async function publishArticle(){
     return;
   }
   const isAdmin=isOwner();
-  const ownerId=currentUser?.id||_sb.auth.currentUser?.id||'';
-  if(!ownerId){
-    notifyPublishError(null,t('toast_user_error'));
-    console.error('publishArticle: authenticated user id is missing');
-    return;
-  }
-  const a = { id, owner_id:ownerId, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
+  const a = { id, owner_id:authUser.id, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
-  const saveError=await saveArticle(a);
+  let saveError;
+  try{
+    saveError=await saveArticle(a);
+  }catch(error){
+    saveError=error;
+    console.error('publishArticle',error);
+  }
   if(saveError){
     notifyPublishError(saveError,t('toast_save_error'));
     btn.disabled=false;
