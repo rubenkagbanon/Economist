@@ -62,6 +62,7 @@ let _writeUnlocked=false;
 let editorBlocks=[];
 let _coverData='';
 let writerSyncTimer=null;
+let writerStateWrite=Promise.resolve();
 
 function writerStatePath(){
   return currentUser?.id?`${WRITER_SESSIONS_PATH}/${currentUser.id}`:null;
@@ -69,6 +70,12 @@ function writerStatePath(){
 async function getWriterState(){
   const path=writerStatePath();
   return path?await dbGet(path):null;
+}
+function persistWriterState(value){
+  const path=writerStatePath();
+  if(!path)return Promise.resolve(new Error(t('toast_user_error')));
+  writerStateWrite=writerStateWrite.then(()=>dbSet(path,value));
+  return writerStateWrite;
 }
 async function syncSubmittedWriterState(){
   if(!_writeUnlocked||isOwner())return;
@@ -105,15 +112,7 @@ function currentDraft(){
   };
 }
 function saveDraft(){
-  if(!_writeUnlocked) return;
-  const key = draftStorageKey();
-  if(!key) return;
-  const draft = currentDraft();
-  try{
-    localStorage.setItem(key, JSON.stringify(draft));
-  }catch(e){}
-  const path=writerStatePath();
-  if(path)dbSet(path,{status:'draft',draft,updatedAt:Date.now()});
+  return;
 }
 async function saveDraftNow(){
   if(!_writeUnlocked || !currentUser){
@@ -124,8 +123,7 @@ async function saveDraftNow(){
   if(btn){btn.disabled=true;btn.textContent=t('write_saving_draft');}
   const draft=currentDraft();
   const key=draftStorageKey();
-  const path=writerStatePath();
-  const error=path?await dbSet(path,{status:'draft',draft,updatedAt:Date.now()}):new Error(t('toast_user_error'));
+  const error=await persistWriterState({status:'draft',draft,updatedAt:Date.now()});
   if(!error && key){
     try{localStorage.setItem(key,JSON.stringify(draft));}catch(e){}
   }
@@ -268,14 +266,11 @@ async function checkCode(){
     return;
   }
 
-  const statePath=writerStatePath();
-  if(statePath){
-    const stateError=await dbSet(statePath,{status:'draft',draft:null,updatedAt:Date.now()});
-    if(stateError){
-      errEl.textContent=t('toast_save_error');
-      errEl.style.display='block';
-      return;
-    }
+  const stateError=await persistWriterState({status:'draft',draft:null,updatedAt:Date.now()});
+  if(stateError){
+    errEl.textContent=t('toast_save_error');
+    errEl.style.display='block';
+    return;
   }
   _writeUnlocked=true;
   saveWriteUnlocked(true);
@@ -459,15 +454,6 @@ function blockToHtml(b){
 function previewArticle(){
   const title=document.getElementById('f-title').value.trim();
   const deck=document.getElementById('f-deck').value.trim();
-  const cat=document.getElementById('f-cat').value;
-  const author=document.getElementById('f-author').value.trim();
-  if(!title||!deck||!cat||!author){ showToast(t('toast_required_fields')); return; }
-  const bodyText=editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type)).map(b=>stripHtml(b.html)).join(' ').trim();
-  if(!bodyText){ showToast(t('toast_add_content')); return; }
-  document.getElementById('preview-cat').textContent=tCat(cat);
-  document.getElementById('preview-title').textContent=title;
-  document.getElementById('preview-deck').textContent=deck;
-  document.getElementById('preview-meta').textContent=`${t('home_par')} ${author}`;
   const coverWrap=document.getElementById('preview-cover-wrap');
   coverWrap.style.display=_coverData?'block':'none';
   if(_coverData)document.getElementById('preview-cover').src=_coverData;
@@ -532,8 +518,8 @@ async function publishArticle(){
   }
   articles.push(a);
   clearDraft();
-  const statePath=writerStatePath();
-  if(statePath)await dbSet(statePath,{status:'submitted',updatedAt:Date.now()});
+  const stateError=await persistWriterState({status:'submitted',updatedAt:Date.now()});
+  if(stateError)console.error('publishArticle state',stateError);
   if(writerSyncTimer)clearInterval(writerSyncTimer);
   editorBlocks=[];
   _coverData='';
