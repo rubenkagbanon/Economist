@@ -21,6 +21,7 @@
 const EMAILJS_PUBLIC_KEY  = "VWz1Tmbj4CndEFo9U";    
 const EMAILJS_SERVICE_ID  = "service_3r94wdl";     
 const EMAILJS_TEMPLATE_ID = "template_o52gu3d";    
+const EMAIL_LOGO_URL = "https://www.econglobe.com/css/Logo.png";
 
 let _emailjsReady = false;
 function initEmailJS(){
@@ -102,9 +103,11 @@ async function emailNotifyArticleDecision(article, approved){
     ? '[Economist] Votre article a été publié'
     : '[Economist] Votre article n’a pas été retenu';
   const message=approved
-    ? `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.\n\n— Economist`
-    : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.\n\n— Economist`;
-  return sendEmail({to_email:toEmail,subject,from_name:'Economist',reply_to:OWNER_EMAIL,message});
+    ? `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.`
+    : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.`;
+  const messageHtml=message.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+
+    `<br><br><img src="${EMAIL_LOGO_URL}" alt="Economist" style="width:96px;height:auto;display:block">`;
+  return sendEmail({to_email:toEmail,subject,from_name:'Economist',reply_to:OWNER_EMAIL,message,message_html:messageHtml,logo_url:EMAIL_LOGO_URL});
 }
 
 // ═══════════════ BIENVENUE (nouvelle inscription) ═══════════════
