@@ -56,6 +56,12 @@ body{min-height:100vh;display:flex;flex-direction:column;background:var(--blanc)
 .modal-overlay.open{display:flex;}
 .modal-box{background:white;width:100%;max-width:480px;border-top:3px solid var(--rouge);padding:2.5rem;position:relative;animation:modalIn .22s ease;max-height:92vh;overflow-y:auto;}
 .article-preview-box{max-width:760px;padding:4rem 2rem;}
+.article-preview-box .art-full-body{overflow:hidden;}
+.article-preview-box .art-full-body .art-info-box,
+.article-preview-box .art-full-body .art-sources-box,
+.article-preview-box .art-full-body .art-credits-box{float:none;width:auto;clear:both;}
+.article-preview-box .art-full-body .art-inline-img{clear:both;}
+.article-preview-box .art-full-body .art-inline-img img{display:block;width:100%;height:auto;max-height:480px;object-fit:contain;}
 @keyframes modalIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .modal-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--txt-pale);line-height:1;}
 .modal-close:hover{color:var(--rouge)}

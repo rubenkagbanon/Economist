@@ -112,7 +112,7 @@ function loadData(force=false) {
 async function saveArticle(a) {
   const {error}=await _sb.from('articles').upsert({
     id:a.id,owner_id:a.owner_id,title:a.title,deck:a.deck,cat:a.cat,author:a.author,
-    img:a.img,body:a.body,body_html:a.bodyHtml,date:a.date,reads:a.reads||0,status:a.status||'pending'
+    img:a.img,body:a.body,body_html:a.bodyHtml,date:a.date,reads:a.reads||0,status:a.status||'pending',lang:a.lang||'fr'
   });
   if(error)console.error('saveArticle',error);
   writeDataCache();

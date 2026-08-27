@@ -53,16 +53,20 @@ async function sendEmail(params){
 }
 
 // ═══════════════ PROPOSITION D'ARTICLE → notifie la rédaction ═══════════════
-async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why}){
-  const message =
-    `Nouvelle proposition d'article — Economist\n\n`+
-    `Nom : ${first} ${last}\nEmail : ${email}\n`+
-    (job?`Profession : ${job}\n`:'')+
-    `Rubrique : ${cat}\n\nSujet :\n${subj}\n\n`+
-    (why?`Motivation :\n${why}\n`:'');
+async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why,lang='fr'}){
+  const english=lang==='en';
+  const message = english
+    ? `New article proposal — Economist\n\nName: ${first} ${last}\nEmail: ${email}\n`+
+      (job?`Profession: ${job}\n`:'')+
+      `Category: ${cat}\n\nSubject:\n${subj}\n\n`+
+      (why?`Motivation:\n${why}\n`:'')
+    : `Nouvelle proposition d'article — Economist\n\nNom : ${first} ${last}\nEmail : ${email}\n`+
+      (job?`Profession : ${job}\n`:'')+
+      `Rubrique : ${cat}\n\nSujet :\n${subj}\n\n`+
+      (why?`Motivation :\n${why}\n`:'');
   const ok = await sendEmail({
     to_email: OWNER_EMAIL,
-    subject: ` Proposition — ${first} ${last}`,
+    subject: english ? `[Economist] Proposal — ${first} ${last}` : `[Economist] Proposition — ${first} ${last}`,
     from_name: `${first} ${last}`,
     reply_to: email,
     message
@@ -71,19 +75,24 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why}){
   // un brouillon mailto pour ne jamais perdre la proposition.
   if(!ok){
     const body = encodeURIComponent(message);
-    window.open(`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(` Proposition — ${first} ${last}`)}&body=${body}`,'_blank');
+    window.open(`mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(english ? `[Economist] Proposal — ${first} ${last}` : `[Economist] Proposition — ${first} ${last}`)}&body=${body}`,'_blank');
   }
   return ok;
 }
 
 // ═══════════════ CODE DE VÉRIFICATION (mot de passe oublié / accès rédacteur) ═══════════════
-async function emailSendVerificationCode(toEmail, toName, code, purpose){
+async function emailSendVerificationCode(toEmail, toName, code, purpose, lang='fr'){
+  const english=lang==='en';
   const subject = purpose==='reset'
-    ? 'Economist — Votre code de réinitialisation'
-    : 'Economist — Votre code d\'accès rédacteur';
+    ? (english ? 'Economist — Your password reset code' : 'Economist — Votre code de réinitialisation')
+    : (english ? 'Economist — Your writer access code' : 'Economist — Votre code d\'accès rédacteur');
   const message = purpose==='reset'
-    ? `Bonjour ${toName||''},\n\nVoici votre code de vérification pour réinitialiser votre mot de passe : ${code}\n\nUtilisez ce code dès que possible. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n Economist`
-    : `Bonjour ${toName||''},\n\nVotre idée d'article a été retenue ! Voici votre code d'accès rédacteur : ${code}\n\nCe code permet d'accéder à l'éditeur pour publier un article. Après publication, vous devrez demander un nouveau code.\n\n Economist`;
+    ? (english
+      ? `Hello ${toName||''},\n\nHere is your verification code to reset your password: ${code}\n\nUse this code as soon as possible. If you did not request it, please ignore this message.\n\nEconomist`
+      : `Bonjour ${toName||''},\n\nVoici votre code de vérification pour réinitialiser votre mot de passe : ${code}\n\nUtilisez ce code dès que possible. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\nEconomist`)
+    : (english
+      ? `Hello ${toName||''},\n\nYour article idea was selected! Here is your writer access code: ${code}\n\nThis code gives you access to the editor to submit an article. After submission, you will need to request a new code.\n\nEconomist`
+      : `Bonjour ${toName||''},\n\nVotre idée d'article a été retenue ! Voici votre code d'accès rédacteur : ${code}\n\nCe code permet d'accéder à l'éditeur pour publier un article. Après publication, vous devrez demander un nouveau code.\n\nEconomist`);
   const ok = await sendEmail({
     to_email: toEmail,
     subject,
@@ -99,12 +108,13 @@ async function emailNotifyArticleDecision(article, approved){
   const toEmail=authorUser?.email||'';
   if(!toEmail)return false;
   const firstName=authorUser?.first||article.author||'';
+  const english=article.lang==='en';
   const subject=approved
-    ? ' Votre article a été publié'
-    : ' Votre article n’a pas été retenu';
+    ? (english ? 'Your article has been published' : 'Votre article a été publié')
+    : (english ? 'Your article was not selected' : 'Votre article n’a pas été retenu');
   const message=approved
-    ? `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.`
-    : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.`;
+    ? (english ? `Hello ${firstName},\n\nGood news: your article “${article.title}” was accepted and published on Economist.\n\nThank you for your contribution.` : `Bonjour ${firstName},\n\nBonne nouvelle : votre article « ${article.title} » a été accepté et publié sur Economist.\n\nMerci pour votre contribution.`)
+    : (english ? `Hello ${firstName},\n\nAfter review, your article “${article.title}” was not selected for publication and has been removed from our review space.\n\nThank you for your submission.` : `Bonjour ${firstName},\n\nAprès examen, votre article « ${article.title} » n’a pas été retenu pour publication et a été supprimé de notre espace de validation.\n\nMerci pour votre proposition.`);
   const messageHtml=message.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+
     `<br><br><img src="${EMAIL_LOGO_URL}" alt="Economist" style="width:96px;height:auto;display:block">`;
   return sendEmail({to_email:toEmail,subject,from_name:'Economist',reply_to:OWNER_EMAIL,message,message_html:messageHtml,logo_url:EMAIL_LOGO_URL});

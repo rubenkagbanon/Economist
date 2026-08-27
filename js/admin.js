@@ -149,8 +149,8 @@ async function adminSendManualCode(){
   if(!email){showToast(t('toast_enter_email'));return;}
   const code=genVerifCode();
   const key=code;
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email});
-  const sent=await emailSendVerificationCode(email,'',code,'access');
+  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email,lang:_lang});
+  const sent=await emailSendVerificationCode(email,'',code,'access',_lang);
   showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   emailEl.value='';
   loadAdminCodes();
@@ -184,9 +184,10 @@ async function loadAdminProposals(){
 
 async function adminApproveProposal(id,email,firstName){
   const code=genVerifCode();
-  await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:email});
-  const sent=await emailSendVerificationCode(email,firstName,code,'access');
   const prop=await dbGet(`proposals/${id}`);
+  const lang=prop?.lang||'fr';
+  await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:email,lang});
+  const sent=await emailSendVerificationCode(email,firstName,code,'access',lang);
   await dbSet(`proposals/${id}`,{...prop,status:'sent'});
   showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   loadAdminProposals();loadAdminCodes();

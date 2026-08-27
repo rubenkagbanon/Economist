@@ -358,7 +358,7 @@ async function sendResetCode(){
   const code=genVerifCode();
   const expires=Date.now()+15*60*1000; // 15 minutes
   await dbSet(`${PASSWORD_RESETS_PATH}/${userKey(email)}`,{code,expires,used:false});
-  const sent=await emailSendVerificationCode(email,u.first,code,'reset');
+  const sent=await emailSendVerificationCode(email,u.first,code,'reset',_lang);
   _resetEmail=email;
   document.getElementById('fp-step1').style.display='none';
   document.getElementById('fp-step2').style.display='block';

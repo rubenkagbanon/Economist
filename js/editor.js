@@ -38,7 +38,7 @@ async function submitRequest(){
   const btn=document.querySelector('.reg-submit');
   if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
   const id=`${Date.now()}_${Math.floor(Math.random()*1000)}`;
-  const proposal={first,last,email,job,cat,subj,why,ts:Date.now(),status:'pending'};
+  const proposal={first,last,email,job,cat,subj,why,lang:_lang,ts:Date.now(),status:'pending'};
   const saveError=await dbSet(`proposals/${id}`, proposal);
   if(saveError){
     showToast(`${t('toast_submit_error')} ${saveError.message||t('toast_save_error')}`,6000);
@@ -454,6 +454,15 @@ function blockToHtml(b){
 function previewArticle(){
   const title=document.getElementById('f-title').value.trim();
   const deck=document.getElementById('f-deck').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const author=document.getElementById('f-author').value.trim();
+  if(!title||!deck||!cat||!author){showToast(t('toast_required_fields'));return;}
+  const bodyText=editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type)).map(b=>stripHtml(b.html)).join(' ').trim();
+  if(!bodyText){showToast(t('toast_add_content'));return;}
+  document.getElementById('preview-cat').textContent=tCat(cat);
+  document.getElementById('preview-title').textContent=title;
+  document.getElementById('preview-deck').textContent=deck;
+  document.getElementById('preview-meta').textContent=`${t('home_par')} ${author}`;
   const coverWrap=document.getElementById('preview-cover-wrap');
   coverWrap.style.display=_coverData?'block':'none';
   if(_coverData)document.getElementById('preview-cover').src=_coverData;
@@ -502,7 +511,7 @@ async function publishArticle(){
     return;
   }
   const isAdmin=isOwner();
-  const a = { id, owner_id:authUser.id, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending' };
+  const a = { id, owner_id:authUser.id, title, deck, cat, author, img:_coverData||'', body:bodyText, bodyHtml, date:today(), reads:0, status:isAdmin?'published':'pending', lang:_lang };
   const btn=document.getElementById('btn-publish'); btn.disabled=true;
   let saveError;
   try{
