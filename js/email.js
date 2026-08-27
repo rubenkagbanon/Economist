@@ -80,6 +80,35 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why,lan
   return ok;
 }
 
+async function emailNotifyAdmin(subject, message){
+  return sendEmail({to_email:OWNER_EMAIL,subject,from_name:'Economist',reply_to:OWNER_EMAIL,message});
+}
+
+async function emailNotifyAdminNewArticle(article){
+  const english=article.lang==='en';
+  const subject=english?'[Economist] New article for review':'[Economist] Nouvel article à valider';
+  const message=english
+    ? `A new article was submitted for review.\n\nTitle: ${article.title}\nAuthor: ${article.author}\nCategory: ${article.cat}\nDate: ${article.date}`
+    : `Un nouvel article a été envoyé pour validation.\n\nTitre : ${article.title}\nAuteur : ${article.author}\nRubrique : ${article.cat}\nDate : ${article.date}`;
+  return emailNotifyAdmin(subject,message);
+}
+
+async function emailNotifyAdminNewAccount(user,lang='fr'){
+  const english=lang==='en';
+  const subject=english?'[Economist] New account created':'[Economist] Nouveau compte créé';
+  const message=english
+    ? `A new account was created.\n\nName: ${user.first||''} ${user.last||''}\nEmail: ${user.email}`
+    : `Un nouveau compte a été créé.\n\nNom : ${user.first||''} ${user.last||''}\nEmail : ${user.email}`;
+  return emailNotifyAdmin(subject,message);
+}
+
+async function emailNotifyAdminDeletedAccount(email,lang='fr'){
+  const english=lang==='en';
+  const subject=english?'[Economist] Account deleted':'[Economist] Compte supprimé';
+  const message=english?`The account ${email} was deleted.`:`Le compte ${email} a été supprimé.`;
+  return emailNotifyAdmin(subject,message);
+}
+
 // ═══════════════ CODE DE VÉRIFICATION (mot de passe oublié / accès rédacteur) ═══════════════
 async function emailSendVerificationCode(toEmail, toName, code, purpose, lang='fr'){
   const english=lang==='en';

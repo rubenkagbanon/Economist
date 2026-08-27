@@ -211,6 +211,7 @@ async function adminDeleteUser(email){
     return;
   }
   users=users.filter(u=>(u.email||'').toLowerCase()!==normalizedEmail);
+  await emailNotifyAdminDeletedAccount(normalizedEmail,_lang);
   showToast(t('toast_account_deleted'));
   renderAdmin();
 }

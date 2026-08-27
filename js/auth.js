@@ -92,6 +92,7 @@ async function doSignup(){
     btn.textContent=t('auth_btn_signup');btn.disabled=false;return;
   }
   const u=data.user && data.session ? await profileFromAuthUser(data.user) : {first};
+  if(data.user) await emailNotifyAdminNewAccount({first,last,email},_lang);
   if(data.session) emailSendWelcome(email,first);
   errEl.style.display='none';
   okEl.textContent=data.session ? t('auth_ok_created') : t('auth_ok_confirmation');
@@ -121,6 +122,7 @@ async function syncGoogleUserFromSession(session){
     u={id:session.user.id,first,last,email,joined:today(),avatar,bio:'',level:'',authProvider:'google'};
     users.push(u);
     await saveUser(u);
+    await emailNotifyAdminNewAccount(u,_lang);
   } else {
     let changed = false;
     if(!u.id){u.id=session.user.id;changed=true;}

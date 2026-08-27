@@ -526,6 +526,7 @@ async function publishArticle(){
     return;
   }
   articles.push(a);
+  await emailNotifyAdminNewArticle(a);
   clearDraft();
   const stateError=await persistWriterState({status:'submitted',updatedAt:Date.now()});
   if(stateError)console.error('publishArticle state',stateError);
