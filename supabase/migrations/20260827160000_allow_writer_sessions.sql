@@ -22,3 +22,4 @@ on public.kv_store
 for delete
 to authenticated
 using (path = 'writer_sessions/' || (select auth.uid())::text);
+

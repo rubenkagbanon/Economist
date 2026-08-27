@@ -43,7 +43,7 @@ function renderAdmin(){
       <div class="admin-code-tool">
         <div class="stats-section-title">${t('admin_codes')}</div>
         <div class="admin-panel admin-panel-narrow">
-          <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Créez des codes à usage limité (max 2 utilisations par défaut). Le code <strong>economist2026</strong> reste permanent et illimité.</p>
+          <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Créez des codes à usage limité. Chaque code est consommé selon le nombre d’utilisations autorisées.</p>
           <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem">
             <div style="display:flex;flex-direction:column;gap:.3rem;flex:1">
               <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_new_code')}</label>

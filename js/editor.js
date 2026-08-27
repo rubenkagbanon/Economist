@@ -200,23 +200,14 @@ async function checkCode(){
   errEl.style.display='none';
   if(!val){ errEl.textContent=t('toast_enter_code'); errEl.style.display='block'; return; }
 
-  if(VALID_CODES.includes(val)){
-    _writeUnlocked=true;
-    saveWriteUnlocked(true);
-    const path=writerStatePath();
-    if(path)await dbSet(path,{status:'draft',draft:null,updatedAt:Date.now()});
-    renderWritePage();
-    return;
-  }
-
   const codes = await dbGet(ONE_TIME_CODES_PATH);
-  let key = null, entry = null;
+  let entry = null;
   if(codes && typeof codes === 'object' && !Array.isArray(codes)){
     if(codes.code !== undefined){
       if(codes.code === val){ entry = codes; }
     } else {
       for(const [k,v] of Object.entries(codes)){
-        if(v && v.code === val){ key = k; entry = v; break; }
+        if(v && v.code === val){ entry = v; break; }
       }
     }
   }
@@ -237,13 +228,17 @@ async function checkCode(){
     return;
   }
 
-  const savePath = key ? `${ONE_TIME_CODES_PATH}/${key}` : ONE_TIME_CODES_PATH;
-  await dbSet(savePath, {...entry, used:(entry.used||0)+1});
+  const { data: consumeResult, error: consumeError } = await _sb.rpc('consume_access_code', { p_code: val });
+  if(consumeError || !consumeResult?.ok){
+    errEl.textContent=consumeResult?.error||consumeError?.message||t('toast_save_error');
+    errEl.style.display='block';
+    return;
+  }
+
   const statePath=writerStatePath();
   if(statePath){
     const stateError=await dbSet(statePath,{status:'draft',draft:null,updatedAt:Date.now()});
     if(stateError){
-      await dbSet(savePath,entry);
       errEl.textContent=t('toast_save_error');
       errEl.style.display='block';
       return;
