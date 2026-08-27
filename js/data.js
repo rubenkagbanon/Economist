@@ -139,6 +139,41 @@ async function saveUser(u) {
   else writeDataCache();
   return error || null;
 }
+async function ensureAuthProfile(authUser) {
+  if(!authUser?.id)return new Error('Missing authenticated user');
+  const email=(authUser.email||'').trim().toLowerCase();
+  const metadata=authUser.user_metadata||{};
+  const fullName=(metadata.full_name||metadata.name||email.split('@')[0]||'Utilisateur').trim();
+  const nameParts=fullName.split(/\s+/).filter(Boolean);
+  const profile={
+    id:authUser.id,
+    email,
+    first:nameParts[0]||'Utilisateur',
+    last:nameParts.slice(1).join(' '),
+    joined:today(),
+    avatar:metadata.avatar_url||'',
+    bio:'',
+    level:'',
+    authProvider:authUser.app_metadata?.provider||'supabase'
+  };
+  const existing=users.find(user=>(user.email||'').toLowerCase()===email);
+  if(existing){
+    profile.first=existing.first||profile.first;
+    profile.last=existing.last||profile.last;
+    profile.joined=existing.joined||profile.joined;
+    profile.avatar=existing.avatar||profile.avatar;
+    profile.bio=existing.bio||'';
+    profile.level=existing.level||'';
+  }
+  const error=await saveUser(profile);
+  if(!error){
+    const index=users.findIndex(user=>(user.email||'').toLowerCase()===email);
+    if(index===-1)users.push(profile);
+    else users[index]={...users[index],...profile};
+    currentUser=users[index===-1?users.length-1:index];
+  }
+  return error;
+}
 async function deleteUserDB(email) {
   const normalizedEmail=(email||'').trim().toLowerCase();
   if(!normalizedEmail)return new Error('Missing user email');

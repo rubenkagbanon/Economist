@@ -315,7 +315,7 @@ function openProfile(email){
       <div style="flex:1">
         <div class="profile-name">${u.first} ${u.last}</div>
         <div class="profile-meta">${t('profile_member')} ${u.joined||'—'}${userArticles.length?` · ${userArticles.length} article${userArticles.length>1?'s':''} publié${userArticles.length>1?'s':''}`:' · '+t('profile_reader')}</div>
-        ${u.bio?`<div class="profile-bio">"${u.bio}"</div>`:''}
+        ${u.bio?`<div class="profile-bio">${u.bio}</div>`:''}
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
         <div class="profile-actions">
           ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}

@@ -369,6 +369,10 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .admin-page .stats-section-title{font-family:'Roboto Slab',Georgia,serif;font-size:9px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:1px solid var(--gris-clair)}
 .admin-panel{border:.5px solid var(--gris-clair);padding:1.5rem;margin-bottom:3rem}
 .admin-panel-narrow{max-width:520px}
+.admin-code-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem;margin-bottom:3rem}
+.admin-code-tool .stats-section-title{margin-bottom:1.5rem}
+.admin-code-tool .admin-panel-narrow{max-width:none;height:100%;box-sizing:border-box}
+@media(max-width:700px){.admin-code-tools{grid-template-columns:1fr;gap:0}.admin-code-tool{margin-bottom:2.5rem}.admin-code-tool:last-child{margin-bottom:0}}
 .admin-panel-space{margin-bottom:3rem}
 .admin-table-wrap{overflow-x:auto}
 .admin-page .stats-table{width:100%;border-collapse:collapse;font-family:'Roboto Slab',Georgia,serif;font-size:.88rem}

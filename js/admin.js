@@ -25,37 +25,43 @@ function renderAdmin(){
 
     ${pendingMarkup}
 
-    <div class="stats-section-title">✉ Envoyer un code manuellement</div>
-    <div class="admin-panel admin-panel-narrow">
-      <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Contrôle manuel : envoyez un code d'accès rédacteur directement à n'importe quelle adresse e-mail, sans passer par une proposition.</p>
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end">
-        <div style="display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:200px">
-          <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">E-mail destinataire</label>
-          <input type="email" id="manual-code-email" placeholder="personne@email.com" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:100%">
+    <div class="admin-code-tools">
+      <div class="admin-code-tool">
+        <div class="stats-section-title">✉ Envoyer un code manuellement</div>
+        <div class="admin-panel admin-panel-narrow">
+          <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Contrôle manuel : envoyez un code d'accès rédacteur directement à n'importe quelle adresse e-mail, sans passer par une proposition.</p>
+          <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end">
+            <div style="display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:200px">
+              <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">E-mail destinataire</label>
+              <input type="email" id="manual-code-email" placeholder="personne@email.com" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:100%">
+            </div>
+            <button class="btn-red" onclick="adminSendManualCode()" style="padding:10px 18px;white-space:nowrap">Générer et envoyer</button>
+          </div>
         </div>
-        <button class="btn-red" onclick="adminSendManualCode()" style="padding:10px 18px;white-space:nowrap">Générer et envoyer</button>
+      </div>
+
+      <div class="admin-code-tool">
+        <div class="stats-section-title">${t('admin_codes')}</div>
+        <div class="admin-panel admin-panel-narrow">
+          <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Créez des codes à usage limité (max 2 utilisations par défaut). Le code <strong>economist2026</strong> reste permanent et illimité.</p>
+          <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem">
+            <div style="display:flex;flex-direction:column;gap:.3rem;flex:1">
+              <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_new_code')}</label>
+              <input type="text" id="new-code-val" placeholder="${t('admin_new_code_ph')}" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:100%">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.3rem">
+              <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_max')}</label>
+              <input type="number" id="new-code-max" value="2" min="1" max="99" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:80px">
+            </div>
+            <button class="btn-red" onclick="adminAddCode()" style="padding:10px 18px;white-space:nowrap">${t('admin_create')}</button>
+          </div>
+          <div id="admin-codes-list" style="font-family:var(--sans);font-size:.85rem;color:var(--txt-lite);font-style:italic">${t('admin_loading')}</div>
+        </div>
       </div>
     </div>
 
     <div class="stats-section-title">📩 Propositions reçues</div>
     <div id="admin-proposals-list" class="admin-panel-space">${t('admin_loading')}</div>
-
-    <div class="stats-section-title">${t('admin_codes')}</div>
-    <div class="admin-panel admin-panel-narrow">
-      <p style="font-family:var(--sans);font-size:.85rem;color:var(--txt-mut);margin-bottom:1.2rem;line-height:1.65;font-weight:300">Créez des codes à usage limité (max 2 utilisations par défaut). Le code <strong>economist2026</strong> reste permanent et illimité.</p>
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem">
-        <div style="display:flex;flex-direction:column;gap:.3rem;flex:1">
-          <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_new_code')}</label>
-          <input type="text" id="new-code-val" placeholder="${t('admin_new_code_ph')}" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:100%">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:.3rem">
-          <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_max')}</label>
-          <input type="number" id="new-code-max" value="2" min="1" max="99" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:80px">
-        </div>
-        <button class="btn-red" onclick="adminAddCode()" style="padding:10px 18px;white-space:nowrap">${t('admin_create')}</button>
-      </div>
-      <div id="admin-codes-list" style="font-family:var(--sans);font-size:.85rem;color:var(--txt-lite);font-style:italic">${t('admin_loading')}</div>
-    </div>
 
     <div class="stats-section-title">${t('admin_arts')}</div>
     ${articles.length?`<div class="admin-table-wrap admin-panel-space"><table class="stats-table"><thead><tr><th>${t('admin_table_titre')}</th><th>${t('admin_table_auteur')}</th><th>${t('admin_table_cat')}</th><th>${t('admin_table_date')}</th><th>${t('admin_table_reads')}</th><th>${t('admin_table_action')}</th></tr></thead><tbody>
