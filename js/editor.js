@@ -54,6 +54,24 @@ async function submitRequest(){
 let _writeUnlocked=false;
 let editorBlocks=[];
 let _coverData='';
+let writerSyncTimer=null;
+
+function writerStatePath(){
+  return currentUser?.id?`${WRITER_SESSIONS_PATH}/${currentUser.id}`:null;
+}
+async function getWriterState(){
+  const path=writerStatePath();
+  return path?await dbGet(path):null;
+}
+async function syncSubmittedWriterState(){
+  if(!_writeUnlocked||isOwner())return;
+  const state=await getWriterState();
+  if(state?.status==='submitted'){
+    _writeUnlocked=false;
+    saveWriteUnlocked(false);
+    if(document.getElementById('page-write')?.classList.contains('active'))renderWritePage();
+  }
+}
 
 function draftStorageKey(){
   if(!currentUser||!currentUser.email) return null;
@@ -73,17 +91,19 @@ function saveDraft(){
   if(!_writeUnlocked) return;
   const key = draftStorageKey();
   if(!key) return;
-  try{
-    const draft = {
+  const draft = {
       cat: document.getElementById('f-cat')?.value || '',
       author: document.getElementById('f-author')?.value || '',
       title: document.getElementById('f-title')?.value || '',
       deck: document.getElementById('f-deck')?.value || '',
       cover: _coverData || '',
       blocks: editorBlocks
-    };
+  };
+  try{
     localStorage.setItem(key, JSON.stringify(draft));
   }catch(e){}
+  const path=writerStatePath();
+  if(path)dbSet(path,{status:'draft',draft,updatedAt:Date.now()});
 }
 function clearDraft(){
   const key = draftStorageKey();
@@ -107,7 +127,7 @@ function saveWriteUnlocked(value){
   }catch(e){}
 }
 
-function renderWritePage(){
+async function renderWritePage(){
   document.getElementById('write-login-gate').style.display='none';
   document.getElementById('code-gate').style.display='none';
   document.getElementById('write-form').style.display='none';
@@ -122,6 +142,18 @@ function renderWritePage(){
       _writeUnlocked = true;
     }
   }
+  const writerState=await getWriterState();
+  if(writerState?.status==='draft'){
+    _writeUnlocked=true;
+    saveWriteUnlocked(true);
+  }
+  if(!isOwner() && writerState?.status==='submitted'){
+    _writeUnlocked=false;
+    saveWriteUnlocked(false);
+    document.getElementById('code-gate').style.display='block';
+    document.getElementById('gate-err').textContent=t('code_exhausted');
+    return;
+  }
   if(!_writeUnlocked){
     document.getElementById('code-gate').style.display='block';
     document.getElementById('gate-err').style.display='none';
@@ -129,8 +161,10 @@ function renderWritePage(){
     return;
   }
   document.getElementById('write-form').style.display='block';
+  if(writerSyncTimer)clearInterval(writerSyncTimer);
+  writerSyncTimer=setInterval(syncSubmittedWriterState,5000);
   if(editorBlocks.length===0){
-    const draft = loadDraft();
+    const draft = loadDraft()||writerState?.draft;
     if(draft && Array.isArray(draft.blocks) && draft.blocks.length){
       editorBlocks = draft.blocks;
       document.getElementById('f-cat').value = draft.cat || '';
@@ -169,6 +203,8 @@ async function checkCode(){
   if(VALID_CODES.includes(val)){
     _writeUnlocked=true;
     saveWriteUnlocked(true);
+    const path=writerStatePath();
+    if(path)await dbSet(path,{status:'draft',draft:null,updatedAt:Date.now()});
     renderWritePage();
     return;
   }
@@ -203,6 +239,16 @@ async function checkCode(){
 
   const savePath = key ? `${ONE_TIME_CODES_PATH}/${key}` : ONE_TIME_CODES_PATH;
   await dbSet(savePath, {...entry, used:(entry.used||0)+1});
+  const statePath=writerStatePath();
+  if(statePath){
+    const stateError=await dbSet(statePath,{status:'draft',draft:null,updatedAt:Date.now()});
+    if(stateError){
+      await dbSet(savePath,entry);
+      errEl.textContent=t('toast_save_error');
+      errEl.style.display='block';
+      return;
+    }
+  }
   _writeUnlocked=true;
   saveWriteUnlocked(true);
   renderWritePage();
@@ -456,6 +502,21 @@ async function publishArticle(){
   }
   articles.push(a);
   clearDraft();
+  const statePath=writerStatePath();
+  if(statePath)await dbSet(statePath,{status:'submitted',updatedAt:Date.now()});
+  if(writerSyncTimer)clearInterval(writerSyncTimer);
+  editorBlocks=[];
+  _coverData='';
+  document.getElementById('f-cat').value='';
+  document.getElementById('f-author').value=`${currentUser.first} ${currentUser.last}`;
+  document.getElementById('f-title').value='';
+  document.getElementById('f-deck').value='';
+  document.getElementById('f-img').value='';
+  hideCoverPreview();
+  renderBlocks();
+  updateWordCount();
+  updateCount('f-title','tc',80);
+  updateCount('f-deck','dc',250);
   lastPublishedId=id;
   _writeUnlocked=isAdmin;
   saveWriteUnlocked(isAdmin);

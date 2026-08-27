@@ -106,9 +106,7 @@ async function loadAdminCodes(){
   const el=document.getElementById('admin-codes-list');if(!el)return;
   const codes=await dbGet(ONE_TIME_CODES_PATH);
   if(!codes){el.textContent='Aucun code créé.';el.style.fontStyle='italic';return;}
-  const activeEntries=Object.entries(codes).filter(([,v])=>(v.used||0)<(v.max||2));
-  const inactiveKeys=Object.keys(codes).filter(key=>!activeEntries.some(([activeKey])=>activeKey===key));
-  await Promise.all(inactiveKeys.map(key=>dbDelete(`${ONE_TIME_CODES_PATH}/${key}`)));
+  const activeEntries=Object.entries(codes);
   const rows=activeEntries.map(([k,v])=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:.5px solid var(--gris-clair);gap:.8rem;flex-wrap:wrap">
       <div>
