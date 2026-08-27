@@ -179,6 +179,42 @@ async function doGoogleAuth(mode='login'){
   }
 }
 
+async function ensureValidAuthSession(){
+  if(!_sb || !_sb.auth){
+    currentUser=null; clearLocalSession();
+    return {user:null, session:null, error:new Error(t('toast_user_error'))};
+  }
+
+  try{
+    const { data: { session }, error: sessionError } = await _sb.auth.getSession();
+    if(sessionError) throw sessionError;
+    if(!session?.user){
+      currentUser=null; clearLocalSession();
+      throw new Error('Session expirée. Veuillez vous reconnecter.');
+    }
+
+    const { data: { user }, error: userError } = await _sb.auth.getUser();
+    if(userError) throw userError;
+    if(!user || session.user.id !== user.id){
+      currentUser=null; clearLocalSession();
+      throw new Error('Session expirée. Veuillez vous reconnecter.');
+    }
+
+    return { user, session, error:null };
+  } catch(error){
+    const msg = String(error?.message || '');
+    const isSessionIssue = /jwt|sub claim|session|user.*not.*exist|expired/i.test(msg);
+
+    if(isSessionIssue){
+      try{ await _sb.auth.signOut(); }catch(e){ console.error('Session cleanup error:', e); }
+      currentUser=null; clearLocalSession();
+      return { user:null, session:null, error:new Error('Votre session a expiré. Veuillez vous reconnecter.') };
+    }
+
+    return { user:null, session:null, error:error || new Error(t('toast_user_error')) };
+  }
+}
+
 async function doLogout(){
   try{ if(_sb && _sb.auth){ await _sb.auth.signOut(); } }catch(e){ console.error('Google logout error:', e); }
   currentUser=null;clearLocalSession();

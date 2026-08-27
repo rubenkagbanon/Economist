@@ -467,13 +467,15 @@ async function publishArticle(){
     notifyPublishError(null,t('toast_user_error'));
     return;
   }
-  const {data:sessionData,error:sessionError}=await _sb.auth.getSession();
-  const {data:authData,error:authError}=await _sb.auth.getUser();
-  const authUser=authData?.user;
-  if(sessionError||authError||!sessionData?.session?.user?.id||!authUser?.id||sessionData.session.user.id!==authUser.id){
-    notifyPublishError(sessionError||authError,new Error(t('toast_user_error')));
+
+  const { user: authUser, error: authSessionError } = await ensureValidAuthSession();
+  if(authSessionError || !authUser?.id){
+    notifyPublishError(authSessionError || new Error(t('toast_user_error')));
+    renderNav();
+    showPage('home');
     return;
   }
+
   const profileError=await ensureAuthProfile(authUser);
   if(profileError){
     notifyPublishError(profileError,t('toast_save_error'));
