@@ -4,12 +4,22 @@
 
 // ═══════════════ PROPOSITION D'ARTICLE ═══════════════
 let proposalSubmitting=false;
+function toggleCustomCategoryInput(selectId, inputId){
+  const select = document.getElementById(selectId);
+  const inputWrap = document.getElementById(`${inputId}-wrap`);
+  const input = document.getElementById(inputId);
+  const shouldShow = select && select.value === 'Autres';
+  if(inputWrap) inputWrap.style.display = shouldShow ? 'block' : 'none';
+  if(input && !shouldShow) input.value = '';
+}
+
 function initProposalContact(){
   if(!currentUser)return;
   const first=document.getElementById('r-first');
   const last=document.getElementById('r-last');
   if(first && !first.value)first.value=currentUser.first||'';
   if(last && !last.value)last.value=currentUser.last||'';
+  toggleCustomCategoryInput('r-cat','r-custom-cat');
 }
 
 async function submitRequest(){
@@ -30,7 +40,9 @@ async function submitRequest(){
   const last =document.getElementById('r-last').value.trim();
   const email=document.getElementById('r-email').value.trim().toLowerCase();
   const job  =document.getElementById('r-job').value.trim();
-  const cat  =document.getElementById('r-cat').value;
+  const selectedCat = document.getElementById('r-cat').value;
+  const customCat = document.getElementById('r-custom-cat')?.value.trim() || '';
+  const cat = normalizeCategory(selectedCat === 'Autres' ? customCat || 'Autres' : selectedCat);
   const subj =document.getElementById('r-subject').value.trim();
   const why  =document.getElementById('r-why').value.trim();
   if(!first||!last||!email||!cat||!subj){ showToast(t('toast_required_fields_proposal')); return; }
@@ -199,6 +211,7 @@ async function renderWritePage(){
     if(draft && Array.isArray(draft.blocks) && draft.blocks.length){
       editorBlocks = draft.blocks;
       document.getElementById('f-cat').value = draft.cat || '';
+      toggleCustomCategoryInput('f-cat','f-custom-cat');
       document.getElementById('f-author').value = draft.author || `${currentUser.first} ${currentUser.last}`;
       document.getElementById('f-title').value = draft.title || '';
       document.getElementById('f-deck').value = draft.deck || '';
@@ -210,6 +223,7 @@ async function renderWritePage(){
       }
     } else {
       document.getElementById('f-cat').value = '';
+      toggleCustomCategoryInput('f-cat','f-custom-cat');
       document.getElementById('f-author').value = `${currentUser.first} ${currentUser.last}`;
       document.getElementById('f-title').value = '';
       document.getElementById('f-deck').value = '';
@@ -479,7 +493,9 @@ function notifyPublishError(error, fallback=''){
 async function publishArticle(){
   const title =document.getElementById('f-title').value.trim();
   const deck  =document.getElementById('f-deck').value.trim();
-  const cat   =document.getElementById('f-cat').value;
+  const selectedCat = document.getElementById('f-cat').value;
+  const customCat = document.getElementById('f-custom-cat')?.value.trim() || '';
+  const cat = normalizeCategory(selectedCat === 'Autres' ? customCat || 'Autres' : selectedCat);
   const author=document.getElementById('f-author').value.trim();
   if(!title||!deck||!cat||!author){ showToast(t('toast_required_fields')); return; }
   const bodyText = editorBlocks.filter(b=>['paragraph','quote','infobox','h1','h2','h3'].includes(b.type))

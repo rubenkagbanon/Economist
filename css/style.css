@@ -76,6 +76,11 @@ body{min-height:100vh;display:flex;flex-direction:column;background:var(--blanc)
 .m-row input,.m-row textarea{font-family:var(--sans);font-size:.95rem;border:.5px solid var(--gris-clair);padding:.7rem 1rem;outline:none;transition:border .2s;width:100%;}
 .m-row textarea{resize:vertical;min-height:80px;line-height:1.6}
 .m-row input:focus,.m-row textarea:focus{border-color:var(--rouge)}
+.pw-field{position:relative;display:flex;align-items:center;width:100%}
+.pw-field input{padding-right:4rem !important}
+.pw-toggle{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);border:none;background:transparent;color:var(--rouge);font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:.2rem .3rem;line-height:1}
+.pw-toggle:hover{opacity:.8}
+.gate-password-field{width:min(100%,280px)}
 .m-err{font-family:var(--sans);font-size:.78rem;color:var(--rouge);display:none;margin-top:.3rem}
 .m-ok{font-family:var(--sans);font-size:.82rem;color:#4a9a5a;display:none;margin-top:.3rem;line-height:1.5}
 .btn-modal{font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;background:var(--rouge);color:white;border:none;padding:11px 28px;cursor:pointer;transition:opacity .2s;width:100%;margin-top:.4rem;}
@@ -301,7 +306,7 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .gate-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:1rem;}
 .gate p{font-family:var(--sans);font-size:.9rem;color:var(--txt-soft);margin-bottom:1.5rem;font-weight:300;line-height:1.65}
 .gate-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
-.gate input[type=password]{font-family:var(--sans);font-size:1rem;letter-spacing:.3em;border:.5px solid var(--gris-clair);padding:.65rem 1rem;width:200px;outline:none;transition:border .2s;}
+.gate input[type=password],.gate input[type=text]{font-family:var(--sans);font-size:1rem;letter-spacing:.08em;border:.5px solid var(--gris-clair);padding:.65rem 1rem;width:200px;outline:none;transition:border .2s;}
 .gate input:focus{border-color:var(--rouge)}
 .gate-err{font-family:var(--sans);font-size:.82rem;color:var(--rouge);margin-top:.7rem;display:none}
 .form-wrap{display:flex;flex-direction:column;gap:1.6rem}
@@ -488,7 +493,8 @@ footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizin
   .nav-top{padding:0 .8rem}
   .profile-header{flex-direction:column;align-items:flex-start}
   .gate-row{flex-direction:column;align-items:flex-start}
-  .gate input[type=password]{width:100%}
+  .gate-password-field,.gate input[type=password],.gate input[type=text]{width:100%}
+  .pw-field{max-width:100%}
 }
 
 /* ═══════════ CTRL BUTTONS (lang + theme) ═══════════ */

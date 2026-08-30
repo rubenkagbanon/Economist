@@ -152,6 +152,17 @@ function openModal(tab){
 function closeModal(){
   document.getElementById('auth-modal').classList.remove('open');
 }
+function togglePasswordVisibility(inputId){
+  const input = document.getElementById(inputId);
+  const btn = document.querySelector(`[data-target="${inputId}"]`);
+  if(!input || !btn) return;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Masquer' : 'Afficher';
+  btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+  input.focus();
+}
+
 function switchTab(tab){
   const tabsEl = document.querySelector('.modal-tabs');
   if(tab==='forgot'||tab==='password'){

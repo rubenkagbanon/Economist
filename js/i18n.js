@@ -2,7 +2,7 @@
 // i18n.js — traductions FR / EN
 // ════════════════════════════════════════════════════════════
 
-let _lang = 'en';
+let _lang = 'fr';
 
 const I18N = {
   fr: {
@@ -19,7 +19,7 @@ const I18N = {
 
     cat_une:"À la une", cat_eco:"Économie", cat_fin:"Finance", cat_pol:"Politiques", cat_soc:"Sociologie", cat_africa:"Afrique", cat_world:"Monde",
     cat_dro:"Droit", cat_tec:"Technologies", cat_health:"Santé", cat_ecol:"Écologie",
-    cat_ia:"IA", cat_data:"Data Science",
+    cat_ia:"IA", cat_data:"Data Science", cat_other:"Autres",
 
     nav_propose:"Proposer un article", nav_write:"Écrire un article", nav_stats:"Mes statistiques", nav_about:"À propos",
     nav_admin:"Admin", nav_login:"S'abonner / Connexion", nav_logout:"Déconnexion", nav_privacy:"Confidentialité", nav_rules:"Conditions d’utilisation", footer_developed:"Développé par Ruben Kagbanon", footer_founder:"Fondateur Sosthene Jichi",
@@ -97,7 +97,7 @@ const I18N = {
 
     cat_une:"Front page", cat_eco:"Economy", cat_fin:"Finance", cat_pol:"Politics", cat_soc:"Sociology", cat_africa:"Africa", cat_world:"World",
     cat_dro:"Law", cat_tec:"Technology", cat_health:"Health", cat_ecol:"Ecology",
-    cat_ia:"AI", cat_data:"Data Science",
+    cat_ia:"AI", cat_data:"Data Science", cat_other:"Other",
 
     nav_propose:"Submit an article", nav_write:"Write an article", nav_stats:"My statistics", nav_about:"About",
     nav_admin:"Admin", nav_login:"Subscribe / Log in", nav_logout:"Log out", nav_privacy:"Privacy", nav_rules:"Terms of Use", footer_developed:"Developed by Ruben Kagbanon", footer_founder:"Founder Sosthene Jichi",
@@ -166,8 +166,8 @@ const I18N = {
 // Rubriques : traduction fr → en (les articles stockent toujours le nom fr)
 const CAT_EN = {
   'Économie':'Economy', 'Finance':'Finance', 'Politiques':'Politics', 'Sociologie':'Sociology',
-  'Droit':'Law', 'Technologies':'Technology', 'Santé':'Health',
-  'Écologie':'Ecology', 'IA':'AI', 'Data Science':'Data Science'
+  'Afrique':'Africa', 'Monde':'World', 'Droit':'Law', 'Technologies':'Technology', 'Santé':'Health',
+  'Écologie':'Ecology', 'IA':'AI', 'Data Science':'Data Science', 'Autres':'Other', 'Autre':'Other'
 };
 const MONTH_EN = {
   'janvier':'January','février':'February','mars':'March','avril':'April','mai':'May','juin':'June',
@@ -180,8 +180,29 @@ function t(key){
 function tf(key, values={}){
   return t(key).replace(/\{(\w+)\}/g,(_,name)=>values[name]===undefined?`{${name}}`:values[name]);
 }
+function normalizeCategory(cat){
+  const value = String(cat || '').trim();
+  if(!value) return 'Autres';
+  const direct = {
+    'Autre':'Autres','Autres':'Autres','Other':'Autres','Others':'Autres',
+    'Afrique':'Autres','Africa':'Autres','Monde':'Autres','World':'Autres'
+  };
+  if(direct[value]) return direct[value];
+  const label = value.toLowerCase();
+  if(label.includes('autres') || label.includes('other') || label.includes('others')) return 'Autres';
+  const canonical = {
+    'économie':'Économie','finance':'Finance','politiques':'Politiques','sociologie':'Sociologie',
+    'droit':'Droit','technologies':'Technologies','santé':'Santé','écologie':'Écologie','ia':'IA',
+    'data science':'Data Science','economy':'Économie','politics':'Politiques','sociology':'Sociologie',
+    'law':'Droit','technology':'Technologies','health':'Santé','ecology':'Écologie','ai':'IA'
+  };
+  const lowered = value.toLowerCase();
+  if(canonical[lowered]) return canonical[lowered];
+  return 'Autres';
+}
 function tCat(cat){
-  return _lang==='en' ? (CAT_EN[cat]||cat) : cat;
+  const normalized = normalizeCategory(cat);
+  return _lang==='en' ? (CAT_EN[normalized] || normalized) : normalized;
 }
 function tEmptyCategory(cat){
   return _lang==='en'
@@ -278,6 +299,7 @@ function refreshCurrentPage(){
   else if(name==='write' && _writeUnlocked) renderBlocks();
   else if(name==='mystats') renderMyStats();
   else if(name==='admin') renderAdmin();
+  else if(name==='profile' && currentProfileEmail) openProfile(currentProfileEmail);
 }
 function toggleLang(){
   _lang = _lang==='fr' ? 'en' : 'fr';

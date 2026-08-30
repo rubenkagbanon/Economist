@@ -102,8 +102,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateLogoForTheme();
   try{
     const savedLang=localStorage.getItem('eco_lang');
-    if(savedLang) _lang=savedLang;
-  }catch(e){}
+    if(savedLang === 'en' || savedLang === 'fr') _lang = savedLang;
+    else {
+      _lang = 'fr';
+      localStorage.setItem('eco_lang', _lang);
+    }
+  }catch(e){
+    _lang='fr';
+  }
   translateLegalPages();
   applyTranslations();
   updateLangButton();

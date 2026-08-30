@@ -5,6 +5,7 @@
 // ═══════════════ NAVIGATION ═══════════════
 let activeReadArticleId=null;
 let activeReadTimer=null;
+let currentProfileEmail=null;
 
 function cancelArticleRead(){
   if(activeReadTimer)clearTimeout(activeReadTimer);
@@ -297,6 +298,7 @@ async function confirmDeleteArticle(id){
 
 // ═══════════════ PROFIL PUBLIC ═══════════════
 function openProfile(email){
+  currentProfileEmail = email || null;
   const u=users.find(x=>x.email===email);
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
   if(window.location.protocol!=='file:'){
@@ -309,12 +311,16 @@ function openProfile(email){
   const isMe=currentUser&&currentUser.email===email;
   const avatarClass=profileLevelClass(u.level);
   const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img loading="lazy" decoding="async" src="${u.avatar}" alt="${u.first}"></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;
+  const profileMetaPrefix = _lang === 'en' ? 'Member since' : 'Membre depuis le';
+  const profileMetaSuffix = userArticles.length
+    ? ` · ${userArticles.length} ${_lang === 'en' ? (userArticles.length > 1 ? 'articles' : 'article') : (userArticles.length > 1 ? 'articles' : 'article')} ${_lang === 'en' ? 'published' : 'publié' + (userArticles.length > 1 ? 's' : '')}`
+    : ` · ${t('profile_reader')}`;
   document.getElementById('profile-content').innerHTML=`
     <button class="back-btn" onclick="showPage('home')">${t('home_back')}</button>
     <div class="profile-header">${avatarEl}
       <div style="flex:1">
         <div class="profile-name">${u.first} ${u.last}</div>
-        <div class="profile-meta">${t('profile_member')} ${u.joined||'—'}${userArticles.length?` · ${userArticles.length} article${userArticles.length>1?'s':''} publié${userArticles.length>1?'s':''}`:' · '+t('profile_reader')}</div>
+        <div class="profile-meta">${profileMetaPrefix} ${tDate(u.joined)||'—'}${profileMetaSuffix}</div>
         ${u.bio?`<div class="profile-bio">${u.bio}</div>`:''}
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
         <div class="profile-actions">

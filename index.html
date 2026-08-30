@@ -198,7 +198,12 @@
       </div>
       <div class="m-divider"></div>
       <div class="m-row"><label data-i18n="auth_email">Email</label><input type="email" id="login-email" autocomplete="email"></div>
-      <div class="m-row"><label data-i18n="auth_pwd">Mot de passe</label><input type="password" id="login-pwd" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="m-row"><label data-i18n="auth_pwd">Mot de passe</label>
+        <div class="pw-field">
+          <input type="password" id="login-pwd" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          <button type="button" class="pw-toggle" data-target="login-pwd" onclick="togglePasswordVisibility('login-pwd')">Afficher</button>
+        </div>
+      </div>
       <button class="btn-modal" id="btn-login" onclick="doLogin()" data-i18n="auth_btn_login">Se connecter</button>
       <p class="m-err" id="login-err" data-i18n="auth_err_login">Email ou mot de passe incorrect.</p>
       <div class="m-divider"></div>
@@ -217,8 +222,18 @@
     <div class="modal-panel" id="tab-password">
       <div class="modal-title" data-i18n="password_manage">Créer / modifier mon mot de passe</div>
       <p class="modal-sub" data-i18n="password_sub">Utilisez ensuite votre e-mail et ce mot de passe pour vous connecter.</p>
-      <div class="m-row"><label data-i18n="password_new">Nouveau mot de passe</label><input type="password" id="new-password" autocomplete="new-password"></div>
-      <div class="m-row"><label data-i18n="password_confirm">Confirmer le mot de passe</label><input type="password" id="confirm-password" autocomplete="new-password" onkeydown="if(event.key==='Enter')savePassword()"></div>
+      <div class="m-row"><label data-i18n="password_new">Nouveau mot de passe</label>
+        <div class="pw-field">
+          <input type="password" id="new-password" autocomplete="new-password">
+          <button type="button" class="pw-toggle" data-target="new-password" onclick="togglePasswordVisibility('new-password')">Afficher</button>
+        </div>
+      </div>
+      <div class="m-row"><label data-i18n="password_confirm">Confirmer le mot de passe</label>
+        <div class="pw-field">
+          <input type="password" id="confirm-password" autocomplete="new-password" onkeydown="if(event.key==='Enter')savePassword()">
+          <button type="button" class="pw-toggle" data-target="confirm-password" onclick="togglePasswordVisibility('confirm-password')">Afficher</button>
+        </div>
+      </div>
       <button class="btn-modal" id="btn-password" onclick="savePassword()" data-i18n="password_save">Enregistrer le mot de passe</button>
       <p class="m-err" id="password-err"></p>
     </div>
@@ -296,6 +311,7 @@
     <div class="cat" onclick="filterCat(this,'Écologie')" data-i18n="cat_ecol">Écologie</div>
     <div class="cat" onclick="filterCat(this,'IA')" data-i18n="cat_ia">IA</div>
     <div class="cat" onclick="filterCat(this,'Data Science')" data-i18n="cat_data">Data Science</div>
+    <div class="cat" onclick="filterCat(this,'Autres')" data-i18n="cat_other">Autres</div>
     <div class="nav-cats-sep"></div>
     <div class="cat nav-link-item" id="nav-cats-propose" style="display:none" onclick="showPage('propose')" data-i18n="nav_propose">Proposer un article</div>
     <div class="cat nav-link-item" id="nav-cats-write" style="display:none" onclick="showPage('write')" data-i18n="nav_write">Écrire</div>
@@ -363,9 +379,10 @@
     <div class="reg-card">
       <div class="reg-section" data-i18n="propose_idea">Votre idée</div>
       <div class="reg-row"><label>Rubrique *</label>
-        <select id="r-cat"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Santé" data-i18n="cat_health">Santé</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option></select>
+        <select id="r-cat" onchange="toggleCustomCategoryInput('r-cat','r-custom-cat')"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Santé" data-i18n="cat_health">Santé</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option><option value="Autres" data-i18n="cat_other">Autres</option></select>
       </div>
-      <div class="reg-row"><label data-i18n="propose_subject">Sujet *</label><textarea id="r-subject" data-i18n-placeholder="propose_subject_ph" placeholder="Décrivez brièvement votre idée…"></textarea></div>
+      <div class="reg-row" id="r-custom-cat-wrap" style="display:none"><label>Précisez (max 15)</label><input type="text" id="r-custom-cat" maxlength="15" placeholder="Ex: sport, culture…"></div>
+      <div class="reg-row"><label data-i18n="propose_subject">Sujet *</label><textarea id="r-subject" data-i18n-placeholder="propose_subject_ph" placeholder="Décrivez brièvement votre idée…" maxlength="80"></textarea></div>
       <div class="reg-row"><label data-i18n="propose_motivation">Motivation (optionnel)</label><textarea id="r-why" data-i18n-placeholder="propose_motivation_ph" style="min-height:80px" placeholder="Pourquoi ce sujet ?"></textarea></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
@@ -393,7 +410,10 @@
       <div class="gate-label" data-i18n="write_code_label">Code d'accès rédacteur</div>
       <p><span data-i18n="write_code_prompt">Entrez votre code reçu par e-mail.</span><br><span data-i18n="write_no_code">Pas de code ?</span> <span style="color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('propose')" data-i18n="propose_link">Proposer un article</span></p>
       <div class="gate-row">
-        <input type="password" id="access-code" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkCode()">
+        <div class="pw-field gate-password-field">
+          <input type="password" id="access-code" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkCode()">
+          <button type="button" class="pw-toggle" data-target="access-code" onclick="togglePasswordVisibility('access-code')">Afficher</button>
+        </div>
         <button class="btn-red" onclick="checkCode()" data-i18n="write_unlock">Déverrouiller</button>
       </div>
       <div class="gate-err" id="gate-err" data-i18n="write_code_error">Code incorrect.</div>
@@ -402,8 +422,9 @@
       <div class="form-wrap">
         <div class="form-two-col">
           <div class="form-row"><label data-i18n="lbl_rubrique">Rubrique *</label>
-            <select id="f-cat" onchange="saveDraft()"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Afrique" data-i18n="cat_africa">Afrique</option><option value="Monde" data-i18n="cat_world">Monde</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option></select>
+            <select id="f-cat" onchange="toggleCustomCategoryInput('f-cat','f-custom-cat'); saveDraft()"><option value="" data-i18n="propose_select">— Sélectionner —</option><option value="Économie" data-i18n="cat_eco">Économie</option><option value="Finance" data-i18n="cat_fin">Finance</option><option value="Politiques" data-i18n="cat_pol">Politiques</option><option value="Sociologie" data-i18n="cat_soc">Sociologie</option><option value="Droit" data-i18n="cat_dro">Droit</option><option value="Technologies" data-i18n="cat_tec">Technologies</option><option value="Santé" data-i18n="cat_health">Santé</option><option value="Écologie" data-i18n="cat_ecol">Écologie</option><option value="IA" data-i18n="cat_ia">IA</option><option value="Data Science" data-i18n="cat_data">Data Science</option><option value="Autres" data-i18n="cat_other">Autres</option></select>
           </div>
+          <div class="form-row" id="f-custom-cat-wrap" style="display:none"><label>Précisez (max 15)</label><input type="text" id="f-custom-cat" maxlength="15" placeholder="Ex: sport, culture…" oninput="saveDraft()"></div>
           <div class="form-row"><label data-i18n="write_author">Auteur *</label><input type="text" id="f-author" data-i18n-placeholder="write_author_ph" placeholder="Prénom Nom" oninput="saveDraft()"></div>
         </div>
         <div class="form-row"><label data-i18n="write_title_label">Titre *</label><input type="text" id="f-title" data-i18n-placeholder="write_title_ph" placeholder="Un titre précis…" oninput="updateCount('f-title','tc',80)">
