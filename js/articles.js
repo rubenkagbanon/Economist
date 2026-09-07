@@ -54,10 +54,10 @@ function showPage(name){
   pg.classList.add('active');
   if(name==='propose')initProposalContact();
   document.title=name==='rules'
-    ? 'Economist | Conditions d’utilisation'
+    ? 'EconGlobe | Conditions d’utilisation'
     : name==='privacy'
-      ? 'Economist | Politique de confidentialité'
-      : 'Economist | Actualités et analyse dans plusieurs domaines';
+      ? 'EconGlobe | Politique de confidentialité'
+      : 'EconGlobe | Actualités et analyse dans plusieurs domaines';
   if(name!=='profile') resetProfileShareMetadata();
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
@@ -76,10 +76,10 @@ function showPage(name){
   if(name==='admin')   { loadData(true).then(()=>renderAdmin()); }
 }
 function setProfileShareMetadata(user){
-  const title=`${user?.first||''} ${user?.last||''}`.trim()||'Profil Economist';
-  const description=user?.bio||`Profil de ${title} sur Economist.`;
+  const title=`${user?.first||''} ${user?.last||''}`.trim()||'Profil EconGlobe';
+  const description=user?.bio||`Profil de ${title} sur EconGlobe.`;
   const image=user?.avatar||'https://www.econglobe.com/css/Logo.png';
-  document.title=`${title} | Economist`;
+  document.title=`${title} | EconGlobe`;
   document.querySelector('meta[name="description"]')?.setAttribute('content',description);
   document.querySelector('meta[property="og:title"]')?.setAttribute('content',title);
   document.querySelector('meta[property="og:description"]')?.setAttribute('content',description);
@@ -91,16 +91,16 @@ function setProfileShareMetadata(user){
 }
 function resetProfileShareMetadata(){
   const defaults={
-    'meta[name="description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
-    'meta[property="og:title"]':'Economist | Actualités et analyse dans plusieurs domaines',
-    'meta[property="og:description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
+    'meta[name="description"]':'Discover research, studies, investigations and ideas across economics, finance, politics, technology, health, society and the environment. EconGlobe makes valuable work easier to find and understand.',
+    'meta[property="og:title"]':'EconGlobe | Research, Ideas and Global Perspectives',
+    'meta[property="og:description"]':'Discover research, studies, investigations and ideas across economics, finance, politics, technology, health, society and the environment. EconGlobe makes valuable work easier to find and understand.',
     'meta[property="og:image"]':'https://www.econglobe.com/css/Logo.png',
-    'meta[property="og:image:alt"]':'Logo Economist',
-    'meta[name="twitter:title"]':'Economist | Actualités et analyse dans plusieurs domaines',
-    'meta[name="twitter:description"]':'Découvrez des articles issus de recherches, mémoires, études, enquêtes et découvertes dans de nombreux domaines. Economist donne une nouvelle visibilité aux travaux déjà réalisés et aux idées qui peuvent nous aider à mieux comprendre et faire avancer le monde.',
+    'meta[property="og:image:alt"]':'Logo EconGlobe',
+    'meta[name="twitter:title"]':'EconGlobe | Research, Ideas and Global Perspectives',
+    'meta[name="twitter:description"]':'Discover research, studies, investigations and ideas across economics, finance, politics, technology, health, society and the environment. EconGlobe makes valuable work easier to find and understand.',
     'meta[name="twitter:image"]':'https://www.econglobe.com/css/Logo.png'
   };
-  document.title='Economist | Actualités et analyse dans plusieurs domaines';
+  document.title='EconGlobe | Research, Ideas and Global Perspectives';
   Object.entries(defaults).forEach(([selector,value])=>document.querySelector(selector)?.setAttribute('content',value));
 }
 function pageFromPath(){
@@ -161,7 +161,7 @@ async function shareArticle(id){
   if(!article)return;
   const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
   const articleUrl=new URL(`/?article=${encodeURIComponent(article.id)}`,siteOrigin).href;
-  const shareData={title:article.title,text:article.deck||`Lire l’article « ${article.title} » sur Economist.`,url:articleUrl};
+  const shareData={title:article.title,text:article.deck||`Lire l’article « ${article.title} » sur EconGlobe.`,url:articleUrl};
   if(navigator.share){
     await navigator.share(shareData).catch(()=>{});
     return;

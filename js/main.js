@@ -18,7 +18,7 @@ function maybeShowOnboarding(){
 }
 function setLoadingStatus(message){
   const el=document.getElementById('loading-text');
-  if(el)el.textContent='Economist · Chargement…';
+  if(el)el.textContent='EconGlobe · Chargement…';
 }
 function waitForPageReady(){
   const fontPromise=document.fonts?.ready||Promise.resolve();

@@ -1,12 +1,12 @@
-# Economist
+# EconGlobe
 
 <p align="center">
    <a href="https://www.econglobe.com/">
-      <img src="css/Logo.png" alt="Logo du site Economist" width="220">
+      <img src="css/Logo.png" alt="Logo du site EconGlobe" width="220">
    </a>
 </p>
 
-**Economist** est une plateforme éditoriale consacrée à l'actualité, à
+**EconGlobe** est une plateforme éditoriale consacrée à l'actualité, à
 l'analyse et au partage de perspectives sur les grands enjeux contemporains.
 Elle aborde notamment l'économie, la finance, la politique, la sociologie,
 le droit, la technologie, la santé, l'écologie, l'intelligence artificielle et

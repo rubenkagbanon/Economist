@@ -175,7 +175,9 @@ const MONTH_EN = {
 };
 
 function t(key){
-  return (I18N[_lang] && I18N[_lang][key]) || (I18N.fr[key]) || key;
+  return ((I18N[_lang] && I18N[_lang][key]) || (I18N.fr[key]) || key)
+    .replace(/Economist/g,'EconGlobe')
+    .replace(/economist-vip/g,'econglobe-vip');
 }
 function tf(key, values={}){
   return t(key).replace(/\{(\w+)\}/g,(_,name)=>values[name]===undefined?`{${name}}`:values[name]);
@@ -244,17 +246,17 @@ function setLegalText(selector, translations){
 function translateLegalPages(){
   setLegalText('.help-article-kicker', ['Help Center','Help Center']);
   setLegalText('.help-back', ['Back to site','Back to site']);
-  setLegalText('.help-sidebar-label', ['Economist Help','Economist Help']);
+  setLegalText('.help-sidebar-label', ['EconGlobe Help','EconGlobe Help']);
   setLegalText('#privacy-article .help-article-kicker', ['Privacy and data']);
   setLegalText('#rules-article .help-article-kicker', ['Rules and policies']);
   setLegalText('#privacy-article > h2', ['Privacy Policy']);
   setLegalText('#rules-article > h2', ['Terms of Use']);
-  setLegalText('#privacy-article .help-article-lead', ['At Economist, we want you to understand what information is used to operate the platform, publish articles and protect your account.']);
-  setLegalText('#rules-article .help-article-lead', ['These terms explain how to use Economist, publish content and participate responsibly on the platform.']);
+  setLegalText('#privacy-article .help-article-lead', ['At EconGlobe, we want you to understand what information is used to operate the platform, publish articles and protect your account.']);
+  setLegalText('#rules-article .help-article-lead', ['These terms explain how to use EconGlobe, publish content and participate responsibly on the platform.']);
   setLegalText('.help-updated', ['Last updated: August 20, 2026','Last updated: August 20, 2026']);
   setLegalText('.help-callout strong', ['In brief','In brief']);
-  setLegalText('#privacy-article .help-callout p', ['This policy explains what information Economist receives, how it is used and what choices you have to manage your data.']);
-  setLegalText('#rules-article .help-callout p', ['Economist is an open editorial platform dedicated to showcasing and sharing works, research, studies, dissertations, discoveries and reflections across different fields. Submitted content must concern work already completed by its author and is reviewed before possible publication on the platform.', 'By using Economist, you agree to respect other users, copyrights, privacy, the accuracy of submitted information, and the platform submission and publication rules.']);
+  setLegalText('#privacy-article .help-callout p', ['This policy explains what information EconGlobe receives, how it is used and what choices you have to manage your data.']);
+  setLegalText('#rules-article .help-callout p', ['EconGlobe is an open editorial platform dedicated to showcasing and sharing works, research, studies, dissertations, discoveries and reflections across different fields. Submitted content must concern work already completed by its author and is reviewed before possible publication on the platform.', 'By using EconGlobe, you agree to respect other users, copyrights, privacy, the accuracy of submitted information, and the platform submission and publication rules.']);
   setLegalText('#privacy-article .help-sidebar a', ['Privacy Policy','Information collected','How we use information','Sharing and third-party services','Your rights','Contact']);
   setLegalText('#rules-article .help-sidebar a', ['Terms of Use','Account and access','Content and rights','Safety and moderation','Contact']);
   setLegalText('#privacy-article section h2', ['Purpose of this policy','Information collected','How we use information','Sharing and third-party services','Retention and security','Your rights','Changes to this policy','Contact us']);
