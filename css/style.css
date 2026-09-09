@@ -1,5 +1,4 @@
 *{margin:0;padding:0;box-sizing:border-box}
-@font-face{font-family:'EconomistSans';font-style:normal;font-weight:300 900;font-display:swap;src:url('https://marber-cdn.economist.com/foundations/latest/fonts/economist-sans-roman.woff2') format('woff2')}
 :root{
   --rouge:#8B0000;
   --noir:#111010;

@@ -191,12 +191,12 @@ function togglePwd(inputId, btn){
 }
 
 // ═══════════════ THEME ═══════════════
-const themeLogoSources=['css/Logo.png','css/dark logo.png'];
+const themeLogoSources=['css/Logo.png?v=20260909','css/dark logo.png?v=20260909'];
 themeLogoSources.forEach(src=>{ const img=new Image(); img.src=src; });
 
 function updateLogoForTheme(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const logoSrc=isDark ? 'css/dark logo.png' : 'css/Logo.png';
+  const logoSrc=isDark ? 'css/dark logo.png?v=20260909' : 'css/Logo.png?v=20260909';
   document.querySelectorAll('.loading-logo-image, .nav-logo-image').forEach(img=>{
     if(img.src !== new URL(logoSrc, document.baseURI).href) img.src=logoSrc;
   }); 

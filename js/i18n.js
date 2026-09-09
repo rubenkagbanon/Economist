@@ -28,7 +28,7 @@ const I18N = {
 
     admin_access:"Accès réservé à l'administrateur.", admin_btn_login:"Se connecter",
     admin_badge:"Espace administrateur", admin_members:"Membres", admin_codes:"Codes d'accès",
-    admin_new_code:"Nouveau code", admin_new_code_ph:"ex: economist-vip", admin_max:"Utilisations max",
+    admin_new_code:"Nouveau code", admin_new_code_ph:"ex: econglobe-vip", admin_max:"Utilisations max",
     admin_create:"Créer", admin_loading:"Chargement…", admin_arts:"Articles",
     admin_table_titre:"Titre", admin_table_auteur:"Auteur", admin_table_cat:"Rubrique",
     admin_table_date:"Date", admin_table_reads:"Lectures", admin_table_action:"Action",
@@ -106,7 +106,7 @@ const I18N = {
 
     admin_access:"Access restricted to the administrator.", admin_btn_login:"Log in",
     admin_badge:"Administrator area", admin_members:"Members", admin_codes:"Access codes",
-    admin_new_code:"New code", admin_new_code_ph:"e.g. economist-vip", admin_max:"Max uses",
+    admin_new_code:"New code", admin_new_code_ph:"e.g. econglobe-vip", admin_max:"Max uses",
     admin_create:"Create", admin_loading:"Loading…", admin_arts:"Articles",
     admin_table_titre:"Title", admin_table_auteur:"Author", admin_table_cat:"Category",
     admin_table_date:"Date", admin_table_reads:"Reads", admin_table_action:"Action",
