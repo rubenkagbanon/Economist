@@ -14,15 +14,18 @@ async function profileFromAuthUser(authUser){
   await loadData(true);
   let user=users.find(item=>(item.email||'').toLowerCase()===email);
   const meta=authUser.user_metadata||{};
+  const authProvider=authUser.app_metadata?.provider==='google'?'google':'supabase';
   if(!user){
     const fullName=(meta.full_name||meta.name||email.split('@')[0]).trim();
     const parts=fullName.split(/\s+/).filter(Boolean);
-    user={id:authUser.id,first:parts[0]||'Utilisateur',last:parts.slice(1).join(' ')||'',email,joined:today(),avatar:meta.avatar_url||'',bio:'',level:'',authProvider:'supabase'};
+    user={id:authUser.id,first:parts[0]||'Utilisateur',last:parts.slice(1).join(' ')||'',email,joined:today(),avatar:meta.avatar_url||'',bio:'',level:'',authProvider};
     users.push(user);
     await saveUser(user);
-  } else if(!user.id){
-    user.id=authUser.id;
-    await saveUser(user);
+  } else {
+    let changed=false;
+    if(!user.id){user.id=authUser.id;changed=true;}
+    if(user.authProvider!==authProvider){user.authProvider=authProvider;changed=true;}
+    if(changed) await saveUser(user);
   }
   currentUser=user;
   saveLocalSession(email);
@@ -126,6 +129,7 @@ async function syncGoogleUserFromSession(session){
   } else {
     let changed = false;
     if(!u.id){u.id=session.user.id;changed=true;}
+    if(u.authProvider!=='google'){u.authProvider='google';changed=true;}
     if(changed) await saveUser(u);
   }
 
