@@ -35,7 +35,7 @@ function renderAdmin(){
               <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">E-mail destinataire</label>
               <input type="email" id="manual-code-email" placeholder="personne@email.com" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:100%">
             </div>
-            <button class="btn-red" onclick="adminSendManualCode()" style="padding:10px 18px;white-space:nowrap">Générer et envoyer</button>
+            <button class="btn-red" onclick="adminSendManualCode(this)" style="padding:10px 18px;white-space:nowrap">Générer et envoyer</button>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@ function renderAdmin(){
               <label style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)">${t('admin_max')}</label>
               <input type="number" id="new-code-max" value="2" min="1" max="99" style="font-family:var(--sans);font-size:.9rem;border:.5px solid var(--gris-clair);padding:.55rem .9rem;outline:none;width:80px">
             </div>
-            <button class="btn-red" onclick="adminAddCode()" style="padding:10px 18px;white-space:nowrap">${t('admin_create')}</button>
+            <button class="btn-red" onclick="adminAddCode(this)" style="padding:10px 18px;white-space:nowrap">${t('admin_create')}</button>
           </div>
           <div id="admin-codes-list" style="font-family:var(--sans);font-size:.85rem;color:var(--txt-lite);font-style:italic">${t('admin_loading')}</div>
         </div>
@@ -116,43 +116,51 @@ async function loadAdminCodes(){
       </div>
       <div style="display:flex;gap:.5rem;align-items:center">
         ${(v.used||0)>=(v.max||2)?'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-pale)">Épuisé</span>':'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a9a5a">Actif</span>'}
-        <button class="btn-danger" onclick="adminDeleteCode('${k}')">✕</button>
+        <button class="btn-danger" onclick="adminDeleteCode('${k}',this)">✕</button>
       </div>
     </div>`).join('');
   el.innerHTML=rows||'<span>Aucun code actif.</span>';el.style.fontStyle='normal';
 }
 
-async function adminAddCode(){
+async function adminAddCode(button){
+  if(button?.disabled)return;
+  if(button)button.disabled=true;
   const val=document.getElementById('new-code-val').value.trim();
   const max=parseInt(document.getElementById('new-code-max').value)||2;
-  if(!val){showToast(t('toast_enter_code'));return;}
+  if(!val){if(button)button.disabled=false;showToast(t('toast_enter_code'));return;}
   const key=val.replace(/[^a-zA-Z0-9]/g,'_');
   const existing=await dbGet(`${ONE_TIME_CODES_PATH}/${key}`);
-  if(existing){showToast(t('toast_code_exists'));return;}
+  if(existing){if(button)button.disabled=false;showToast(t('toast_code_exists'));return;}
   await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code:val,max,used:0});
   document.getElementById('new-code-val').value='';
   showToast(tf('toast_code_created',{code:val,max}));
+  if(button)button.disabled=false;
   loadAdminCodes();
 }
 
-async function adminDeleteCode(key){
+async function adminDeleteCode(key,button){
+  if(button?.disabled)return;
   if(!confirm(t('confirm_delete_code')))return;
+  if(button)button.disabled=true;
   await dbDelete(`${ONE_TIME_CODES_PATH}/${key}`);
   showToast(t('toast_del_code'));
   loadAdminCodes();
 }
 
 // Génère un code, l'enregistre comme code à usage unique et l'envoie par e-mail
-async function adminSendManualCode(){
+async function adminSendManualCode(button){
+  if(button?.disabled)return;
   const emailEl=document.getElementById('manual-code-email');
   const email=emailEl.value.trim().toLowerCase();
   if(!email){showToast(t('toast_enter_email'));return;}
+  if(button)button.disabled=true;
   const code=genVerifCode();
   const key=code;
   await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email,lang:_lang});
   const sent=await emailSendVerificationCode(email,'',code,'access',_lang);
   showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   emailEl.value='';
+  if(button)button.disabled=false;
   loadAdminCodes();
 }
 
@@ -177,7 +185,7 @@ async function loadAdminProposals(){
       <div style="font-family:var(--sans);font-size:.85rem;color:var(--txt-soft);line-height:1.6;margin-bottom:.8rem">${p.subj||''}</div>
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
         ${p.status==='sent'?'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a9a5a">Code envoyé</span>':`<button class="btn-red" style="padding:6px 14px;font-size:9.5px" onclick="adminApproveProposal('${id}','${p.email}','${p.first}',this)">Envoyer un code d'accès</button>`}
-        <button class="btn-danger" onclick="adminDeleteProposal('${id}')">Supprimer</button>
+        <button class="btn-danger" onclick="adminDeleteProposal('${id}',this)">Supprimer</button>
       </div>
     </div>`).join('');
 }
@@ -226,11 +234,14 @@ async function adminApproveProposal(id,email,firstName,button){
   showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   loadAdminProposals();loadAdminCodes();
 }
-async function adminDeleteProposal(id){
+async function adminDeleteProposal(id,button){
+  if(button?.disabled)return;
   if(!confirm(t('confirm_delete_proposal')))return;
+  if(button)button.disabled=true;
   const proposal=await dbGet(`proposals/${id}`);
   const deleteError=await dbDelete(`proposals/${id}`);
-  if(deleteError){showToast(t('toast_delete_error'));return;}
+  if(deleteError){if(button)button.disabled=false;showToast(t('toast_delete_error'));return;}
+  button?.closest('[style*="border"]')?.remove();
   await emailNotifyProposalRejected(proposal,proposal?.lang||_lang);
   loadAdminProposals();
 }
