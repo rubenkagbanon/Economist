@@ -149,6 +149,20 @@ async function emailNotifyArticleDecision(article, approved){
   return sendEmail({to_email:toEmail,subject,from_name:'EconGlobe',reply_to:OWNER_EMAIL,message,message_html:messageHtml,logo_url:EMAIL_LOGO_URL});
 }
 
+async function emailNotifyProposalRejected(proposal, lang='fr'){
+  const toEmail=(proposal?.email||'').trim();
+  if(!toEmail)return false;
+  const english=lang==='en';
+  const firstName=proposal.first||'';
+  const subject=english?'Your proposal was not selected':'Votre proposition n’a pas été retenue';
+  const message=english
+    ? `Hello ${firstName},\n\nThank you for your proposal “${proposal.subj||''}”. After review, it was not selected for publication on EconGlobe.\n\nThank you for your interest.`
+    : `Bonjour ${firstName},\n\nMerci pour votre proposition « ${proposal.subj||''} ». Après examen, elle n’a pas été retenue pour publication sur EconGlobe.\n\nMerci pour votre intérêt.`;
+  const messageHtml=message.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+
+    `<br><br><img src="${EMAIL_LOGO_URL}" alt="EconGlobe" style="width:96px;height:auto;display:block">`;
+  return sendEmail({to_email:toEmail,subject,from_name:'EconGlobe',reply_to:OWNER_EMAIL,message,message_html:messageHtml,logo_url:EMAIL_LOGO_URL});
+}
+
 // ═══════════════ BIENVENUE (nouvelle inscription) ═══════════════
 async function emailSendWelcome(toEmail, toFirstName){
   const message =

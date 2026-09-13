@@ -228,7 +228,10 @@ async function adminApproveProposal(id,email,firstName,button){
 }
 async function adminDeleteProposal(id){
   if(!confirm(t('confirm_delete_proposal')))return;
-  await dbDelete(`proposals/${id}`);
+  const proposal=await dbGet(`proposals/${id}`);
+  const deleteError=await dbDelete(`proposals/${id}`);
+  if(deleteError){showToast(t('toast_delete_error'));return;}
+  await emailNotifyProposalRejected(proposal,proposal?.lang||_lang);
   loadAdminProposals();
 }
 
