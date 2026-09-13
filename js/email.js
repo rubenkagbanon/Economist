@@ -18,9 +18,9 @@
 // 4. "Account" → "General" → copiez votre PUBLIC_KEY
 // 5. Remplacez les 3 valeurs ci-dessous.
 // ────────────────────────────────────────────────────────────
-const EMAILJS_PUBLIC_KEY  = "VWz1Tmbj4CndEFo9U";    
-const EMAILJS_SERVICE_ID  = "service_3r94wdl";     
-const EMAILJS_TEMPLATE_ID = "template_o52gu3d";    
+const EMAILJS_PUBLIC_KEY  = "zu0PX9OrQ2n7gqnlB";    
+const EMAILJS_SERVICE_ID  = "service_econglobe";     
+const EMAILJS_TEMPLATE_ID = "template_v59ndul";    
 const EMAIL_LOGO_URL = "https://www.econglobe.com/css/Logo.png";
 
 let _emailjsReady = false;
