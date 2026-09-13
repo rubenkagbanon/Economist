@@ -176,19 +176,53 @@ async function loadAdminProposals(){
       </div>
       <div style="font-family:var(--sans);font-size:.85rem;color:var(--txt-soft);line-height:1.6;margin-bottom:.8rem">${p.subj||''}</div>
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
-        ${p.status==='sent'?'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a9a5a">Code envoyé</span>':`<button class="btn-red" style="padding:6px 14px;font-size:9.5px" onclick="adminApproveProposal('${id}','${p.email}','${p.first}')">Envoyer un code d'accès</button>`}
+        ${p.status==='sent'?'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a9a5a">Code envoyé</span>':`<button class="btn-red" style="padding:6px 14px;font-size:9.5px" onclick="adminApproveProposal('${id}','${p.email}','${p.first}',this)">Envoyer un code d'accès</button>`}
         <button class="btn-danger" onclick="adminDeleteProposal('${id}')">Supprimer</button>
       </div>
     </div>`).join('');
 }
 
-async function adminApproveProposal(id,email,firstName){
-  const code=genVerifCode();
+const proposalApprovalsInFlight=new Set();
+
+async function adminApproveProposal(id,email,firstName,button){
+  if(proposalApprovalsInFlight.has(id))return;
+  proposalApprovalsInFlight.add(id);
+  if(button){button.disabled=true;button.textContent='Envoi…';}
   const prop=await dbGet(`proposals/${id}`);
+  if(!prop||prop.status==='sent'){
+    proposalApprovalsInFlight.delete(id);
+    loadAdminProposals();
+    return;
+  }
   const lang=prop?.lang||'fr';
-  await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:email,lang});
+  const normalizedEmail=email.trim().toLowerCase();
+  const codes=await dbGet(ONE_TIME_CODES_PATH)||{};
+  const activeCode=Object.values(codes).find(entry=>
+    entry?.forEmail?.trim().toLowerCase()===normalizedEmail && (entry.used||0)<(entry.max||1)
+  );
+  if(activeCode){
+    await dbDelete(`proposals/${id}`);
+    proposalApprovalsInFlight.delete(id);
+    showToast(tf('toast_code_active',{email:normalizedEmail}));
+    loadAdminProposals();
+    return;
+  }
+  let code=genVerifCode();
+  while(codes[code])code=genVerifCode();
+  const codeError=await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:normalizedEmail,lang});
+  if(codeError){
+    proposalApprovalsInFlight.delete(id);
+    if(button){button.disabled=false;button.textContent="Envoyer un code d'accès";}
+    showToast(t('toast_code_not_configured'));
+    return;
+  }
   const sent=await emailSendVerificationCode(email,firstName,code,'access',lang);
-  await dbSet(`proposals/${id}`,{...prop,status:'sent'});
+  if(sent){
+    await dbDelete(`proposals/${id}`);
+  }else{
+    await dbDelete(`${ONE_TIME_CODES_PATH}/${code}`);
+  }
+  proposalApprovalsInFlight.delete(id);
   showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
   loadAdminProposals();loadAdminCodes();
 }
