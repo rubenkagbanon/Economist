@@ -215,3 +215,26 @@ function avHtml(u,size=28){
 function genVerifCode(){
   return String(Math.floor(100000 + Math.random()*900000));
 }
+
+function normalizeAccessCodeEntries(codes){
+  const out = {};
+  if (!codes || typeof codes !== 'object' || Array.isArray(codes)) return out;
+
+  if (Object.prototype.hasOwnProperty.call(codes, 'code') &&
+      (Object.prototype.hasOwnProperty.call(codes, 'max') ||
+       Object.prototype.hasOwnProperty.call(codes, 'used') ||
+       Object.prototype.hasOwnProperty.call(codes, 'forEmail'))) {
+    const codeValue = String(codes.code ?? '').trim();
+    if (codeValue) out[codeValue] = codes;
+    return out;
+  }
+
+  Object.entries(codes).forEach(([key, value]) => {
+    if (!value || typeof value !== 'object') return;
+    const codeValue = String(value.code ?? key ?? '').trim();
+    if (!codeValue) return;
+    out[codeValue] = value;
+  });
+
+  return out;
+}

@@ -205,7 +205,8 @@ async function adminApproveProposal(id,email,firstName,button){
   const lang=prop?.lang||'fr';
   const normalizedEmail=email.trim().toLowerCase();
   const codes=await dbGet(ONE_TIME_CODES_PATH)||{};
-  const activeCode=Object.values(codes).find(entry=>
+  const codeMap=normalizeAccessCodeEntries(codes);
+  const activeCode=Object.values(codeMap).find(entry=>
     entry?.forEmail?.trim().toLowerCase()===normalizedEmail && (entry.used||0)<(entry.max||1)
   );
   if(activeCode){
@@ -216,7 +217,7 @@ async function adminApproveProposal(id,email,firstName,button){
     return;
   }
   let code=genVerifCode();
-  while(codes[code])code=genVerifCode();
+  while(codeMap[code])code=genVerifCode();
   const codeError=await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:normalizedEmail,lang});
   if(codeError){
     proposalApprovalsInFlight.delete(id);

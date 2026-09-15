@@ -246,19 +246,12 @@ async function checkCode(){
   if(!val){ errEl.textContent=t('toast_enter_code'); errEl.style.display='block'; return; }
 
   const codes = await dbGet(ONE_TIME_CODES_PATH);
-  let entry = null;
-  if(codes && typeof codes === 'object' && !Array.isArray(codes)){
-    if(codes.code !== undefined){
-      if(codes.code === val){ entry = codes; }
-    } else {
-      for(const [k,v] of Object.entries(codes)){
-        if(v && v.code === val){ entry = v; break; }
-      }
-    }
-  }
+  const normalizedCodes = normalizeAccessCodeEntries(codes);
+  const entry = normalizedCodes[String(val).trim()];
 
   if(!entry){
-    errEl.textContent=t('code_invalid'); errEl.style.display='block';
+    errEl.textContent=t('code_invalid');
+    errEl.style.display='block';
     return;
   }
 
@@ -269,13 +262,14 @@ async function checkCode(){
   }
 
   if((entry.used||0) >= (entry.max||2)){
-    errEl.textContent=t('code_exhausted'); errEl.style.display='block';
+    errEl.textContent=t('code_exhausted');
+    errEl.style.display='block';
     return;
   }
 
   const { data: consumeResult, error: consumeError } = await _sb.rpc('consume_access_code', { p_code: val });
   if(consumeError || !consumeResult?.ok){
-    errEl.textContent=consumeResult?.error||consumeError?.message||t('toast_save_error');
+    errEl.textContent=consumeResult?.error || consumeError?.message || t('code_invalid');
     errEl.style.display='block';
     return;
   }
