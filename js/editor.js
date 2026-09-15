@@ -245,6 +245,12 @@ async function checkCode(){
   errEl.style.display='none';
   if(!val){ errEl.textContent=t('toast_enter_code'); errEl.style.display='block'; return; }
 
+  if(!currentUser || !currentUser.email){
+    errEl.textContent=t('session_permission');
+    errEl.style.display='block';
+    return;
+  }
+
   const codes = await dbGet(ONE_TIME_CODES_PATH);
   const normalizedCodes = normalizeAccessCodeEntries(codes);
   const entry = normalizedCodes[String(val).trim()];
@@ -269,7 +275,15 @@ async function checkCode(){
 
   const { data: consumeResult, error: consumeError } = await _sb.rpc('consume_access_code', { p_code: val });
   if(consumeError || !consumeResult?.ok){
-    errEl.textContent=consumeResult?.error || consumeError?.message || t('code_invalid');
+    const msg = String(consumeResult?.error || consumeError?.message || '');
+    const lower = msg.toLowerCase();
+    if (lower.includes('unauthorized') || lower.includes('permission denied') || lower.includes('jwt') || lower.includes('session')) {
+      errEl.textContent = t('session_permission');
+    } else if (lower.includes('expired') || lower.includes('invalid code') || lower.includes('not assigned')) {
+      errEl.textContent = t('code_expired');
+    } else {
+      errEl.textContent = t('code_invalid');
+    }
     errEl.style.display='block';
     return;
   }

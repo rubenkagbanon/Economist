@@ -238,3 +238,17 @@ function normalizeAccessCodeEntries(codes){
 
   return out;
 }
+
+function buildAccessCodeRecord({ code, max = 1, used = 0, forEmail = null, source = 'manual', proposalId = null, lang = 'fr' }) {
+  const entry = {
+    code: String(code || '').trim(),
+    max: Number(max) || 1,
+    used: Number(used) || 0,
+    source: String(source || 'manual'),
+    lang: String(lang || 'fr'),
+    createdAt: Date.now()
+  };
+  if (forEmail && String(forEmail).trim()) entry.forEmail = String(forEmail).trim().toLowerCase();
+  if (proposalId) entry.proposalId = String(proposalId);
+  return entry;
+}

@@ -125,26 +125,41 @@ async function loadAdminCodes(){
 async function adminAddCode(button){
   if(button?.disabled)return;
   if(button)button.disabled=true;
-  const val=document.getElementById('new-code-val').value.trim();
-  const max=parseInt(document.getElementById('new-code-max').value)||2;
-  if(!val){if(button)button.disabled=false;showToast(t('toast_enter_code'));return;}
-  const key=val.replace(/[^a-zA-Z0-9]/g,'_');
-  const existing=await dbGet(`${ONE_TIME_CODES_PATH}/${key}`);
-  if(existing){if(button)button.disabled=false;showToast(t('toast_code_exists'));return;}
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code:val,max,used:0});
-  document.getElementById('new-code-val').value='';
-  showToast(tf('toast_code_created',{code:val,max}));
-  if(button)button.disabled=false;
-  loadAdminCodes();
+  try{
+    const val=document.getElementById('new-code-val').value.trim();
+    const max=parseInt(document.getElementById('new-code-max').value)||2;
+    if(!val){showToast(t('toast_enter_code'));return;}
+    const key=val.replace(/[^a-zA-Z0-9]/g,'_');
+    const existing=await dbGet(`${ONE_TIME_CODES_PATH}/${key}`);
+    if(existing){showToast(t('toast_code_exists'));return;}
+    await dbSet(`${ONE_TIME_CODES_PATH}/${key}`, buildAccessCodeRecord({
+      code: val,
+      max,
+      used: 0,
+      forEmail: null,
+      source: 'global',
+      proposalId: null,
+      lang: _lang
+    }));
+    document.getElementById('new-code-val').value='';
+    showToast(tf('toast_code_created',{code:val,max}));
+    loadAdminCodes();
+  } finally {
+    if(button)button.disabled=false;
+  }
 }
 
 async function adminDeleteCode(key,button){
   if(button?.disabled)return;
   if(!confirm(t('confirm_delete_code')))return;
   if(button)button.disabled=true;
-  await dbDelete(`${ONE_TIME_CODES_PATH}/${key}`);
-  showToast(t('toast_del_code'));
-  loadAdminCodes();
+  try{
+    await dbDelete(`${ONE_TIME_CODES_PATH}/${key}`);
+    showToast(t('toast_del_code'));
+    loadAdminCodes();
+  } finally {
+    if(button)button.disabled=false;
+  }
 }
 
 // Génère un code, l'enregistre comme code à usage unique et l'envoie par e-mail
@@ -154,14 +169,24 @@ async function adminSendManualCode(button){
   const email=emailEl.value.trim().toLowerCase();
   if(!email){showToast(t('toast_enter_email'));return;}
   if(button)button.disabled=true;
-  const code=genVerifCode();
-  const key=code;
-  await dbSet(`${ONE_TIME_CODES_PATH}/${key}`,{code,max:1,used:0,forEmail:email,lang:_lang});
-  const sent=await emailSendVerificationCode(email,'',code,'access',_lang);
-  showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
-  emailEl.value='';
-  if(button)button.disabled=false;
-  loadAdminCodes();
+  try{
+    const code=genVerifCode();
+    await dbSet(`${ONE_TIME_CODES_PATH}/${code}`, buildAccessCodeRecord({
+      code,
+      max: 1,
+      used: 0,
+      forEmail: email,
+      source: 'manual',
+      proposalId: null,
+      lang: _lang
+    }));
+    const sent=await emailSendVerificationCode(email,'',code,'access',_lang);
+    showToast(sent?tf('toast_code_sent',{email}):tf('toast_code_not_configured',{code}));
+    emailEl.value='';
+    loadAdminCodes();
+  } finally {
+    if(button)button.disabled=false;
+  }
 }
 
 // ═══════════════ PROPOSITIONS D'ARTICLES ═══════════════
@@ -218,7 +243,16 @@ async function adminApproveProposal(id,email,firstName,button){
   }
   let code=genVerifCode();
   while(codeMap[code])code=genVerifCode();
-  const codeError=await dbSet(`${ONE_TIME_CODES_PATH}/${code}`,{code,max:1,used:0,forEmail:normalizedEmail,lang});
+  const codeRecord = buildAccessCodeRecord({
+    code,
+    max: 1,
+    used: 0,
+    forEmail: normalizedEmail,
+    source: 'proposal',
+    proposalId: id,
+    lang
+  });
+  const codeError=await dbSet(`${ONE_TIME_CODES_PATH}/${code}`, codeRecord);
   if(codeError){
     proposalApprovalsInFlight.delete(id);
     if(button){button.disabled=false;button.textContent="Envoyer un code d'accès";}
