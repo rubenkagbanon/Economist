@@ -50,11 +50,11 @@ function writeDataCache(){
   try{ localStorage.setItem(DATA_CACHE_KEY,JSON.stringify({savedAt:Date.now(),articles,users})); }catch(e){}
 }
 async function fetchData(){
-  const articlesQuery=_sb.from('articles').select('*').order('id');
+  const articlesQuery=_sb.from('articles').select('id, owner_id, title, deck, cat, author, img, body, body_html, date, reads, status, lang').order('id');
   if(!isOwner())articlesQuery.or('status.eq.published,status.is.null');
   const [{data:articleRows,error:articleError},{data:userRows,error:userError}]=await Promise.all([
     articlesQuery,
-    _sb.from('profiles').select('*')
+    _sb.from('profiles').select('id, email, first, last, joined, avatar, bio, level, auth_provider')
   ]);
   if(articleError||userError)throw articleError||userError;
   const arts={},usrs={};
@@ -69,7 +69,7 @@ async function dbGet(path) {
   const { data: row, error } = await _sb.from(KV_TABLE).select('value').eq('path', path).maybeSingle();
   if (error) { console.error('dbGet', path, error); return null; }
   if (row) return row.value;
-  const { data: rows, error: err2 } = await _sb.from(KV_TABLE).select('path,value').like('path', `${path}/%`);
+  const { data: rows, error: err2 } = await _sb.from(KV_TABLE).select('path,value').like('path', `${path}/%`).limit(200);
   if (err2) { console.error('dbGet', path, err2); return null; }
   if (!rows || !rows.length) return null;
   const out = {};
@@ -198,10 +198,11 @@ function clearLocalSession()     { try{localStorage.removeItem('eco_email');}cat
 // ═══════════════ HELPERS ═══════════════
 function today(){ const d=new Date(); return `${d.getDate()} ${MM[d.getMonth()]} ${d.getFullYear()}`; }
 function readTime(body){ const w=(body||'').trim().split(/\s+/).length; return `${Math.max(1,Math.round(w/200))} min`; }
+function isOwnerEmail(email){
+  return !!email && String(email).trim().toLowerCase()===OWNER_EMAIL.toLowerCase();
+}
 function isOwner(){
-  return currentUser &&
-    currentUser.email.toLowerCase()===OWNER_EMAIL.toLowerCase() &&
-    currentUser.authProvider==='google';
+  return !!currentUser && isOwnerEmail(currentUser.email);
 }
 function showToast(msg,dur=3200){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
