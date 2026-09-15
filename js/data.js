@@ -212,6 +212,28 @@ function avHtml(u,size=28){
   if(u&&u.avatar) return `<img src="${u.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rouge)">`;
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:${size*0.4}px;color:white;flex-shrink:0">${((u&&u.first?u.first[0]:'')+((u&&u.last?u.last[0]:'')||'')).toUpperCase()||'?'}</div>`;
 }
+
+function optimizeImageUrl(url, { maxWidth = 1600, quality = 80 } = {}) {
+  if (!url || typeof url !== 'string') return url;
+  const trimmed = url.trim();
+  if (!trimmed || !/^https?:\/\//i.test(trimmed)) return trimmed;
+
+  try {
+    const u = new URL(trimmed);
+    if (u.searchParams.has('width') || u.searchParams.has('quality')) return trimmed;
+    u.searchParams.set('width', String(maxWidth));
+    u.searchParams.set('quality', String(quality));
+    return u.toString();
+  } catch (error) {
+    return trimmed;
+  }
+}
+
+function imageAttrs(url, { maxWidth = 1600, quality = 80, sizes = '(max-width: 768px) 100vw, 50vw', loading = 'lazy', fetchPriority = 'auto' } = {}) {
+  const src = optimizeImageUrl(url, { maxWidth, quality });
+  return `src="${src}" srcset="${src} 1x" sizes="${sizes}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}"`;
+}
+
 // Génère un code numérique à 6 chiffres (codes de vérification par e-mail)
 function genVerifCode(){
   return String(Math.floor(100000 + Math.random()*900000));
