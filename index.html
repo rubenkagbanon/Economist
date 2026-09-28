@@ -245,11 +245,16 @@
     <div class="m-row"><label>Nom</label><input type="text" id="edit-last" autocomplete="family-name" maxlength="80"></div>
     <div class="m-row"><label>Bio</label><textarea id="edit-bio" placeholder="Quelques mots sur vous…" style="min-height:80px"></textarea></div>
     <fieldset class="profile-level-fieldset">
-      <legend data-i18n="profile_level">Niveau d’études</legend>
+      <legend data-i18n="profile_level">Profil / affiliation</legend>
       <label class="profile-level-option"><input type="radio" name="profile-level" value="licence" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-green"></span><span data-i18n="level_licence">Licence</span></label>
       <label class="profile-level-option"><input type="radio" name="profile-level" value="master" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-blue"></span><span data-i18n="level_master">Master</span></label>
       <label class="profile-level-option"><input type="radio" name="profile-level" value="doctorat" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-purple"></span><span data-i18n="level_doctorat">Doctorat / PhD</span></label>
       <label class="profile-level-option"><input type="radio" name="profile-level" value="professor" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-copper"></span><span data-i18n="level_professor">Professor</span></label>
+      <div class="profile-level-group" data-i18n="profile_org_types">Type d’organisation</div>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="magazine" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-teal"></span><span data-i18n="level_magazine">Média / magazine</span></label>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="firm" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-gold"></span><span data-i18n="level_firm">Entreprise</span></label>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="institution" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-slate"></span><span data-i18n="level_institution">Institution</span></label>
+      <label class="profile-level-option"><input type="radio" name="profile-level" value="association" onchange="updateEditAvatarLevel(this.value)"><span class="level-dot level-dot-forest"></span><span data-i18n="level_association">Association / ONG</span></label>
     </fieldset>
     <button class="btn-modal" onclick="saveProfileEdit()">Enregistrer</button>
   </div>

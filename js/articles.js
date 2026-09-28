@@ -128,7 +128,7 @@ function profileSlug(user){
     .toLowerCase().replace(/[^a-z0-9]/g,'');
 }
 function profileLevelClass(level){
-  return ['licence','master','doctorat','professor'].includes(level)?` profile-level-${level}`:'';
+  return ['licence','master','doctorat','professor','magazine','firm','institution','association'].includes(level)?` profile-level-${level}`:'';
 }
 function profileEmailFromPath(){
   const path=window.location.pathname.replace(/^\/+|\/+$/g,'');
@@ -319,6 +319,7 @@ function openProfile(email){
   const userArticles=articles.filter(article=>articleBelongsToUser(article,u)).reverse();
   const isMe=currentUser&&currentUser.email===email;
   const avatarClass=profileLevelClass(u.level);
+  const profileType=['licence','master','doctorat','professor','magazine','firm','institution','association'].includes(u.level)?t(`level_${u.level}`):'';
   const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img ${imageAttrs(u.avatar,{maxWidth:400,sizes:'72px'})} alt="${u.first}"></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;
   const profileMetaPrefix = _lang === 'en' ? 'Member since' : 'Membre depuis le';
   const profileMetaSuffix = userArticles.length
@@ -331,6 +332,7 @@ function openProfile(email){
         <div class="profile-name">${u.first} ${u.last}</div>
         <div class="profile-meta">${profileMetaPrefix} ${tDate(u.joined)||'—'}${profileMetaSuffix}</div>
         ${u.bio?`<div class="profile-bio">${u.bio}</div>`:''}
+        ${profileType?`<div class="profile-badge profile-type-badge profile-type-${u.level}">${profileType}</div>`:''}
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
         <div class="profile-actions">
           ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}

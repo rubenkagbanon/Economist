@@ -274,8 +274,8 @@ function handleAvatarUpload(e){
 function updateEditAvatarLevel(level){
   const preview=document.getElementById('edit-avatar-preview');
   if(!preview)return;
-  preview.classList.remove('profile-level-licence','profile-level-master','profile-level-doctorat','profile-level-professor');
-  if(level)preview.classList.add(`profile-level-${level}`);
+  preview.classList.remove('profile-level-licence','profile-level-master','profile-level-doctorat','profile-level-professor','profile-level-magazine','profile-level-firm','profile-level-institution','profile-level-association');
+  if(['licence','master','doctorat','professor','magazine','firm','institution','association'].includes(level))preview.classList.add(`profile-level-${level}`);
 }
 async function saveProfileEdit(){
   if(!currentUser)return;
