@@ -68,7 +68,7 @@ async function init(){
   renderNav();
   renderHome(currentActiveCat);
 
-  const sharedArticleId=new URLSearchParams(window.location.search).get('article');
+  const sharedArticleId=articleIdFromPath()||new URLSearchParams(window.location.search).get('article');
   if(sharedArticleId){
     const sharedArticle=articles.find(article=>String(article.id)===sharedArticleId);
     if(sharedArticle)openArticle(sharedArticle.id);
@@ -83,7 +83,7 @@ async function init(){
 
   try{
     const savedPage=localStorage.getItem('eco_page');
-    if(!routePage && savedPage && !['home','privacy','rules','profile'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
+    if(!routePage && !sharedArticleId && savedPage && !['home','privacy','rules','profile'].includes(savedPage) && document.getElementById('page-'+savedPage)) showPage(savedPage);
   }catch(e){}
 
   setLoadingStatus('Chargement des images et des polices…');

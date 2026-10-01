@@ -234,7 +234,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .sec-name{font-family:var(--sans);font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:500}
 .grid-articles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:3rem 2.5rem}
 .art-card{cursor:pointer;display:flex;flex-direction:column;border-bottom:.5px solid var(--gris-clair);padding-bottom:1.5rem;overflow:hidden;}
-.art-card:hover .art-title{color:var(--rouge)}
+.art-card:hover .art-title-link{color:inherit;text-decoration:none}
+.art-title{color:var(--rouge)}
 .art-card:hover .art-thumb-img{transform:scale(1.03)}
 .art-thumb{width:100%;aspect-ratio:3/2;overflow:hidden;position:relative;background:#f0f0f0;}
 .art-thumb-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease;}

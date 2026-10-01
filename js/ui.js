@@ -201,7 +201,7 @@ function updateLogoForTheme(){
     if(img.src !== new URL(logoSrc, document.baseURI).href) img.src=logoSrc;
   }); 
   const favicon=document.getElementById('site-favicon');
-  if(favicon) favicon.href=logoSrc;
+  if(favicon) favicon.href=isDark ? logoSrc : '/favicon-192.png';
   updateThemeToggle(isDark);
 }
 
@@ -249,3 +249,14 @@ function closeOnboard(){
     try{ localStorage.setItem('eco_onboard_dismissed','1'); }catch(e){}
   }
 }
+
+// Les pages statiques (/article/…, /profil/, 404) utilisent <base href="/"> :
+// sans ceci, un lien "#section" renverrait vers l'accueil au lieu de défiler.
+document.addEventListener('click',event=>{
+  const link=event.target.closest?.('a[href^="#"]');
+  if(!link)return;
+  const target=document.getElementById(decodeURIComponent(link.getAttribute('href').slice(1)));
+  if(!target)return;
+  event.preventDefault();
+  target.scrollIntoView({behavior:'smooth',block:'start'});
+});

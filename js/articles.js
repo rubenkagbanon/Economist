@@ -6,6 +6,7 @@
 let activeReadArticleId=null;
 let activeReadTimer=null;
 let currentProfileEmail=null;
+let currentArticleRoute=null;
 
 function cancelArticleRead(){
   if(activeReadTimer)clearTimeout(activeReadTimer);
@@ -58,10 +59,10 @@ function showPage(name){
     : name==='privacy'
       ? 'EconGlobe | Politique de confidentialité'
       : 'EconGlobe | Actualités et analyse dans plusieurs domaines';
-  if(name!=='profile') resetProfileShareMetadata();
+  if(name!=='profile'&&name!=='article') resetProfileShareMetadata();
   document.body.classList.toggle('legal-view', name==='rules' || name==='privacy');
   const currentPath=window.location.pathname.replace(/\/+$/,'')||'/';
-  const route=name==='privacy'?'/?page=privacy':name==='rules'?'/?page=rules':name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
+  const route=name==='privacy'?'/?page=privacy':name==='rules'?'/?page=rules':name==='article'&&currentArticleRoute?currentArticleRoute:name==='profile'&&currentPath!=='/'?`${currentPath}/`:'/';
   const currentUrl=window.location.pathname+window.location.search;
   if(window.location.protocol!=='file:' && currentUrl!==route){
     try{ window.history.pushState({page:name},'',route); }catch(e){}
@@ -97,6 +98,26 @@ function setProfileShareMetadata(user){
   document.querySelector('meta[name="twitter:title"]')?.setAttribute('content',title);
   document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',description);
   document.querySelector('meta[name="twitter:image"]')?.setAttribute('content',image);
+  setCanonicalUrl(window.location.pathname);
+}
+function setCanonicalUrl(path){
+  const url=new URL(path,'https://www.econglobe.com').href;
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href',url);
+  document.querySelector('meta[property="og:url"]')?.setAttribute('content',url);
+}
+function setArticleShareMetadata(article){
+  const description=article.deck||`Lire l’article « ${article.title} » sur EconGlobe.`;
+  const image=article.img&&!String(article.img).startsWith('data:')?article.img:'https://www.econglobe.com/css/Logo.png';
+  document.title=`${article.title} | EconGlobe`;
+  document.querySelector('meta[name="description"]')?.setAttribute('content',description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content',article.title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content',description);
+  document.querySelector('meta[property="og:image"]')?.setAttribute('content',image);
+  document.querySelector('meta[property="og:image:alt"]')?.setAttribute('content',article.title);
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute('content',article.title);
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',description);
+  document.querySelector('meta[name="twitter:image"]')?.setAttribute('content',image);
+  setCanonicalUrl(articlePath(article));
 }
 function resetProfileShareMetadata(){
   const defaults={
@@ -111,6 +132,7 @@ function resetProfileShareMetadata(){
   };
   document.title='EconGlobe | Research, Ideas and Global Perspectives';
   Object.entries(defaults).forEach(([selector,value])=>document.querySelector(selector)?.setAttribute('content',value));
+  setCanonicalUrl('/');
 }
 function pageFromPath(){
   const requestedPage=new URLSearchParams(window.location.search).get('page');
@@ -119,6 +141,7 @@ function pageFromPath(){
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';
   if(path==='/terms')return 'rules';
+  if(path.startsWith('/article/'))return null;
   if(path!=='/')return 'profile';
   return null;
 }
@@ -132,7 +155,7 @@ function profileLevelClass(level){
 }
 function profileEmailFromPath(){
   const path=window.location.pathname.replace(/^\/+|\/+$/g,'');
-  if(!path||path==='privacy'||path==='terms')return null;
+  if(!path||path==='privacy'||path==='terms'||path.startsWith('article/'))return null;
   const user=users.find(u=>profileSlug(u)===path.toLowerCase());
   return user?.email||null;
 }
@@ -169,7 +192,7 @@ async function shareArticle(id){
   const article=articles.find(item=>item.id===id);
   if(!article)return;
   const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
-  const articleUrl=new URL(`/?article=${encodeURIComponent(article.id)}`,siteOrigin).href;
+  const articleUrl=new URL(articlePath(article),siteOrigin).href;
   const shareData={title:article.title,text:article.deck||`Lire l’article « ${article.title} » sur EconGlobe.`,url:articleUrl};
   if(navigator.share){
     await navigator.share(shareData).catch(()=>{});
@@ -191,6 +214,9 @@ function filterPrivacy(query){
   });
 }
 window.addEventListener('popstate',()=>{
+  const articleId=articleIdFromPath();
+  const article=articleId&&articles.find(item=>String(item.id)===articleId);
+  if(article){ openArticle(article.id); return; }
   const page=pageFromPath();
   if(page)showPage(page); else showPage('home');
 });
@@ -214,7 +240,7 @@ function artCardHtml(a){
   return `<div class="art-card" onclick="openArticle(${a.id})">
     <div class="art-thumb">${a.img?`<img class="art-thumb-img" ${imageAttrs(a.img,{maxWidth:800,sizes:'(max-width: 768px) 100vw, 33vw'})} alt="" onerror="this.parentNode.innerHTML='<div class=art-thumb-empty></div>'">`:`<div class="art-thumb-empty"></div>`}</div>
     <div class="art-card-body">
-      <div class="art-k">${tCat(a.cat)}</div><div class="art-title">${a.title}</div>
+      <div class="art-k">${tCat(a.cat)}</div><div class="art-title"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${a.title}</a></div>
       <div class="art-excerpt">${a.deck}</div>
       <div class="art-foot"><span>${a.author}</span><span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)}</span></div>
     </div></div>`;
@@ -239,7 +265,7 @@ function renderHome(cat){
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
         ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img ${imageAttrs(hero.img,{maxWidth:1200,loading:'eager',fetchPriority:'high',sizes:'100vw'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
         <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${tCat(hero.cat)}</div>
-        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem">${hero.title}</h1>
+        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${hero.title}</a></h1>
         <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${hero.deck}</p>
         <div style="display:flex;flex-wrap:wrap;gap:.6rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
       </div></div>
@@ -250,7 +276,7 @@ function renderHome(cat){
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
           ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img ${imageAttrs(hero.img,{maxWidth:1500,loading:'eager',fetchPriority:'high',sizes:'100vw'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${tCat(hero.cat)}</div>
-          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem">${hero.title}</h1>
+          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${hero.title}</a></h1>
           <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${hero.deck}</p>
           <div style="display:flex;align-items:center;gap:1rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
         </div>
@@ -292,7 +318,10 @@ async function openArticle(id,fromPage='home'){
     </div>
     ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw'})} alt="" onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${tCat(a.cat)} — ${tDate(a.date)}</div>`:''}
     <div class="art-full-body">${bodyContent}</div>`;
+  currentArticleRoute=articlePath(a);
   showPage('article');
+  currentArticleRoute=null;
+  setArticleShareMetadata(a);
   if(backPage==='home')scheduleArticleRead(id);
 }
 

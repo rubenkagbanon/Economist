@@ -197,6 +197,20 @@ function clearLocalSession()     { try{localStorage.removeItem('eco_email');}cat
 
 // ═══════════════ HELPERS ═══════════════
 function today(){ const d=new Date(); return `${d.getDate()} ${MM[d.getMonth()]} ${d.getFullYear()}`; }
+function articleSlug(title){
+  return String(title||'')
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
+    .slice(0,80).replace(/-+$/,'');
+}
+function articlePath(article){
+  const slug=articleSlug(article.title);
+  return `/article/${article.id}${slug?'-'+slug:''}/`;
+}
+function articleIdFromPath(){
+  const match=window.location.pathname.match(/^\/article\/(\d+)/);
+  return match?match[1]:null;
+}
 function readTime(body){ const w=(body||'').trim().split(/\s+/).length; return `${Math.max(1,Math.round(w/200))} min`; }
 function isOwnerEmail(email){
   return !!email && String(email).trim().toLowerCase()===OWNER_EMAIL.toLowerCase();

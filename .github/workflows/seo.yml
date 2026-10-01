@@ -1,0 +1,42 @@
+# Régénère les pages statiques des articles/profils et le sitemap
+# à partir de Supabase (voir scripts/build-seo.mjs).
+name: Pages SEO
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # toutes les 6 heures
+  workflow_dispatch:         # bouton « Run workflow » dans l'onglet Actions
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - scripts/build-seo.mjs
+      - .github/workflows/seo.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/build-seo.mjs
+      - name: Commit des pages générées
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Aucun changement"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Mise à jour des pages SEO (articles, profils, sitemap)"
+          git push
