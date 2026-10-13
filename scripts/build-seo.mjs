@@ -206,6 +206,14 @@ ${sitemap.map(u => `  <url>
 </urlset>
 `;
   await writeFile(path.join(ROOT, 'sitemap.xml'), xml);
+
+  // Liens statiques vers les articles dans l'accueil, pour que les robots les découvrent
+  const homeFile = path.join(ROOT, 'index.html');
+  const home = await readFile(homeFile, 'utf8');
+  const region = /<!-- seo:articles -->[\s\S]*?<!-- \/seo:articles -->/;
+  if (!region.test(home)) throw new Error('index.html : repère <!-- seo:articles --> introuvable');
+  const links = [...articles].reverse().map(a => `<li><a href="${articlePath(a)}">${esc(a.title)}</a></li>`).join('');
+  await writeFile(homeFile, home.replace(region, `<!-- seo:articles -->${links ? `<ul>${links}</ul>` : ''}<!-- /seo:articles -->`));
   console.log(`${articles.length} article(s), ${sitemap.length} URL dans le sitemap`);
 }
 

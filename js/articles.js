@@ -285,7 +285,7 @@ function renderHome(cat){
           ${rest.slice(0,4).map(a=>`<div style="padding:1.1rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;display:flex;gap:.9rem;align-items:flex-start" onclick="openArticle(${a.id})">
             ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img ${imageAttrs(a.img,{maxWidth:800,sizes:'72px'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
             <div style="flex:1"><div style="font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);margin-bottom:.35rem">${tCat(a.cat)}</div>
-            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''">${a.title}</div>
+            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${a.title}</a></div>
             <div style="font-family:var(--sans);font-size:9.5px;color:var(--gris)">${tDate(a.date)}</div></div>
           </div>`).join('')}
         </div>
