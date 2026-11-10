@@ -40,7 +40,7 @@ async function doLogin(){
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
   const {data,error}=await _sb.auth.signInWithPassword({email,password:pwd});
   btn.textContent='Se connecter';btn.disabled=false;
-  if(error||!data.user){document.getElementById('login-err').style.display='block';return;}
+  if(error||!data.user){const le=document.getElementById('login-err');const m=friendlyError(error,null);if(m)le.textContent=m;le.style.display='block';return;}
   const u=await profileFromAuthUser(data.user);
   document.getElementById('login-err').style.display='none';
   closeModal(); renderNav(); renderHome(currentActiveCat);
@@ -60,7 +60,7 @@ async function savePassword(){
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
   const {error}=await _sb.auth.updateUser({password:pwd});
   btn.textContent=t('password_save');btn.disabled=false;
-  if(error){errEl.textContent=error.message||t('password_save_error');errEl.style.display='block';return;}
+  if(error){errEl.textContent=friendlyError(error,'password_save_error');errEl.style.display='block';return;}
   showToast(t('password_saved'));closeModal();
 }
 
@@ -91,7 +91,7 @@ async function doSignup(){
     emailRedirectTo:getAuthRedirectUrl()
   }});
   if(error){
-    errEl.textContent=error.message||t('auth_err_email');errEl.style.display='block';okEl.style.display='none';
+    errEl.textContent=friendlyError(error,'toast_generic_error');errEl.style.display='block';okEl.style.display='none';
     btn.textContent=t('auth_btn_signup');btn.disabled=false;return;
   }
   const u=data.user && data.session ? await profileFromAuthUser(data.user) : {first};
@@ -360,7 +360,7 @@ async function sendResetCode(){
   const { error } = await _sb.auth.resetPasswordForEmail(email,{ redirectTo });
   btn.textContent=t('password_send_code');btn.disabled=false;
   if(error && !/not.?found|no user/i.test(error.message||'')){
-    errEl.textContent=error.message||t('toast_email_not_configured');errEl.style.display='block';return;
+    errEl.textContent=friendlyError(error,'toast_email_not_configured');errEl.style.display='block';return;
   }
   // Même message que le compte existe ou non (ne pas révéler les inscrits)
   closeModal();

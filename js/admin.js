@@ -289,8 +289,7 @@ async function adminDeleteUser(email){
   if(!confirm(tf('confirm_delete_account',{email:normalizedEmail})))return;
   const error=await deleteUserDB(normalizedEmail);
   if(error){
-    const detail = error?.message || error?.error || t('toast_delete_error');
-    showToast(`${t('toast_delete_error')} ${detail}`);
+    showToast(friendlyError(error,'toast_delete_error'));
     return;
   }
   users=users.filter(u=>(u.email||'').toLowerCase()!==normalizedEmail);

@@ -33,7 +33,7 @@ async function submitRequest(){
   if(authError || !authUser?.id){
     renderNav();
     showPage('home');
-    showToast(authError?.message || t('toast_login_required'));
+    showToast(authError ? friendlyError(authError,'toast_login_required') : t('toast_login_required'));
     return;
   }
   const first=document.getElementById('r-first').value.trim();
@@ -62,7 +62,7 @@ async function submitRequest(){
   const proposal={first,last,email,job,cat,subj,why,lang:_lang,ts:Date.now(),status:'pending'};
   const saveError=await dbSet(`proposals/${id}`, proposal);
   if(saveError){
-    showToast(`${t('toast_submit_error')} ${saveError.message||t('toast_save_error')}`,6000);
+    showToast(`${t('toast_submit_error')} ${friendlyError(saveError,'toast_save_error')}`,6000);
       proposalSubmitting=false;
     if(btn){ btn.disabled=false; btn.textContent=t('propose_submit'); }
     return;
@@ -517,7 +517,7 @@ function closeArticlePreview(){
   document.getElementById('article-preview-modal').classList.remove('open');
 }
 function notifyPublishError(error, fallback=''){
-  const detail=error?.message||fallback;
+  const detail=error?friendlyError(error,'toast_generic_error'):fallback;
   showToast(detail?`${t('toast_publish_error')} ${detail}`:t('toast_publish_error'),6000);
 }
 async function publishArticle(){

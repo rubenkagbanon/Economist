@@ -286,6 +286,61 @@ function safeHtml(html){
   return esc(String(html ?? '').replace(/<[^>]*>/g,' '));
 }
 
+// ── Messages d'erreur compréhensibles ───────────────────────────
+// Ne jamais afficher à l'utilisateur un message technique brut (noms de
+// tables, codes SQL, « Failed to fetch »…). Le détail reste dans la console.
+// fallbackKey : clé i18n utilisée si l'erreur n'est pas reconnue
+// (passer null pour obtenir null dans ce cas).
+const FRIENDLY_ERRORS = [
+  { re:/failed to fetch|networkerror|network request|load failed|timeout|timed out|ECONN|offline/i,
+    fr:'Connexion internet instable. Vérifiez votre connexion puis réessayez.',
+    en:'Unstable internet connection. Check your connection and try again.' },
+  { re:/invalid login credentials|invalid_credentials/i,
+    fr:'Adresse e-mail ou mot de passe incorrect.',
+    en:'Incorrect email address or password.' },
+  { re:/email not confirmed|email_not_confirmed/i,
+    fr:'Confirmez d’abord votre adresse e-mail grâce au lien reçu par e-mail, puis reconnectez-vous.',
+    en:'Please confirm your email address using the link we sent you, then sign in again.' },
+  { re:/user already registered|already been registered|user_already_exists/i,
+    fr:'Un compte existe déjà avec cette adresse e-mail. Connectez-vous ou utilisez « Mot de passe oublié ».',
+    en:'An account already exists with this email address. Sign in or use “Forgot password”.' },
+  { re:/password should be at least|weak_password|password is too weak/i,
+    fr:'Mot de passe trop faible : utilisez au moins 8 caractères, en mélangeant lettres et chiffres.',
+    en:'Password too weak: use at least 8 characters, mixing letters and numbers.' },
+  { re:/should be different from the old password|same_password/i,
+    fr:'Le nouveau mot de passe doit être différent de l’ancien.',
+    en:'The new password must be different from the old one.' },
+  { re:/unable to validate email|invalid email|email_address_invalid|invalid format/i,
+    fr:'Cette adresse e-mail n’est pas valide.',
+    en:'This email address is not valid.' },
+  { re:/rate limit|too many requests|over_.*_rate_limit|\b429\b/i,
+    fr:'Trop de tentatives en peu de temps. Patientez quelques minutes avant de réessayer.',
+    en:'Too many attempts in a short time. Please wait a few minutes before trying again.' },
+  { re:/jwt|sub claim|session|expired|not authenticated|unauthorized|refresh token/i,
+    fr:'Votre session a expiré. Reconnectez-vous puis réessayez.',
+    en:'Your session has expired. Please sign in again and retry.' },
+  { re:/row-level security|permission denied|\b42501\b|policy|forbidden|\b403\b|not allowed/i,
+    fr:'Vous n’avez pas l’autorisation d’effectuer cette action avec ce compte.',
+    en:'You are not allowed to perform this action with this account.' },
+  { re:/duplicate key|\b23505\b|already exists/i,
+    fr:'Cet élément existe déjà.',
+    en:'This item already exists.' },
+  { re:/payload too large|request entity too large|\b413\b|value too long|too large/i,
+    fr:'Le contenu est trop volumineux. Essayez avec une image plus légère ou un texte plus court.',
+    en:'The content is too large. Try a lighter image or a shorter text.' },
+  { re:/not found|no rows|\b404\b|PGRST116/i,
+    fr:'Élément introuvable : il a peut-être été supprimé entre-temps. Actualisez la page.',
+    en:'Item not found: it may have been deleted in the meantime. Please refresh the page.' }
+];
+function friendlyError(error, fallbackKey='toast_user_error'){
+  if(error) console.error('[détail technique]', error);
+  const raw=String(error?.message||error?.error||error?.msg||error?.code||error||'');
+  const hit=raw && FRIENDLY_ERRORS.find(entry=>entry.re.test(raw));
+  if(hit) return (typeof _lang!=='undefined'&&_lang==='en')?hit.en:hit.fr;
+  if(fallbackKey===null) return null;
+  return typeof t==='function'?t(fallbackKey):'Une erreur est survenue. Réessayez dans un instant.';
+}
+
 function avHtml(u,size=28){
   if(u&&u.avatar) return `<img src="${esc(u.avatar)}" alt="" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rouge)">`;
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:${size*0.4}px;color:white;flex-shrink:0">${((u&&u.first?u.first[0]:'')+((u&&u.last?u.last[0]:'')||'')).toUpperCase()||'?'}</div>`;
