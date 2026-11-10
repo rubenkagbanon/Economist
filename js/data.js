@@ -222,8 +222,23 @@ function showToast(msg,dur=3200){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
+// ── Sécurité : toute donnée saisie par un utilisateur doit passer par esc()
+// avant d'être insérée dans du HTML (innerHTML / gabarits).
+function esc(value){
+  return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Argument de chaîne pour un attribut onclick="fn(...)" : JSON puis échappement HTML
+function jsArg(value){
+  return esc(JSON.stringify(String(value ?? '')));
+}
+// HTML riche (corps d'article) : nettoyé par DOMPurify, repli sur du texte brut
+function safeHtml(html){
+  if(window.DOMPurify) return DOMPurify.sanitize(String(html ?? ''), { ADD_ATTR: ['target'] });
+  return esc(String(html ?? '').replace(/<[^>]*>/g,' '));
+}
+
 function avHtml(u,size=28){
-  if(u&&u.avatar) return `<img src="${u.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rouge)">`;
+  if(u&&u.avatar) return `<img src="${esc(u.avatar)}" alt="" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--rouge)">`;
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rouge);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:${size*0.4}px;color:white;flex-shrink:0">${((u&&u.first?u.first[0]:'')+((u&&u.last?u.last[0]:'')||'')).toUpperCase()||'?'}</div>`;
 }
 
@@ -243,9 +258,10 @@ function optimizeImageUrl(url, { maxWidth = 1600, quality = 80 } = {}) {
   }
 }
 
-function imageAttrs(url, { maxWidth = 1600, quality = 80, sizes = '(max-width: 768px) 100vw, 50vw', loading = 'lazy', fetchPriority = 'auto' } = {}) {
-  const src = optimizeImageUrl(url, { maxWidth, quality });
-  return `src="${src}" srcset="${src} 1x" sizes="${sizes}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}"`;
+function imageAttrs(url, { maxWidth = 1600, quality = 80, sizes = '(max-width: 768px) 100vw, 50vw', loading = 'lazy', fetchPriority = 'auto', alt } = {}) {
+  const src = esc(optimizeImageUrl(url, { maxWidth, quality }));
+  const altAttr = alt === undefined ? '' : ` alt="${esc(alt)}"`;
+  return `src="${src}" srcset="${src} 1x" sizes="${sizes}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}"${altAttr}`;
 }
 
 // Génère un code numérique à 6 chiffres (codes de vérification par e-mail)

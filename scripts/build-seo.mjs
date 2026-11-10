@@ -58,7 +58,10 @@ async function query(table, params) {
 function articleBody(a) {
   const html = a.body_html || String(a.body || '').split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
   return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<(script|style|iframe|object|embed|form|template)[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<\/?(script|style|iframe|object|embed|form|template|base|meta|link)\b[^>]*>/gi, '')
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/(href|src|xlink:href|action|formaction)\s*=\s*(["']?)\s*(javascript|vbscript|data):[^"'\s>]*\2/gi, '$1="#"')
     .replace(/<img[^>]+src=["']data:[^>]*>/gi, '');
 }
 

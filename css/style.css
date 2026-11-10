@@ -2,7 +2,7 @@
 :root{
   --rouge:#8B0000;
   --noir:#111010;
-  --gris:#999;
+  --gris:#6e6e6e; /* 5:1 sur blanc (WCAG AA) */
   --gris-clair:#E8E8E8;
   --blanc:#FFFFFF;
   --serif:'DM Serif Display',Georgia,serif;
@@ -13,7 +13,7 @@
   --txt-soft:#444;
   --txt-mut:#555;
   --txt-lite:#707070;
-  --txt-pale:#8a8a8a;
+  --txt-pale:#707070; /* 4.9:1 sur blanc (WCAG AA) */
   --bg-subtle:#f8f8f8;
   --bg-input:#ffffff;
 }

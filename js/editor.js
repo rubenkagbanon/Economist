@@ -46,6 +46,15 @@ async function submitRequest(){
   const subj =document.getElementById('r-subject').value.trim();
   const why  =document.getElementById('r-why').value.trim();
   if(!first||!last||!email||!cat||!subj){ showToast(t('toast_required_fields_proposal')); return; }
+  // Anti-spam : champ piège invisible (rempli uniquement par les robots)
+  if(document.getElementById('r-website')?.value){ return; }
+  if(!/^[^\s@<>"']+@[^\s@<>"']+\.[a-z]{2,}$/i.test(email) || email.length>254){ showToast(t('toast_invalid_email')); return; }
+  if(first.length>80||last.length>80||job.length>120||subj.length>200||why.length>2000){ showToast(t('toast_required_fields_proposal')); return; }
+  // Une proposition par minute et par navigateur
+  try{
+    const lastTs=Number(localStorage.getItem('eco_last_proposal')||0);
+    if(Date.now()-lastTs<60000){ showToast(t('toast_too_fast')); return; }
+  }catch(e){}
   proposalSubmitting=true;
   const btn=document.querySelector('.reg-submit');
   if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
@@ -58,6 +67,7 @@ async function submitRequest(){
     if(btn){ btn.disabled=false; btn.textContent=t('propose_submit'); }
     return;
   }
+  try{ localStorage.setItem('eco_last_proposal', String(Date.now())); }catch(e){}
   await emailNotifyOwnerOfProposal(proposal);
   document.getElementById('reg-email-shown').textContent=email;
   document.getElementById('reg-success').style.display='block';
@@ -251,35 +261,19 @@ async function checkCode(){
     return;
   }
 
-  const codes = await dbGet(ONE_TIME_CODES_PATH);
-  const normalizedCodes = normalizeAccessCodeEntries(codes);
-  const entry = normalizedCodes[String(val).trim()];
-
-  if(!entry){
-    errEl.textContent=t('code_invalid');
-    errEl.style.display='block';
-    return;
-  }
-
-  if(entry.forEmail && currentUser && entry.forEmail.toLowerCase() !== currentUser.email.toLowerCase()){
-    errEl.textContent=t('code_unassigned');
-    errEl.style.display='block';
-    return;
-  }
-
-  if((entry.used||0) >= (entry.max||2)){
-    errEl.textContent=t('code_exhausted');
-    errEl.style.display='block';
-    return;
-  }
-
+  // La vérification se fait uniquement côté serveur (RPC security definer) :
+  // les codes d'accès ne sont plus lisibles depuis le navigateur.
   const { data: consumeResult, error: consumeError } = await _sb.rpc('consume_access_code', { p_code: val });
   if(consumeError || !consumeResult?.ok){
     const msg = String(consumeResult?.error || consumeError?.message || '');
     const lower = msg.toLowerCase();
     if (lower.includes('unauthorized') || lower.includes('permission denied') || lower.includes('jwt') || lower.includes('session')) {
       errEl.textContent = t('session_permission');
-    } else if (lower.includes('expired') || lower.includes('invalid code') || lower.includes('not assigned')) {
+    } else if (lower.includes('not assigned')) {
+      errEl.textContent = t('code_unassigned');
+    } else if (lower.includes('exhausted')) {
+      errEl.textContent = t('code_exhausted');
+    } else if (lower.includes('expired')) {
       errEl.textContent = t('code_expired');
     } else {
       errEl.textContent = t('code_invalid');

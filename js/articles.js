@@ -136,7 +136,7 @@ function resetProfileShareMetadata(){
 }
 function pageFromPath(){
   const requestedPage=new URLSearchParams(window.location.search).get('page');
-  if(requestedPage==='privacy'||requestedPage==='rules')return requestedPage;
+  if(['privacy','rules','about','write','propose'].includes(requestedPage))return requestedPage;
   if(window.location.protocol==='file:')return null;
   const path=window.location.pathname.replace(/\/+$/,'')||'/';
   if(path==='/privacy')return 'privacy';
@@ -238,11 +238,11 @@ function triggerReveal(){
 // ═══════════════ HOME ═══════════════
 function artCardHtml(a){
   return `<div class="art-card" onclick="openArticle(${a.id})">
-    <div class="art-thumb">${a.img?`<img class="art-thumb-img" ${imageAttrs(a.img,{maxWidth:800,sizes:'(max-width: 768px) 100vw, 33vw'})} alt="" onerror="this.parentNode.innerHTML='<div class=art-thumb-empty></div>'">`:`<div class="art-thumb-empty"></div>`}</div>
+    <div class="art-thumb">${a.img?`<img class="art-thumb-img" ${imageAttrs(a.img,{maxWidth:800,sizes:'(max-width: 768px) 100vw, 33vw',alt:a.title})} onerror="this.parentNode.innerHTML='<div class=art-thumb-empty></div>'">`:`<div class="art-thumb-empty"></div>`}</div>
     <div class="art-card-body">
-      <div class="art-k">${tCat(a.cat)}</div><div class="art-title"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${a.title}</a></div>
-      <div class="art-excerpt">${a.deck}</div>
-      <div class="art-foot"><span>${a.author}</span><span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)}</span></div>
+      <div class="art-k">${esc(tCat(a.cat))}</div><div class="art-title"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${esc(a.title)}</a></div>
+      <div class="art-excerpt">${esc(a.deck)}</div>
+      <div class="art-foot"><span>${esc(a.author)}</span><span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)}</span></div>
     </div></div>`;
 }
 
@@ -263,29 +263,29 @@ function renderHome(cat){
   if(isMobile){
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
-        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img ${imageAttrs(hero.img,{maxWidth:1200,loading:'eager',fetchPriority:'high',sizes:'100vw'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
-        <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${tCat(hero.cat)}</div>
-        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${hero.title}</a></h1>
-        <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${hero.deck}</p>
-        <div style="display:flex;flex-wrap:wrap;gap:.6rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
+        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img ${imageAttrs(hero.img,{maxWidth:1200,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+        <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${esc(tCat(hero.cat))}</div>
+        <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${esc(hero.title)}</a></h1>
+        <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${esc(hero.deck)}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.6rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${esc(hero.author)}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
       </div></div>
       ${rest.length?`<div class="sec-wrap reveal" style="padding-top:1.5rem"><div class="sec-head"><span class="sec-name">${catLabel}</span></div><div class="grid-articles">${rest.map(a=>artCardHtml(a)).join('')}</div></div>`:''}`;
   } else {
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="display:grid;grid-template-columns:1fr 320px;border-bottom:.5px solid var(--gris-clair)">
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
-          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img ${imageAttrs(hero.img,{maxWidth:1500,loading:'eager',fetchPriority:'high',sizes:'100vw'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
-          <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${tCat(hero.cat)}</div>
-          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${hero.title}</a></h1>
-          <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${hero.deck}</p>
-          <div style="display:flex;align-items:center;gap:1rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${hero.author}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
+          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img ${imageAttrs(hero.img,{maxWidth:1500,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+          <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${esc(tCat(hero.cat))}</div>
+          <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${esc(hero.title)}</a></h1>
+          <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${esc(hero.deck)}</p>
+          <div style="display:flex;align-items:center;gap:1rem;font-family:var(--sans);font-size:10px;color:var(--gris);text-transform:uppercase"><span>${esc(hero.author)}</span><span class="dot"></span><span>${tDate(hero.date)}</span><span class="dot"></span><span>${readTime(hero.body)}</span></div>
         </div>
         <div style="padding-left:2.5rem;padding-top:.5rem">
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gris);margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:.5px solid var(--gris-clair)">${t('home_alire')}</div>
           ${rest.slice(0,4).map(a=>`<div style="padding:1.1rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;display:flex;gap:.9rem;align-items:flex-start" onclick="openArticle(${a.id})">
-            ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img ${imageAttrs(a.img,{maxWidth:800,sizes:'72px'})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
-            <div style="flex:1"><div style="font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);margin-bottom:.35rem">${tCat(a.cat)}</div>
-            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${a.title}</a></div>
+            ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img ${imageAttrs(a.img,{maxWidth:800,sizes:'72px',alt:''})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+            <div style="flex:1"><div style="font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);margin-bottom:.35rem">${esc(tCat(a.cat))}</div>
+            <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${esc(a.title)}</a></div>
             <div style="font-family:var(--sans);font-size:9.5px;color:var(--gris)">${tDate(a.date)}</div></div>
           </div>`).join('')}
         </div>
@@ -299,7 +299,7 @@ function renderHome(cat){
 async function openArticle(id,fromPage='home'){
   const a=articles.find(x=>x.id===id); if(!a)return;
   const backPage=fromPage==='admin'?'admin':'home';
-  const bodyContent=a.bodyHtml||a.body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+  const bodyContent=a.bodyHtml?safeHtml(a.bodyHtml):(a.body||'').split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=(a.owner_id&&users.find(user=>String(user.id)===String(a.owner_id)))||findAuthorUser(a.author);
   const authorSlug=authorUser?profileSlug(authorUser):`${a.author||''}`.trim().replace(/\s+/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const canDelete=isOwner()||(currentUser&&currentUser.first+' '+currentUser.last===a.author);
@@ -309,14 +309,14 @@ async function openArticle(id,fromPage='home'){
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
       <button class="back-btn" style="margin-bottom:0" onclick="showPage('${backPage}')">${t('home_back')}</button>${shareBtn}${delBtn}
     </div>
-    <div class="art-full-k">${tCat(a.cat)}</div>
-    <h1 class="art-full-title">${a.title}</h1>
-    <div class="art-full-deck">${a.deck}</div>
+    <div class="art-full-k">${esc(tCat(a.cat))}</div>
+    <h1 class="art-full-title">${esc(a.title)}</h1>
+    <div class="art-full-deck">${esc(a.deck)}</div>
     <div class="art-full-meta">
-      <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile('${authorUser.email}')`:`window.location.href=this.href`}">${a.author}</a></span>
+      <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile(${jsArg(authorUser.email)})`:`window.location.href=this.href`}">${esc(a.author)}</a></span>
       <span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)} ${t('home_read')}</span>
     </div>
-    ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw'})} alt="" onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${tCat(a.cat)} — ${tDate(a.date)}</div>`:''}
+    ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw',alt:a.title})} onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${esc(tCat(a.cat))} — ${tDate(a.date)}</div>`:''}
     <div class="art-full-body">${bodyContent}</div>`;
   currentArticleRoute=articlePath(a);
   showPage('article');
@@ -349,7 +349,7 @@ function openProfile(email){
   const isMe=currentUser&&currentUser.email===email;
   const avatarClass=profileLevelClass(u.level);
   const profileType=['licence','master','doctorat','professor','magazine','firm','institution','association'].includes(u.level)?t(`level_${u.level}`):'';
-  const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img ${imageAttrs(u.avatar,{maxWidth:400,sizes:'72px'})} alt="${u.first}"></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>`;
+  const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img ${imageAttrs(u.avatar,{maxWidth:400,sizes:'72px',alt:`${u.first||''} ${u.last||''}`.trim()})}></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${esc(((u.first||'')[0]||'')+((u.last||'')[0]||'')).toUpperCase()}</div>`;
   const profileMetaPrefix = _lang === 'en' ? 'Member since' : 'Membre depuis le';
   const profileMetaSuffix = userArticles.length
     ? ` · ${userArticles.length} ${_lang === 'en' ? (userArticles.length > 1 ? 'articles' : 'article') : (userArticles.length > 1 ? 'articles' : 'article')} ${_lang === 'en' ? 'published' : 'publié' + (userArticles.length > 1 ? 's' : '')}`
@@ -358,14 +358,14 @@ function openProfile(email){
     <button class="back-btn" onclick="showPage('home')">${t('home_back')}</button>
     <div class="profile-header">${avatarEl}
       <div style="flex:1">
-        <div class="profile-name">${u.first} ${u.last}</div>
+        <div class="profile-name">${esc(u.first)} ${esc(u.last)}</div>
         <div class="profile-meta">${profileMetaPrefix} ${tDate(u.joined)||'—'}${profileMetaSuffix}</div>
-        ${u.bio?`<div class="profile-bio">${u.bio}</div>`:''}
+        ${u.bio?`<div class="profile-bio">${esc(u.bio)}</div>`:''}
         ${profileType?`<div class="profile-badge profile-type-badge profile-type-${u.level}">${profileType}</div>`:''}
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
         <div class="profile-actions">
           ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}
-          <button class="profile-share-btn" onclick="shareProfile('${u.email}')">${t('profile_share')}</button>
+          <button class="profile-share-btn" onclick="shareProfile(${jsArg(u.email)})">${t('profile_share')}</button>
         </div>
       </div>
     </div>
@@ -387,7 +387,7 @@ function renderMyStats(){
     </div>
     ${myArts.length?`<div class="stats-section-title">${t('stats_my')}</div><div style="overflow-x:auto">
       <table class="stats-table"><thead><tr><th>${t('stats_table_titre')}</th><th>${t('stats_table_cat')}</th><th>${t('stats_table_date')}</th><th>${t('stats_table_reads')}</th><th>${t('stats_table_action')}</th></tr></thead><tbody>
-      ${myArts.map(a=>`<tr><td><span class="td-title" onclick="openArticle(${a.id})">${a.title}</span></td><td><span class="stats-cat-badge">${tCat(a.cat)}</span></td><td>${tDate(a.date)}</td><td><strong style="color:var(--rouge)">${a.reads||0}</strong></td><td><button class="btn-danger" onclick="confirmDeleteArticle(${a.id})">${t('admin_delete')}</button></td></tr>`).join('')}
+      ${myArts.map(a=>`<tr><td><span class="td-title" onclick="openArticle(${a.id})">${esc(a.title)}</span></td><td><span class="stats-cat-badge">${esc(tCat(a.cat))}</span></td><td>${tDate(a.date)}</td><td><strong style="color:var(--rouge)">${a.reads||0}</strong></td><td><button class="btn-danger" onclick="confirmDeleteArticle(${a.id})">${t('admin_delete')}</button></td></tr>`).join('')}
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--gris);font-style:italic;padding:2rem 0">${t('stats_none')}</div>`}`;
 }
 

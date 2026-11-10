@@ -233,7 +233,7 @@ let editAvatarBase64=null;
 function openProfileEdit(){
   if(!currentUser)return; editAvatarBase64=null;
   const prev=document.getElementById('edit-avatar-preview');
-  if(currentUser.avatar){prev.innerHTML=`<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
+  if(currentUser.avatar){prev.innerHTML=`<img src="${esc(currentUser.avatar)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
   else{prev.textContent=(currentUser.first[0]+(currentUser.last[0]||'')).toUpperCase();prev.style.background='var(--rouge)';}
   document.getElementById('edit-first').value=currentUser.first||'';
   document.getElementById('edit-last').value=currentUser.last||'';
@@ -261,7 +261,7 @@ function handleAvatarUpload(e){
       const reader=new FileReader();
       reader.onload=ev=>{
         editAvatarBase64=ev.target.result;
-        document.getElementById('edit-avatar-preview').innerHTML=`<img src="${editAvatarBase64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+        document.getElementById('edit-avatar-preview').innerHTML=`<img src="${esc(editAvatarBase64)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
       };
       reader.readAsDataURL(blob);
     },'image/jpeg',.82);

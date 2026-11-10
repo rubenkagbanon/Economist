@@ -37,10 +37,10 @@ function renderNav(){
   const mobActionsEl = document.getElementById('mob-actions');
   if(loggedIn){
     actionsEl.innerHTML = `${searchHtml}
-      <div class="nav-user" onclick="showPage('profile');openProfile('${currentUser.email}')">
-        ${avHtml(currentUser,28)}<span>${currentUser.first}</span><span class="nav-user-dot"></span>
+      <div class="nav-user" onclick="showPage('profile');openProfile(${jsArg(currentUser.email)})">
+        ${avHtml(currentUser,28)}<span>${esc(currentUser.first)}</span><span class="nav-user-dot"></span>
       </div>`;
-    mobActionsEl.innerHTML = `<button class="btn-outline" style="width:100%" onclick="closeMobileMenu();showPage('profile');openProfile('${currentUser.email}')">${t('profile_edit')}</button>`;
+    mobActionsEl.innerHTML = `<button class="btn-outline" style="width:100%" onclick="closeMobileMenu();showPage('profile');openProfile(${jsArg(currentUser.email)})">${t('profile_edit')}</button>`;
   } else {
     actionsEl.innerHTML = `${searchHtml}
       <button class="btn-outline" onclick="openModal('login')">${t('auth_login')}</button>
