@@ -308,6 +308,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 .gate-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
 .gate input[type=password],.gate input[type=text]{font-family:var(--sans);font-size:1rem;letter-spacing:.08em;border:.5px solid var(--gris-clair);padding:.65rem 1rem;width:200px;outline:none;transition:border .2s;}
 .gate input:focus{border-color:var(--rouge)}
+#access-code{font-family:"Arial Rounded MT Bold","Arial Rounded MT",Arial,sans-serif;font-weight:700;letter-spacing:.12em}
+#access-code::placeholder{font-family:"Arial Rounded MT Bold","Arial Rounded MT",Arial,sans-serif}
 .gate-err{font-family:var(--sans);font-size:.82rem;color:var(--rouge);margin-top:.7rem;display:none}
 .form-wrap{display:flex;flex-direction:column;gap:1.6rem}
 .form-row{display:flex;flex-direction:column;gap:.5rem}

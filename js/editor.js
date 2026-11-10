@@ -269,6 +269,8 @@ async function checkCode(){
     const lower = msg.toLowerCase();
     if (lower.includes('unauthorized') || lower.includes('permission denied') || lower.includes('jwt') || lower.includes('session')) {
       errEl.textContent = t('session_permission');
+    } else if (lower.includes('too many')) {
+      errEl.textContent = t('code_too_many');
     } else if (lower.includes('not assigned')) {
       errEl.textContent = t('code_unassigned');
     } else if (lower.includes('exhausted')) {
