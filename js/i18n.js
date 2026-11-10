@@ -214,10 +214,11 @@ function tEmptyCategory(cat){
     : `Aucun article en « ${tCat(cat)} » pour l'instant.`;
 }
 function tDate(dateStr){
-  if(_lang!=='en' || !dateStr) return dateStr;
+  // Le texte vient de la base (modifiable par les membres) : toujours échappé
+  if(_lang!=='en' || !dateStr) return esc(dateStr||'');
   let out = dateStr;
   Object.keys(MONTH_EN).forEach(fr=>{ out = out.replace(new RegExp(fr,'i'), MONTH_EN[fr]); });
-  return out;
+  return esc(out);
 }
 function applyTranslations(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{

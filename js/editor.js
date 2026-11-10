@@ -19,6 +19,8 @@ function initProposalContact(){
   const last=document.getElementById('r-last');
   if(first && !first.value)first.value=currentUser.first||'';
   if(last && !last.value)last.value=currentUser.last||'';
+  const mail=document.getElementById('r-email');
+  if(mail){ mail.value=currentUser.email||''; mail.readOnly=true; }
   toggleCustomCategoryInput('r-cat','r-custom-cat');
 }
 
@@ -38,7 +40,8 @@ async function submitRequest(){
   }
   const first=document.getElementById('r-first').value.trim();
   const last =document.getElementById('r-last').value.trim();
-  const email=document.getElementById('r-email').value.trim().toLowerCase();
+  // L'adresse de contact est celle du compte connecté (imposé aussi par la base)
+  const email=(currentUser.email||'').trim().toLowerCase();
   const job  =document.getElementById('r-job').value.trim();
   const selectedCat = document.getElementById('r-cat').value;
   const customCat = document.getElementById('r-custom-cat')?.value.trim() || '';
@@ -71,7 +74,7 @@ async function submitRequest(){
   await emailNotifyOwnerOfProposal(proposal);
   document.getElementById('reg-email-shown').textContent=email;
   document.getElementById('reg-success').style.display='block';
-  ['r-first','r-last','r-email','r-job','r-cat','r-subject','r-why'].forEach(fid=>{
+  ['r-first','r-last','r-job','r-cat','r-subject','r-why'].forEach(fid=>{
     const el=document.getElementById(fid); if(el) el.value='';
   });
   proposalSubmitting=false;

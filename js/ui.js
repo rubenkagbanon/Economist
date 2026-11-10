@@ -37,10 +37,10 @@ function renderNav(){
   const mobActionsEl = document.getElementById('mob-actions');
   if(loggedIn){
     actionsEl.innerHTML = `${searchHtml}
-      <div class="nav-user" onclick="showPage('profile');openProfile(${jsArg(currentUser.email)})">
+      <div class="nav-user" onclick="showPage('profile');openProfile(${jsArg(currentUser.id)})">
         ${avHtml(currentUser,28)}<span>${esc(currentUser.first)}</span><span class="nav-user-dot"></span>
       </div>`;
-    mobActionsEl.innerHTML = `<button class="btn-outline" style="width:100%" onclick="closeMobileMenu();showPage('profile');openProfile(${jsArg(currentUser.email)})">${t('profile_edit')}</button>`;
+    mobActionsEl.innerHTML = `<button class="btn-outline" style="width:100%" onclick="closeMobileMenu();showPage('profile');openProfile(${jsArg(currentUser.id)})">${t('profile_edit')}</button>`;
   } else {
     actionsEl.innerHTML = `${searchHtml}
       <button class="btn-outline" onclick="openModal('login')">${t('auth_login')}</button>
@@ -110,13 +110,13 @@ function renderSearchResults(q,targetId){
         <div class="srd-cat">Profil</div>
         <div class="srd-profile-row">
           ${avHtml(u,32)}
-          <div class="srd-title">${u.first||''} ${u.last||''}</div>
+          <div class="srd-title">${esc(u.first||'')} ${esc(u.last||'')}</div>
         </div>
       </div>`).join('')}` : ''}${articleResults.length ? `<div class="srd-section">Articles</div>${articleResults.map(a => `
       <div class="srd-item" onpointerdown="event.preventDefault();selectSearchResult(${a.id},'${targetId}')">
-        <div class="srd-cat">${tCat(a.cat)}</div>
-        <div class="srd-title">${a.title||''}</div>
-        <div class="srd-author">${a.author||''}</div>
+        <div class="srd-cat">${esc(tCat(a.cat))}</div>
+        <div class="srd-title">${esc(a.title||'')}</div>
+        <div class="srd-author">${esc(a.author||'')}</div>
       </div>`).join('')}` : ''}`;
   }
   el.classList.add('open');
@@ -141,7 +141,7 @@ function selectSearchUser(userIndex, targetId){
   const user=users[userIndex];
   if(!user)return;
   showPage('profile');
-  openProfile(user.email);
+  openProfile(user.id);
 }
 
 // ═══════════════ AUTH MODAL ═══════════════

@@ -29,7 +29,8 @@ async function sendEmail(params){
         subject:params.subject,
         message:params.message,
         reply_to:params.reply_to,
-        from_name:params.from_name
+        from_name:params.from_name,
+        lang:typeof _lang!=='undefined'?_lang:'fr'
       }
     });
     if(error||!data?.ok){ console.error('Échec envoi e-mail :', error||data); return false; }

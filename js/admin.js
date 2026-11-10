@@ -69,7 +69,7 @@ function renderAdmin(){
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic;margin-bottom:2rem">${t('admin_none_art')}</div>`}
     <div class="stats-section-title">${t('admin_members')}</div>
     ${users.length?`<div class="admin-table-wrap"><table class="stats-table"><thead><tr><th>${t('admin_member_name')}</th><th>${t('admin_member_email')}</th><th>${t('admin_member_joined')}</th><th>${t('admin_member_arts')}</th><th>${t('admin_member_profile')}</th><th>Action</th></tr></thead><tbody>
-      ${users.map(u=>{const c=articles.filter(a=>a.author===u.first+' '+u.last).length;return `<tr><td>${esc(u.first)} ${esc(u.last)}</td><td style="color:var(--gris);font-family:var(--sans);font-size:.85rem">${esc(u.email)}</td><td style="font-family:var(--sans);font-size:.85rem">${esc(u.joined||'—')}</td><td>${c}</td><td><span style="font-family:var(--sans);font-size:9.5px;color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('profile');openProfile(${jsArg(u.email)})">${t('admin_view')}</span></td><td>${u.email.toLowerCase()===OWNER_EMAIL.toLowerCase()?'':`<button class="btn-danger" onclick="adminDeleteUser(${jsArg(u.email)})">${t('admin_delete')}</button>`}</td></tr>`;}).join('')}
+      ${users.map(u=>{const c=articles.filter(a=>a.author===u.first+' '+u.last).length;return `<tr><td>${esc(u.first)} ${esc(u.last)}</td><td style="color:var(--gris);font-family:var(--sans);font-size:.85rem">${esc(u.email)}</td><td style="font-family:var(--sans);font-size:.85rem">${esc(u.joined||'—')}</td><td>${c}</td><td><span style="font-family:var(--sans);font-size:9.5px;color:var(--rouge);cursor:pointer;text-decoration:underline" onclick="showPage('profile');openProfile(${jsArg(u.email)})">${t('admin_view')}</span></td><td>${u.email.toLowerCase()===OWNER_EMAIL.toLowerCase()?'':`<button class="btn-danger" onclick="adminDeleteUser(${jsArg(u.id)})">${t('admin_delete')}</button>`}</td></tr>`;}).join('')}
       </tbody></table></div>`:`<div style="font-family:var(--sans);font-size:.9rem;color:var(--txt-pale);font-style:italic">${t('admin_none_members')}</div>`}`;
   loadAdminCodes();
   loadAdminProposals();
@@ -110,13 +110,13 @@ async function loadAdminCodes(){
   const rows=activeEntries.map(([k,v])=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:.5px solid var(--gris-clair);gap:.8rem;flex-wrap:wrap">
       <div>
-        <span style="font-family:var(--sans);font-weight:500;color:var(--noir);letter-spacing:.05em">${v.code||k}</span>
-        <span style="font-family:var(--sans);font-size:.78rem;color:var(--gris);margin-left:.8rem">${v.used||0} / ${v.max||2} utilisations</span>
-        ${v.forEmail?`<span style="font-family:var(--sans);font-size:.75rem;color:var(--txt-pale);margin-left:.6rem">→ ${v.forEmail}</span>`:''}
+        <span style="font-family:var(--sans);font-weight:500;color:var(--noir);letter-spacing:.05em">${esc(v.code||k)}</span>
+        <span style="font-family:var(--sans);font-size:.78rem;color:var(--gris);margin-left:.8rem">${Number(v.used)||0} / ${Number(v.max)||2} utilisations</span>
+        ${v.forEmail?`<span style="font-family:var(--sans);font-size:.75rem;color:var(--txt-pale);margin-left:.6rem">→ ${esc(v.forEmail)}</span>`:''}
       </div>
       <div style="display:flex;gap:.5rem;align-items:center">
         ${(v.used||0)>=(v.max||2)?'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-pale)">Épuisé</span>':'<span style="font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a9a5a">Actif</span>'}
-        <button class="btn-danger" onclick="adminDeleteCode('${k}',this)">✕</button>
+        <button class="btn-danger" onclick="adminDeleteCode(${jsArg(k)},this)">✕</button>
       </div>
     </div>`).join('');
   el.innerHTML=rows||'<span>Aucun code actif.</span>';el.style.fontStyle='normal';
@@ -282,17 +282,19 @@ async function adminDeleteProposal(id,button){
 }
 
 // ═══════════════ GESTION DES MEMBRES ═══════════════
-async function adminDeleteUser(email){
+async function adminDeleteUser(userId){
   if(!isOwner())return;
-  const normalizedEmail=(email||'').trim().toLowerCase();
-  if(!normalizedEmail||normalizedEmail===OWNER_EMAIL.toLowerCase())return;
-  if(!confirm(tf('confirm_delete_account',{email:normalizedEmail})))return;
-  const error=await deleteUserDB(normalizedEmail);
+  const target=findUser(userId);
+  if(!target||isOwnerEmail(target.email))return;
+  const normalizedEmail=(target.email||'').trim().toLowerCase();
+  const label=normalizedEmail||((target.first||'')+' '+(target.last||'')).trim();
+  if(!confirm(tf('confirm_delete_account',{email:label})))return;
+  const error=await deleteUserDB(target.id);
   if(error){
     showToast(friendlyError(error,'toast_delete_error'));
     return;
   }
-  users=users.filter(u=>(u.email||'').toLowerCase()!==normalizedEmail);
+  users=users.filter(u=>String(u.id)!==String(target.id));
   await emailNotifyAdminDeletedAccount(normalizedEmail,_lang);
   showToast(t('toast_account_deleted'));
   renderAdmin();

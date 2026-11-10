@@ -38,60 +38,46 @@ Deno.serve(async (req: Request) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const email = String(body?.email || "")
-      .trim()
-      .toLowerCase();
-
-    if (!email) {
-      return json({ error: "Missing email" }, 400);
+    // Cible désignée par son identifiant de compte (immuable), jamais par e-mail
+    const userId = String(body?.id || "").trim();
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) {
+      return json({ error: "Missing or invalid user id" }, 400);
     }
 
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      {
-        auth: { persistSession: false, autoRefreshToken: false },
-      },
+      { auth: { persistSession: false, autoRefreshToken: false } },
     );
 
-    const { data: usersData, error: listUsersError } =
-      await adminClient.auth.admin.listUsers();
-    if (listUsersError) {
-      return json({ error: listUsersError.message }, 500);
-    }
-
-    const targetUser = usersData.users.find(
-      (u) => (u.email || "").trim().toLowerCase() === email,
-    );
-
-    if (!targetUser) {
+    const { data: target, error: getError } = await adminClient.auth.admin.getUserById(userId);
+    if (getError || !target?.user) {
       return json({ error: "User not found in Supabase Auth" }, 404);
     }
+    const targetUser = target.user;
+    const email = (targetUser.email || "").trim().toLowerCase();
 
-    if (targetUser.email?.toLowerCase() === ADMIN_EMAIL) {
+    if (targetUser.id === currentUser.id || email === ADMIN_EMAIL) {
       return json({ error: "Cannot delete the admin account" }, 400);
     }
 
-    const { error: deleteAuthError } = await adminClient.auth.admin.deleteUser(
-      targetUser.id,
-    );
+    const { error: deleteAuthError } = await adminClient.auth.admin.deleteUser(targetUser.id);
     if (deleteAuthError) {
       return json({ error: deleteAuthError.message }, 500);
     }
 
-    const { error: deleteProfileError } = await adminClient
-      .from("profiles")
-      .delete()
-      .eq("email", email);
-
+    // Profil et données associées, par identifiant (et e-mail du compte pour les propositions)
+    const { error: deleteProfileError } = await adminClient.from("profiles").delete().eq("id", targetUser.id);
     if (deleteProfileError) {
       return json({ error: deleteProfileError.message }, 500);
     }
+    await adminClient.from("kv_store").delete().eq("path", "writer_sessions/" + targetUser.id);
+    await adminClient.from("writer_grants").delete().eq("user_id", targetUser.id);
+    if (email) {
+      await adminClient.from("kv_store").delete().like("path", "proposals/%").eq("value->>email", email);
+    }
 
-    return json(
-      { ok: true, deletedEmail: email, deletedUserId: targetUser.id },
-      200,
-    );
+    return json({ ok: true, deletedUserId: targetUser.id }, 200);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";
     return json({ error: message }, 500);

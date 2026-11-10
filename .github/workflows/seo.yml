@@ -28,8 +28,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - name: Installer sharp (compression des couvertures)
-        run: npm install --no-save --no-package-lock sharp@0.33.5
+      - name: Installer sharp (couvertures) et sanitize-html (nettoyage des articles)
+        run: npm install --no-save --no-package-lock sharp@0.33.5 sanitize-html@2.13.0
       - run: node scripts/build-seo.mjs
       - name: Commit des pages générées
         run: |

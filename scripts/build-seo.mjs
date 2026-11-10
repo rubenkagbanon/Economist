@@ -54,15 +54,27 @@ async function query(table, params) {
   return res.json();
 }
 
-// Corps de l'article sans images base64 (trop lourdes pour le HTML statique) ni scripts
+// Nettoyage du corps d'article par LISTE BLANCHE (sanitize-html, installé par le
+// workflow). Si la bibliothèque manque, le corps est rendu en texte brut échappé :
+// jamais de HTML non nettoyé dans une page servie depuis www.econglobe.com.
+let sanitizeHtml = null;
+try { sanitizeHtml = (await import('sanitize-html')).default; } catch { console.warn('sanitize-html indisponible : corps rendu en texte brut'); }
+const MAX_BODY_CHARS = 300000;
 function articleBody(a) {
-  const html = a.body_html || String(a.body || '').split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
-  return html
-    .replace(/<(script|style|iframe|object|embed|form|template)[\s\S]*?<\/\1\s*>/gi, '')
-    .replace(/<\/?(script|style|iframe|object|embed|form|template|base|meta|link)\b[^>]*>/gi, '')
-    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    .replace(/(href|src|xlink:href|action|formaction)\s*=\s*(["']?)\s*(javascript|vbscript|data):[^"'\s>]*\2/gi, '$1="#"')
-    .replace(/<img[^>]+src=["']data:[^>]*>/gi, '');
+  const source = String(a.body_html || '').slice(0, MAX_BODY_CHARS * 4);
+  if (source && sanitizeHtml) {
+    return sanitizeHtml(source, {
+      allowedTags: ['p', 'br', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'u', 's', 'blockquote', 'ul', 'ol', 'li',
+        'a', 'img', 'figure', 'figcaption', 'hr', 'span', 'div', 'sup', 'sub', 'code', 'pre', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
+      allowedAttributes: { a: ['href', 'title', 'target', 'rel'], img: ['src', 'alt', 'title', 'width', 'height'], '*': ['class'] },
+      allowedSchemes: ['http', 'https', 'mailto'],
+      allowedSchemesByTag: { img: ['http', 'https'] },   // pas d'images base64 dans les pages statiques
+      allowProtocolRelative: false,
+      transformTags: { a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer' }) }
+    });
+  }
+  const text = source ? plain(source) : String(a.body || '');
+  return text.slice(0, MAX_BODY_CHARS).split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
 }
 
 // sharp (redimensionnement) est installé par le workflow ; s'il manque, on
@@ -96,16 +108,15 @@ async function coverImage(a, dir) {
       console.warn(`Compression impossible pour l'article ${a.id} :`, e.message);
     }
   }
-  const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
-  await writeFile(path.join(dir, `cover.${ext}`), input);
-  return `${SITE}${articlePath(a)}cover.${ext}`;
+  // Sans compression possible, on n'écrit pas d'octets bruts dans le dépôt
+  return null;
 }
 
 function buildPage(template, { lang, title, description, url, image, type, jsonLd, noscript, articleHtml }) {
   const fullTitle = `${title} | EconGlobe`;
   const set = (html, re, value) => {
     if (!re.test(html)) throw new Error(`index.html : balise introuvable ${re}`);
-    return html.replace(re, value);
+    return html.replace(re, () => value);
   };
   let html = template;
   html = set(html, /<html lang="[^"]*"/, `<html lang="${lang}"`);
@@ -142,7 +153,7 @@ async function main() {
 
   const [articles, profiles] = await Promise.all([
     query('articles', 'select=id,owner_id,title,deck,cat,author,img,body,body_html,date,lang&or=(status.eq.published,status.is.null)&order=id'),
-    query('profiles', 'select=id,first,last,avatar,bio')
+    query('profiles', 'select=id,first,last,avatar,bio&order=id')
   ]);
 
   // Nettoyage des pages générées précédemment (articles supprimés, profils renommés…)
@@ -198,7 +209,10 @@ async function main() {
     sitemap.push({ loc: url, lastmod: published, priority: '0.8', changefreq: 'monthly' });
   }
 
-  for (const p of profiles) {
+  const hasPublished = p => articles.some(a => String(a.owner_id) === String(p.id));
+  const orderedProfiles = [...profiles].sort((x, y) => Number(hasPublished(y)) - Number(hasPublished(x)));
+  for (const p of orderedProfiles) {
+    const bio = String(p.bio || '').slice(0, 2000);
     const slug = profileSlug(p);
     if (!slug || RESERVED.has(slug)) continue;
     const dir = path.join(ROOT, slug);
@@ -206,7 +220,7 @@ async function main() {
     const name = `${p.first || ''} ${p.last || ''}`.replace(/\s+\.$/, '').trim();
     const own = articles.filter(a => authorOf(a) === p).reverse();
     const url = `${SITE}/${slug}/`;
-    const description = truncate(plain(p.bio) || `Profil de ${name} sur EconGlobe.`, 160);
+    const description = truncate(plain(bio) || `Profil de ${name} sur EconGlobe.`, 160);
     const image = p.avatar && /^https?:\/\//.test(p.avatar) ? p.avatar : DEFAULT_IMAGE;
     const list = own.map(a => `<li><a href="${articlePath(a)}">${esc(a.title)}</a></li>`).join('');
     const html = buildPage(template, {
@@ -216,10 +230,10 @@ async function main() {
         '@graph': [organization, {
           '@type': 'ProfilePage',
           url,
-          mainEntity: { '@type': 'Person', name, ...(p.bio && { description: plain(p.bio) }), ...(image !== DEFAULT_IMAGE && { image }) }
+          mainEntity: { '@type': 'Person', name, ...(bio && { description: plain(bio) }), ...(image !== DEFAULT_IMAGE && { image }) }
         }]
       },
-      noscript: `    <h1>${esc(name)}</h1>\n    ${p.bio ? `<p>${esc(plain(p.bio))}</p>` : ''}\n    ${list ? `<ul>${list}</ul>` : ''}`
+      noscript: `    <h1>${esc(name)}</h1>\n    ${bio ? `<p>${esc(plain(bio))}</p>` : ''}\n    ${list ? `<ul>${list}</ul>` : ''}`
     });
     // Les profils sans article publié restent accessibles (code 200) mais hors index
     await mkdir(dir, { recursive: true });
@@ -244,7 +258,8 @@ ${sitemap.map(u => `  <url>
   const region = /<!-- seo:articles -->[\s\S]*?<!-- \/seo:articles -->/;
   if (!region.test(home)) throw new Error('index.html : repère <!-- seo:articles --> introuvable');
   const links = [...articles].reverse().map(a => `<li><a href="${articlePath(a)}">${esc(a.title)}</a></li>`).join('');
-  let updatedHome = home.replace(region, `<!-- seo:articles -->${links ? `<ul>${links}</ul>` : ''}<!-- /seo:articles -->`);
+  const regionHtml = `<!-- seo:articles -->${links ? `<ul>${links}</ul>` : ''}<!-- /seo:articles -->`;
+  let updatedHome = home.replace(region, () => regionHtml);
 
   // Préchargement de la couverture de l'article « à la une » (le plus récent) :
   // le navigateur la télécharge dès le début au lieu d'attendre le JavaScript.
@@ -256,7 +271,8 @@ ${sitemap.map(u => `  <url>
       const p = articlePath(hero);
       tag = `<link rel="preload" as="image" href="${p}cover.jpg" imagesrcset="${p}cover-800.jpg 800w, ${p}cover.jpg 1200w" imagesizes="100vw" fetchpriority="high">`;
     }
-    updatedHome = updatedHome.replace(preloadRegion, `<!-- seo:preload -->${tag}<!-- /seo:preload -->`);
+    const preloadHtml = `<!-- seo:preload -->${tag}<!-- /seo:preload -->`;
+    updatedHome = updatedHome.replace(preloadRegion, () => preloadHtml);
   }
   await writeFile(homeFile, updatedHome);
   console.log(`${articles.length} article(s), ${sitemap.length} URL dans le sitemap`);

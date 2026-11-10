@@ -16,8 +16,8 @@ let _sb;
 let dbReady = false;
 let dataLoaded = false;
 let dataLoadPromise = null;
-const DATA_CACHE_KEY = 'economist_public_data_cache_v2'; // v2 : sans images base64
-try{ localStorage.removeItem('economist_public_data_cache_v1'); }catch(e){}
+const DATA_CACHE_KEY = 'economist_public_data_cache_v3'; // v3 : sans e-mails des membres
+try{ localStorage.removeItem('economist_public_data_cache_v1'); localStorage.removeItem('economist_public_data_cache_v2'); }catch(e){}
 const DATA_CACHE_TTL = 10 * 60 * 1000;
 const DATA_REFRESH_MIN_AGE = 60 * 1000;
 
@@ -63,7 +63,8 @@ async function fetchData(){
     {data:dataImgRows}
   ]=await Promise.all([
     visible(_sb.from('articles').select('id, owner_id, title, deck, cat, author, body, date, reads, status, lang').order('id')),
-    _sb.from('profiles').select('id, email, first, last, joined, avatar, bio, level, auth_provider'),
+    // L'e-mail des membres n'est pas public (seul l'admin l'obtient, voir plus bas)
+    _sb.from('profiles').select('id, first, last, joined, avatar, bio, level'),
     visible(_sb.from('articles').select('id, img').not('img','is',null).not('img','like','data:%')),
     visible(_sb.from('articles').select('id').like('img','data:%'))
   ]);
@@ -78,8 +79,15 @@ async function fetchData(){
     else art.img='';
     arts[row.id]=art;
   });
-  userRows.forEach(row=>{usrs[row.email]={...row,authProvider:row.auth_provider};});
+  userRows.forEach(row=>{usrs[row.id]={...row,email:''};});
+  // Son propre e-mail vient de la session ; l'admin reçoit ceux de tous les membres
+  if(currentUser?.id && usrs[currentUser.id]) usrs[currentUser.id].email=currentUser.email||'';
+  if(isOwner()){
+    const { data: emails } = await _sb.rpc('admin_profile_emails');
+    (emails||[]).forEach(r=>{ if(usrs[r.id]) usrs[r.id].email=r.email||''; });
+  }
   applyData(arts, usrs);
+  if(currentUser?.id){ const fresh=users.find(u=>u.id===currentUser.id); if(fresh) currentUser=fresh; }
   dataLoaded=true;
   writeDataCache();
 }
@@ -88,7 +96,7 @@ async function dbGet(path) {
   const { data: row, error } = await _sb.from(KV_TABLE).select('value').eq('path', path).maybeSingle();
   if (error) { console.error('dbGet', path, error); return null; }
   if (row) return row.value;
-  const { data: rows, error: err2 } = await _sb.from(KV_TABLE).select('path,value').like('path', `${path}/%`).limit(200);
+  const { data: rows, error: err2 } = await _sb.from(KV_TABLE).select('path,value').like('path', `${path}/%`).order('updated_at', { ascending: false }).limit(200);
   if (err2) { console.error('dbGet', path, err2); return null; }
   if (!rows || !rows.length) return null;
   const out = {};
@@ -205,7 +213,7 @@ async function ensureAuthProfile(authUser) {
     level:'',
     authProvider:authUser.app_metadata?.provider||'supabase'
   };
-  const existing=users.find(user=>(user.email||'').toLowerCase()===email);
+  const existing=users.find(user=>user.id===authUser.id);
   if(existing){
     profile.first=existing.first||profile.first;
     profile.last=existing.last||profile.last;
@@ -216,19 +224,19 @@ async function ensureAuthProfile(authUser) {
   }
   const error=await saveUser(profile);
   if(!error){
-    const index=users.findIndex(user=>(user.email||'').toLowerCase()===email);
+    const index=users.findIndex(user=>user.id===authUser.id);
     if(index===-1)users.push(profile);
     else users[index]={...users[index],...profile};
     currentUser=users[index===-1?users.length-1:index];
   }
   return error;
 }
-async function deleteUserDB(email) {
-  const normalizedEmail=(email||'').trim().toLowerCase();
-  if(!normalizedEmail)return new Error('Missing user email');
+// Suppression par identifiant de compte (jamais par e-mail, modifiable)
+async function deleteUserDB(userId) {
+  if(!userId)return new Error('Missing user id');
 
   try{
-    const { data, error } = await _sb.functions.invoke('admin-delete-user', { body: { email: normalizedEmail } });
+    const { data, error } = await _sb.functions.invoke('admin-delete-user', { body: { id: userId } });
     if (error) return error;
     if (data?.error) return new Error(String(data.error));
     if (!data || data.ok !== true) return new Error('Delete response was invalid');
@@ -261,6 +269,12 @@ function articleIdFromPath(){
   return match?match[1]:null;
 }
 function readTime(body){ const w=(body||'').trim().split(/\s+/).length; return `${Math.max(1,Math.round(w/200))} min`; }
+// Recherche d'un membre par identifiant (ou, pour soi/l'admin, par e-mail connu)
+function findUser(key){
+  if(!key)return null;
+  const k=String(key);
+  return users.find(u=>String(u.id)===k) || users.find(u=>u.email && u.email.toLowerCase()===k.toLowerCase()) || null;
+}
 function isOwnerEmail(email){
   return !!email && String(email).trim().toLowerCase()===OWNER_EMAIL.toLowerCase();
 }

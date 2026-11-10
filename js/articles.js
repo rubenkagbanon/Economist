@@ -158,8 +158,10 @@ function profileLevelClass(level){
 function profileEmailFromPath(){
   const path=window.location.pathname.replace(/^\/+|\/+$/g,'');
   if(!path||path==='privacy'||path==='terms'||path.startsWith('article/'))return null;
-  const user=users.find(u=>profileSlug(u)===path.toLowerCase());
-  return user?.email||null;
+  // Noms identiques : priorité au membre qui a des articles publiés (comme la génération des pages)
+  const matches=users.filter(u=>profileSlug(u)===path.toLowerCase());
+  const user=matches.find(u=>articles.some(a=>a.status==='published'&&String(a.owner_id)===String(u.id)))||matches[0];
+  return user?.id||null;
 }
 function findAuthorUser(authorName){
   const normalized=(authorName||'').trim().replace(/\s+/g,' ').toLowerCase();
@@ -168,13 +170,13 @@ function findAuthorUser(authorName){
 function articleBelongsToUser(article,user){
   if(article.owner_id && user.id)return String(article.owner_id)===String(user.id);
   const articleAuthor=findAuthorUser(article.author);
-  if(articleAuthor)return String(articleAuthor.email||'').toLowerCase()===String(user.email||'').toLowerCase();
+  if(articleAuthor)return String(articleAuthor.id)===String(user.id);
   const authorName=(article.author||'').trim().replace(/\s+/g,' ').toLowerCase();
   const userName=`${user.first||''} ${user.last||''}`.trim().replace(/\s+/g,' ').toLowerCase();
   return authorName===userName;
 }
-async function shareProfile(email){
-  const user=users.find(u=>u.email===email);
+async function shareProfile(key){
+  const user=findUser(key);
   if(!user)return;
   const siteOrigin=window.location.protocol==='file:'?'https://www.econglobe.com':window.location.origin;
   const profileUrl=new URL(`/${profileSlug(user)}/`,siteOrigin);
@@ -316,7 +318,7 @@ async function openArticle(id,fromPage='home'){
     <h1 class="art-full-title">${esc(a.title)}</h1>
     <div class="art-full-deck">${esc(a.deck)}</div>
     <div class="art-full-meta">
-      <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile(${jsArg(authorUser.email)})`:`window.location.href=this.href`}">${esc(a.author)}</a></span>
+      <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile(${jsArg(authorUser.id)})`:`window.location.href=this.href`}">${esc(a.author)}</a></span>
       <span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)} ${t('home_read')}</span>
     </div>
     ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw',alt:a.title})} onerror="coverFallback(this,${a.id})"></div><div class="art-full-caption">${esc(tCat(a.cat))} — ${tDate(a.date)}</div>`:''}
@@ -338,9 +340,9 @@ async function confirmDeleteArticle(id){
 }
 
 // ═══════════════ PROFIL PUBLIC ═══════════════
-function openProfile(email){
-  currentProfileEmail = email || null;
-  const u=users.find(x=>x.email===email);
+function openProfile(key){
+  currentProfileEmail = key || null;
+  const u=findUser(key);
   if(!u){document.getElementById('profile-content').innerHTML=`<p style="font-family:var(--sans);color:var(--txt-pale)">${t('profile_not_found')}</p>`;return;}
   if(window.location.protocol!=='file:'){
     const profilePath=`/${profileSlug(u)}/`;
@@ -349,7 +351,7 @@ function openProfile(email){
   }
   setProfileShareMetadata(u);
   const userArticles=articles.filter(article=>articleBelongsToUser(article,u)).reverse();
-  const isMe=currentUser&&currentUser.email===email;
+  const isMe=!!currentUser&&String(currentUser.id)===String(u.id);
   const avatarClass=profileLevelClass(u.level);
   const profileType=['licence','master','doctorat','professor','magazine','firm','institution','association'].includes(u.level)?t(`level_${u.level}`):'';
   const avatarEl=u.avatar?`<div class="profile-avatar${avatarClass}"><img ${imageAttrs(u.avatar,{maxWidth:400,sizes:'72px',alt:`${u.first||''} ${u.last||''}`.trim()})}></div>`:`<div class="profile-avatar${avatarClass}" style="font-size:2rem">${esc(((u.first||'')[0]||'')+((u.last||'')[0]||'')).toUpperCase()}</div>`;
@@ -368,7 +370,7 @@ function openProfile(email){
         ${userArticles.length?`<div class="profile-badge">${t('profile_writer')}</div>`:''}
         <div class="profile-actions">
           ${isMe?`<button class="profile-edit-btn" onclick="openProfileEdit()">${t('profile_edit')}</button>`:''}
-          <button class="profile-share-btn" onclick="shareProfile(${jsArg(u.email)})">${t('profile_share')}</button>
+          <button class="profile-share-btn" onclick="shareProfile(${jsArg(u.id)})">${t('profile_share')}</button>
         </div>
       </div>
     </div>

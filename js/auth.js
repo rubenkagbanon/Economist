@@ -12,7 +12,8 @@ async function profileFromAuthUser(authUser){
   const email=(authUser?.email||'').trim().toLowerCase();
   if(!email)return null;
   await loadData(true);
-  let user=users.find(item=>(item.email||'').toLowerCase()===email);
+  // Identité = identifiant du compte ; l'e-mail vient de la session (jamais du profil public)
+  let user=users.find(item=>String(item.id)===String(authUser.id));
   const meta=authUser.user_metadata||{};
   const authProvider=authUser.app_metadata?.provider==='google'?'google':'supabase';
   if(!user){
@@ -21,12 +22,9 @@ async function profileFromAuthUser(authUser){
     user={id:authUser.id,first:parts[0]||'Utilisateur',last:parts.slice(1).join(' ')||'',email,joined:today(),avatar:meta.avatar_url||'',bio:'',level:'',authProvider};
     users.push(user);
     await saveUser(user);
-  } else {
-    let changed=false;
-    if(!user.id){user.id=authUser.id;changed=true;}
-    if(user.authProvider!==authProvider){user.authProvider=authProvider;changed=true;}
-    if(changed) await saveUser(user);
   }
+  user.email=email;
+  user.authProvider=authProvider;
   currentUser=user;
   saveLocalSession(email);
   return user;
@@ -119,19 +117,15 @@ async function syncGoogleUserFromSession(session){
   const last=nameParts.slice(1).join(' ') || 'User';
   const avatar=meta.avatar_url || '';
 
-  let u = users.find(x => String(x.id||'') === String(session.user.id)) ||
-    users.find(x => (x.email||'').toLowerCase() === email);
+  let u = users.find(x => String(x.id||'') === String(session.user.id));
   if(!u){
     u={id:session.user.id,first,last,email,joined:today(),avatar,bio:'',level:'',authProvider:'google'};
     users.push(u);
     await saveUser(u);
     await emailNotifyAdminNewAccount(u,_lang);
-  } else {
-    let changed = false;
-    if(!u.id){u.id=session.user.id;changed=true;}
-    if(u.authProvider!=='google'){u.authProvider='google';changed=true;}
-    if(changed) await saveUser(u);
   }
+  u.email = email;
+  u.authProvider = session.user.app_metadata?.provider==='google' ? 'google' : 'supabase';
 
   currentUser = u;
   saveLocalSession(email);
@@ -284,8 +278,7 @@ async function saveProfileEdit(){
   const bio=document.getElementById('edit-bio').value.trim();
   const level=document.querySelector('input[name="profile-level"]:checked')?.value||'';
   if(!first||!last){showToast(t('toast_profile_required'));return;}
-  const currentEmail=(currentUser.email||'').trim().toLowerCase();
-  const idx=users.findIndex(u=>(u.email||'').trim().toLowerCase()===currentEmail); if(idx===-1)return;
+  const idx=users.findIndex(u=>String(u.id)===String(currentUser.id)); if(idx===-1)return;
   const oldAuthor=`${users[idx].first} ${users[idx].last}`;
   const newAuthor=`${first} ${last}`;
   const updatedUser={...users[idx],first,last,bio,level};
@@ -312,7 +305,7 @@ async function saveProfileEdit(){
 
   closeProfileEdit();
   renderNav();
-  openProfile(currentUser.email);
+  openProfile(currentUser.id);
   if(document.getElementById('page-home')?.classList.contains('active'))renderHome(currentActiveCat);
   if(document.getElementById('page-mystats')?.classList.contains('active'))renderMyStats();
   if(articleErrors.some(Boolean)){
@@ -367,29 +360,5 @@ async function sendResetCode(){
   showToast(t('toast_reset_link_sent'),6000);
 }
 
-async function confirmResetPwd(){
-  const btn=document.getElementById('btn-fp-confirm');
-  const code=document.getElementById('fp-code').value.trim();
-  const pwd=document.getElementById('fp-new-pwd').value;
-  const pwd2=document.getElementById('fp-new-pwd2').value;
-  const errEl=document.getElementById('fp-err2');
-  errEl.style.display='none';
-  if(!code||!pwd||!pwd2){errEl.textContent=t('auth_err_fields');errEl.style.display='block';return;}
-  if(pwd.length<8){errEl.textContent=t('auth_err_short');errEl.style.display='block';return;}
-  if(pwd!==pwd2){errEl.textContent=t('auth_err_match');errEl.style.display='block';return;}
-  btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  const record=await dbGet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`);
-  if(!record||record.used||record.code!==code||Date.now()>record.expires){
-    errEl.textContent=t('code_expired');errEl.style.display='block';
-    btn.textContent=t('password_reset');btn.disabled=false;return;
-  }
-  await loadData();
-  const idx=users.findIndex(x=>x.email===_resetEmail);
-  if(idx===-1){errEl.textContent=t('account_not_found');errEl.style.display='block';btn.textContent=t('password_reset');btn.disabled=false;return;}
-  users[idx].pwd=pwd;
-  await saveUser(users[idx]);
-  await dbSet(`${PASSWORD_RESETS_PATH}/${userKey(_resetEmail)}`,{...record,used:true});
-  showToast(t('toast_password_updated'));
-  closeModal();
-  openModal('login');
-}
+// (ancien flux de réinitialisation par code supprimé : la réinitialisation passe par Supabase Auth)
+

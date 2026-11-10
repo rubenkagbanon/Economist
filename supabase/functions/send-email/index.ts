@@ -30,9 +30,9 @@ Deno.serve(async (req: Request) => {
 
     const body = await req.json().catch(() => ({}));
     const type = String(body?.type || "") as EmailType;
-    const subject = clean(body?.subject, MAX_SUBJECT);
-    const message = String(body?.message ?? "").slice(0, MAX_MESSAGE);
-    if (!subject || !message.trim()) return json({ error: "Missing subject or message" }, 400);
+    let subject = clean(body?.subject, MAX_SUBJECT);
+    let message = String(body?.message ?? "").slice(0, MAX_MESSAGE);
+    if (type !== "welcome" && (!subject || !message.trim())) return json({ error: "Missing subject or message" }, 400);
 
     const caller = await getCaller(req);
     let to: string;
@@ -41,10 +41,19 @@ Deno.serve(async (req: Request) => {
       case "admin_notification":
         to = ADMIN_EMAIL;
         break;
-      case "welcome":
-        if (!caller?.email) return json({ error: "Unauthorized" }, 401);
+      case "welcome": {
+        // Adresse confirmée uniquement, et contenu fixé par le serveur
+        if (!caller?.email || !(caller as { email_confirmed_at?: string }).email_confirmed_at) {
+          return json({ error: "Unauthorized" }, 401);
+        }
         to = caller.email;
+        const en = body?.lang === "en";
+        subject = en ? "Welcome to EconGlobe!" : "Bienvenue sur EconGlobe !";
+        message = en
+          ? `Hello,\n\nWelcome to EconGlobe! Your account has been created with the address ${to}.\n\nYou can now read all our articles and propose your own from "Propose an article".\n\n— EconGlobe`
+          : `Bonjour,\n\nBienvenue sur EconGlobe ! Votre compte a bien été créé avec l'adresse ${to}.\n\nVous pouvez dès maintenant lire tous nos articles, et proposer les vôtres depuis « Proposer un article ».\n\n— EconGlobe`;
         break;
+      }
       case "user_message": {
         if (!isAdmin(caller)) return json({ error: "Forbidden" }, 403);
         to = String(body?.to || "").trim().toLowerCase();
@@ -53,6 +62,14 @@ Deno.serve(async (req: Request) => {
       }
       default:
         return json({ error: "Unknown email type" }, 400);
+    }
+
+    // Limites d'envoi (journal en base, accessible au seul rôle service)
+    if (type !== "user_message") {
+      const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+      const key = caller?.id ? `user:${caller.id}` : `ip:${ip}`;
+      const limited = await overLimit(type, key);
+      if (limited) return json({ error: "Too many requests" }, 429);
     }
 
     // Une notification admin peut contenir un e-mail de contact (proposition) :
@@ -76,6 +93,35 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Email provider error" }, 502);
   }
 });
+
+// Plafonds : notification admin 5/heure par compte ou IP et 100/jour au total ;
+// bienvenue 1/jour par compte. Chaque envoi accepté est journalisé.
+async function overLimit(kind: string, key: string): Promise<boolean> {
+  const url = Deno.env.get("SUPABASE_URL"), service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !service) return false;
+  const db = createClient(url, service, { auth: { persistSession: false, autoRefreshToken: false } });
+  const since = (ms: number) => new Date(Date.now() - ms).toISOString();
+  const count = async (k: string | null, ms: number) => {
+    let q = db.from("email_send_log").select("id", { count: "exact", head: true }).eq("kind", kind).gte("sent_at", since(ms));
+    if (k) q = q.eq("key", k);
+    const { count: c, error } = await q;
+    if (error) throw error;
+    return c ?? 0;
+  };
+  try {
+    if (kind === "welcome" && await count(key, 86400000) >= 1) return true;
+    if (kind === "admin_notification") {
+      if (await count(key, 3600000) >= 5) return true;
+      if (await count(null, 86400000) >= 100) return true;
+    }
+    await db.from("email_send_log").insert({ kind, key });
+    return false;
+  } catch (e) {
+    // Journal indisponible (migration pas encore appliquée) : on n'empêche pas l'envoi
+    console.error("rate-limit log unavailable:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}
 
 type Mail = { to: string; replyTo: string; subject: string; text: string; html: string };
 
