@@ -61,6 +61,13 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Cannot delete the admin account" }, 400);
     }
 
+    // Tout ce qui appartient au membre disparaît : ses articles d'abord
+    // (sinon la clé étrangère articles.owner_id bloque la suppression du compte)
+    const { error: deleteArticlesError } = await adminClient.from("articles").delete().eq("owner_id", targetUser.id);
+    if (deleteArticlesError) {
+      return json({ error: deleteArticlesError.message }, 500);
+    }
+
     const { error: deleteAuthError } = await adminClient.auth.admin.deleteUser(targetUser.id);
     if (deleteAuthError) {
       return json({ error: deleteAuthError.message }, 500);

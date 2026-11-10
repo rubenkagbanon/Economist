@@ -295,6 +295,8 @@ async function adminDeleteUser(userId){
     return;
   }
   users=users.filter(u=>String(u.id)!==String(target.id));
+  articles=articles.filter(a=>String(a.owner_id)!==String(target.id));
+  writeDataCache();
   await emailNotifyAdminDeletedAccount(normalizedEmail,_lang);
   showToast(t('toast_account_deleted'));
   renderAdmin();

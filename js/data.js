@@ -188,10 +188,16 @@ async function deleteArticleDB(id) {
 function userKey(email){
   return email.replace(/\./g,'_').replace(/@/g,'__at__');
 }
+// Mise à jour puis, si le profil n'existe pas encore, création.
+// (Pas d'« upsert » : il exige de pouvoir relire les colonnes privées e-mail et
+// fournisseur, que la base ne rend plus lisibles. Ces deux colonnes sont
+// renseignées par la base elle-même à partir du compte connecté.)
 async function saveUser(u) {
-  const {error}=await _sb.from('profiles').upsert({
-    id:u.id,email:u.email,first:u.first,last:u.last,joined:u.joined,avatar:u.avatar||'',bio:u.bio||'',level:u.level||'',auth_provider:u.authProvider||''
-  });
+  const row={id:u.id,first:u.first,last:u.last,joined:u.joined,avatar:u.avatar||'',bio:u.bio||'',level:u.level||''};
+  let { data: updated, error } = await _sb.from('profiles').update(row).eq('id', u.id).select('id');
+  if(!error && (!updated || !updated.length)){
+    ({ error } = await _sb.from('profiles').insert({ ...row, email: u.email || '' }));
+  }
   if(error)console.error('saveUser',error);
   else writeDataCache();
   return error || null;
