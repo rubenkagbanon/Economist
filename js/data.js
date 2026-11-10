@@ -16,7 +16,8 @@ let _sb;
 let dbReady = false;
 let dataLoaded = false;
 let dataLoadPromise = null;
-const DATA_CACHE_KEY = 'economist_public_data_cache_v1';
+const DATA_CACHE_KEY = 'economist_public_data_cache_v2'; // v2 : sans images base64
+try{ localStorage.removeItem('economist_public_data_cache_v1'); }catch(e){}
 const DATA_CACHE_TTL = 10 * 60 * 1000;
 const DATA_REFRESH_MIN_AGE = 60 * 1000;
 
@@ -49,16 +50,34 @@ function readDataCache(){
 function writeDataCache(){
   try{ localStorage.setItem(DATA_CACHE_KEY,JSON.stringify({savedAt:Date.now(),articles,users})); }catch(e){}
 }
+// Performance : la liste des articles ne contient NI les images base64 (souvent
+// plusieurs Mo) NI le HTML du corps. Les couvertures base64 sont servies par les
+// JPEG compressés générés par scripts/build-seo.mjs (/article/<slug>/cover.jpg) ;
+// le contenu complet n'est chargé qu'à l'ouverture d'un article (loadArticleFull).
 async function fetchData(){
-  const articlesQuery=_sb.from('articles').select('id, owner_id, title, deck, cat, author, img, body, body_html, date, reads, status, lang').order('id');
-  if(!isOwner())articlesQuery.or('status.eq.published,status.is.null');
-  const [{data:articleRows,error:articleError},{data:userRows,error:userError}]=await Promise.all([
-    articlesQuery,
-    _sb.from('profiles').select('id, email, first, last, joined, avatar, bio, level, auth_provider')
+  const visible=q=>isOwner()?q:q.or('status.eq.published,status.is.null');
+  const [
+    {data:articleRows,error:articleError},
+    {data:userRows,error:userError},
+    {data:urlImgRows},
+    {data:dataImgRows}
+  ]=await Promise.all([
+    visible(_sb.from('articles').select('id, owner_id, title, deck, cat, author, body, date, reads, status, lang').order('id')),
+    _sb.from('profiles').select('id, email, first, last, joined, avatar, bio, level, auth_provider'),
+    visible(_sb.from('articles').select('id, img').not('img','is',null).not('img','like','data:%')),
+    visible(_sb.from('articles').select('id').like('img','data:%'))
   ]);
   if(articleError||userError)throw articleError||userError;
+  const urlImgs=new Map((urlImgRows||[]).map(r=>[String(r.id),r.img]));
+  const dataImgIds=new Set((dataImgRows||[]).map(r=>String(r.id)));
   const arts={},usrs={};
-  articleRows.forEach(row=>{arts[row.id]={...row,bodyHtml:row.body_html,status:row.status||'published'};});
+  articleRows.forEach(row=>{
+    const art={...row,status:row.status||'published',fullLoaded:false};
+    if(urlImgs.has(String(row.id))) art.img=urlImgs.get(String(row.id));
+    else if(dataImgIds.has(String(row.id))){ art.img=`${articlePath(art)}cover.jpg`; art.imgStatic=true; }
+    else art.img='';
+    arts[row.id]=art;
+  });
   userRows.forEach(row=>{usrs[row.email]={...row,authProvider:row.auth_provider};});
   applyData(arts, usrs);
   dataLoaded=true;
@@ -117,6 +136,36 @@ async function saveArticle(a) {
   if(error)console.error('saveArticle',error);
   writeDataCache();
   return error || null;
+}
+// Charge le corps HTML et l'image d'origine d'un article (à l'ouverture).
+async function loadArticleFull(a){
+  if(!a || a.fullLoaded || !window._sb) return a;
+  const { data, error } = await _sb.from('articles').select('img, body_html').eq('id', a.id).maybeSingle();
+  if(!error && data){
+    a.bodyHtml=data.body_html||'';
+    if(a.imgStatic) a.imgData=data.img||'';   // repli si cover.jpg n'est pas encore généré
+    else a.img=data.img||a.img;
+    a.fullLoaded=true;
+  }
+  return a;
+}
+// Repli quand une couverture statique n'existe pas encore (article récent) :
+// on récupère l'image d'origine depuis la base, sinon on masque le cadre.
+async function coverFallback(imgEl, id){
+  imgEl.onerror=null;
+  const a=articles.find(x=>String(x.id)===String(id));
+  if(a && a.imgStatic && !a.imgData && window._sb){
+    const { data } = await _sb.from('articles').select('img').eq('id', a.id).maybeSingle();
+    a.imgData=data?.img||'';
+  }
+  if(a?.imgData){ imgEl.removeAttribute('srcset'); imgEl.src=a.imgData; }
+  else if(imgEl.parentNode) imgEl.parentNode.style.display='none';
+}
+// Mise à jour du seul nom d'auteur (ne touche ni à l'image ni au corps)
+async function updateArticleAuthor(id, author){
+  const {error}=await _sb.from('articles').update({author}).eq('id',id);
+  if(error)console.error('updateArticleAuthor',error);
+  return error||null;
 }
 async function updateArticleStatus(id,status){
   const {error}=await _sb.from('articles').update({status}).eq('id',id);

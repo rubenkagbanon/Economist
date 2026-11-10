@@ -54,12 +54,12 @@ function renderNav(){
 function toggleMobileMenu(){
   document.getElementById('mob-menu').classList.toggle('open');
   document.getElementById('mob-overlay').classList.toggle('open');
-  document.getElementById('hamburger').classList.toggle('open');
+  const hb=document.getElementById('hamburger');hb.classList.toggle('open');hb.setAttribute('aria-expanded',hb.classList.contains('open')?'true':'false');
 }
 function closeMobileMenu(){
   document.getElementById('mob-menu').classList.remove('open');
   document.getElementById('mob-overlay').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');document.getElementById('hamburger').setAttribute('aria-expanded','false');
 }
 function navGo(name){ closeMobileMenu(); showPage(name); }
 

@@ -107,7 +107,9 @@ function setCanonicalUrl(path){
 }
 function setArticleShareMetadata(article){
   const description=article.deck||`Lire l’article « ${article.title} » sur EconGlobe.`;
-  const image=article.img&&!String(article.img).startsWith('data:')?article.img:'https://www.econglobe.com/css/Logo.png';
+  const rawImg=String(article.img||'');
+  const image=rawImg.startsWith('/')?`https://www.econglobe.com${rawImg}`
+    :(rawImg&&!rawImg.startsWith('data:')?rawImg:'https://www.econglobe.com/css/og-default.jpg');
   document.title=`${article.title} | EconGlobe`;
   document.querySelector('meta[name="description"]')?.setAttribute('content',description);
   document.querySelector('meta[property="og:title"]')?.setAttribute('content',article.title);
@@ -238,7 +240,7 @@ function triggerReveal(){
 // ═══════════════ HOME ═══════════════
 function artCardHtml(a){
   return `<div class="art-card" onclick="openArticle(${a.id})">
-    <div class="art-thumb">${a.img?`<img class="art-thumb-img" ${imageAttrs(a.img,{maxWidth:800,sizes:'(max-width: 768px) 100vw, 33vw',alt:a.title})} onerror="this.parentNode.innerHTML='<div class=art-thumb-empty></div>'">`:`<div class="art-thumb-empty"></div>`}</div>
+    <div class="art-thumb">${a.img?`<img class="art-thumb-img" ${imageAttrs(a.img,{maxWidth:800,sizes:'(max-width: 768px) 100vw, 33vw',alt:a.title})} onerror="coverFallback(this,${a.id})">`:`<div class="art-thumb-empty"></div>`}</div>
     <div class="art-card-body">
       <div class="art-k">${esc(tCat(a.cat))}</div><div class="art-title"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${esc(a.title)}</a></div>
       <div class="art-excerpt">${esc(a.deck)}</div>
@@ -263,7 +265,7 @@ function renderHome(cat){
   if(isMobile){
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="cursor:pointer;border-bottom:.5px solid var(--gris-clair);padding-bottom:2rem" onclick="openArticle(${hero.id})">
-        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img ${imageAttrs(hero.img,{maxWidth:1200,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+        ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1rem"><img ${imageAttrs(hero.img,{maxWidth:1200,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="coverFallback(this,${hero.id})"></div>`:''}
         <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.5rem">${esc(tCat(hero.cat))}</div>
         <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:537;line-height:1.2;margin-bottom:.8rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${esc(hero.title)}</a></h1>
         <p style="font-family:'Inter',var(--sans);font-size:.95rem;line-height:1.7;color:var(--txt-soft);margin-bottom:1rem;font-style:italic">${esc(hero.deck)}</p>
@@ -274,7 +276,7 @@ function renderHome(cat){
     wrap.innerHTML=`<div class="sec-wrap reveal" style="padding-bottom:1rem">
       <div style="display:grid;grid-template-columns:1fr 320px;border-bottom:.5px solid var(--gris-clair)">
         <div style="padding-right:3rem;border-right:.5px solid var(--gris-clair);padding-bottom:3rem;cursor:pointer" onclick="openArticle(${hero.id})">
-          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img ${imageAttrs(hero.img,{maxWidth:1500,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+          ${hero.img?`<div style="width:100%;aspect-ratio:16/9;overflow:hidden;margin-bottom:1.5rem"><img ${imageAttrs(hero.img,{maxWidth:1500,loading:'eager',fetchPriority:'high',sizes:'100vw',alt:hero.title})} style="width:100%;height:100%;object-fit:cover" onerror="coverFallback(this,${hero.id})"></div>`:''}
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rouge);margin-bottom:.8rem">${esc(tCat(hero.cat))}</div>
           <h1 style="font-family:'Oswald',Arial,sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:537;line-height:1.15;margin-bottom:1rem"><a class="art-title-link" href="${articlePath(hero)}" onclick="event.preventDefault()">${esc(hero.title)}</a></h1>
           <p style="font-family:'Inter',var(--sans);font-size:1rem;line-height:1.75;color:var(--txt-soft);margin-bottom:1.4rem;font-style:italic">${esc(hero.deck)}</p>
@@ -283,7 +285,7 @@ function renderHome(cat){
         <div style="padding-left:2.5rem;padding-top:.5rem">
           <div style="font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gris);margin-bottom:1.5rem;padding-bottom:.7rem;border-bottom:.5px solid var(--gris-clair)">${t('home_alire')}</div>
           ${rest.slice(0,4).map(a=>`<div style="padding:1.1rem 0;border-bottom:.5px solid var(--gris-clair);cursor:pointer;display:flex;gap:.9rem;align-items:flex-start" onclick="openArticle(${a.id})">
-            ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img ${imageAttrs(a.img,{maxWidth:800,sizes:'72px',alt:''})} style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.display='none'"></div>`:''}
+            ${a.img?`<div style="width:72px;height:52px;flex-shrink:0;overflow:hidden"><img ${imageAttrs(a.img,{maxWidth:800,sizes:'72px',alt:''})} style="width:100%;height:100%;object-fit:cover" onerror="coverFallback(this,${a.id})"></div>`:''}
             <div style="flex:1"><div style="font-family:var(--sans);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rouge);margin-bottom:.35rem">${esc(tCat(a.cat))}</div>
             <div style="font-family:'Oswald',Arial,sans-serif;font-size:.95rem;font-weight:537;line-height:1.3;margin-bottom:.3rem" onmouseover="this.style.color='var(--rouge)'" onmouseout="this.style.color=''"><a class="art-title-link" href="${articlePath(a)}" onclick="event.preventDefault()">${esc(a.title)}</a></div>
             <div style="font-family:var(--sans);font-size:9.5px;color:var(--gris)">${tDate(a.date)}</div></div>
@@ -298,6 +300,7 @@ function renderHome(cat){
 // ═══════════════ ARTICLE FULL ═══════════════
 async function openArticle(id,fromPage='home'){
   const a=articles.find(x=>x.id===id); if(!a)return;
+  await loadArticleFull(a);   // corps HTML chargé seulement maintenant
   const backPage=fromPage==='admin'?'admin':'home';
   const bodyContent=a.bodyHtml?safeHtml(a.bodyHtml):(a.body||'').split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
   const authorUser=(a.owner_id&&users.find(user=>String(user.id)===String(a.owner_id)))||findAuthorUser(a.author);
@@ -316,7 +319,7 @@ async function openArticle(id,fromPage='home'){
       <span>${t('home_par')} <a class="author-chip" href="/${authorSlug}/" onclick="event.preventDefault();${authorUser?`showPage('profile');openProfile(${jsArg(authorUser.email)})`:`window.location.href=this.href`}">${esc(a.author)}</a></span>
       <span class="dot"></span><span>${tDate(a.date)}</span><span class="dot"></span><span>${readTime(a.body)} ${t('home_read')}</span>
     </div>
-    ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw',alt:a.title})} onerror="this.parentNode.style.display='none'"></div><div class="art-full-caption">${esc(tCat(a.cat))} — ${tDate(a.date)}</div>`:''}
+    ${a.img?`<div class="art-full-cover"><img ${imageAttrs(a.img,{maxWidth:1600,sizes:'100vw',alt:a.title})} onerror="coverFallback(this,${a.id})"></div><div class="art-full-caption">${esc(tCat(a.cat))} — ${tDate(a.date)}</div>`:''}
     <div class="art-full-body">${bodyContent}</div>`;
   currentArticleRoute=articlePath(a);
   showPage('article');

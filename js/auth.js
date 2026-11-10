@@ -308,7 +308,7 @@ async function saveProfileEdit(){
   );
   const articlesToUpdate=authoredArticles.filter(article=>article.author!==newAuthor);
   articlesToUpdate.forEach(article=>{article.author=newAuthor;});
-  const articleErrors=await Promise.all(articlesToUpdate.map(article=>saveArticle(article)));
+  const articleErrors=await Promise.all(articlesToUpdate.map(article=>updateArticleAuthor(article.id,newAuthor)));
 
   closeProfileEdit();
   renderNav();
