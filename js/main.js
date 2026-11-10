@@ -46,6 +46,19 @@ async function init(){
       await syncAuthUserFromSession(session);
       if(isOwner())await loadData(true);
     }
+    // Retour depuis le lien « mot de passe oublié » (?reset=1)
+    const openResetIfNeeded=()=>{
+      const params=new URLSearchParams(window.location.search);
+      if(params.get('reset')!=='1'||!currentUser)return;
+      params.delete('reset');
+      const qs=params.toString();
+      try{ window.history.replaceState(null,'',window.location.pathname+(qs?`?${qs}`:'')); }catch(e){}
+      setTimeout(()=>openPasswordModal(),400);
+    };
+    openResetIfNeeded();
+    _sb.auth.onAuthStateChange((event)=>{
+      if(event==='PASSWORD_RECOVERY') setTimeout(openResetIfNeeded,800); // laisse le temps de charger le profil
+    });
     _sb.auth.onAuthStateChange(async (_event, nextSession) => {
       if(!nextSession || !nextSession.user)return;
       setTimeout(async ()=>{

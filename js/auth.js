@@ -323,13 +323,11 @@ async function saveProfileEdit(){
 }
 
 // ═══════════════════════════════════════════════════════════
-// MOT DE PASSE OUBLIÉ — récupération par e-mail + code
+// MOT DE PASSE OUBLIÉ — lien de réinitialisation Supabase Auth
 // ═══════════════════════════════════════════════════════════
-// Étape 1 : la personne entre son e-mail → on génère un code à 6
-//           chiffres, on le stocke dans Supabase (valable 15 min)
-//           et on l'envoie par e-mail via EmailJS (js/email.js).
-// Étape 2 : la personne entre le code reçu + un nouveau mot de
-//           passe → on vérifie le code puis on met à jour le compte.
+// La personne entre son e-mail → Supabase envoie un lien sécurisé.
+// En le suivant, elle revient sur le site (?reset=1) et choisit un
+// nouveau mot de passe dans la fenêtre « Mot de passe » (main.js).
 // ═══════════════════════════════════════════════════════════
 let _resetEmail=null;
 
@@ -355,22 +353,18 @@ async function sendResetCode(){
   errEl.style.display='none';
   if(!email){errEl.textContent=t('toast_enter_email');errEl.style.display='block';return;}
   btn.innerHTML='<span class="spinner"></span>…';btn.disabled=true;
-  await loadData();
-  const u=users.find(x=>x.email===email);
-  if(!u){
-    errEl.textContent=t('toast_account_missing');errEl.style.display='block';
-    btn.textContent=t('password_send_code');btn.disabled=false;return;
-  }
-  const code=genVerifCode();
-  const expires=Date.now()+15*60*1000; // 15 minutes
-  await dbSet(`${PASSWORD_RESETS_PATH}/${userKey(email)}`,{code,expires,used:false});
-  const sent=await emailSendVerificationCode(email,u.first,code,'reset',_lang);
-  _resetEmail=email;
-  document.getElementById('fp-step1').style.display='none';
-  document.getElementById('fp-step2').style.display='block';
-  document.getElementById('fp-email-shown').textContent=email;
+  // Réinitialisation gérée par Supabase Auth : un lien sécurisé est envoyé par
+  // e-mail ; en le suivant, l'utilisateur revient sur le site avec ?reset=1 et
+  // la fenêtre « Nouveau mot de passe » s'ouvre (voir main.js).
+  const redirectTo=getAuthRedirectUrl().replace(/\/?$/,'/')+'?reset=1';
+  const { error } = await _sb.auth.resetPasswordForEmail(email,{ redirectTo });
   btn.textContent=t('password_send_code');btn.disabled=false;
-  showToast(sent?t('toast_reset_email_sent'):t('toast_email_not_configured'));
+  if(error && !/not.?found|no user/i.test(error.message||'')){
+    errEl.textContent=error.message||t('toast_email_not_configured');errEl.style.display='block';return;
+  }
+  // Même message que le compte existe ou non (ne pas révéler les inscrits)
+  closeModal();
+  showToast(t('toast_reset_link_sent'),6000);
 }
 
 async function confirmResetPwd(){

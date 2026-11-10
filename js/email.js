@@ -1,50 +1,38 @@
 // ════════════════════════════════════════════════════════════
-// email.js — Envoi de vrais e-mails via EmailJS (sans backend)
+// email.js — Envoi des e-mails via la fonction serveur Supabase "send-email"
 // ════════════════════════════════════════════════════════════
 //
-// Pourquoi ce fichier existe :
-// L'ancienne version utilisait des liens "mailto:", qui ouvrent le
-// logiciel de messagerie DE L'UTILISATEUR — si la personne n'a pas
-// Gmail/Outlook configuré sur son appareil (très fréquent sur mobile),
-// rien ne se passe et aucun e-mail n'est réellement envoyé.
-// EmailJS envoie le mail directement depuis le site, sans serveur.
-//
+// Les e-mails partent de supabase/functions/send-email (Resend). Aucune clé
+// n'est présente dans le navigateur, et le serveur décide du destinataire :
+//   • vers OWNER_EMAIL       → "admin_notification" (ouvert à tous)
+//   • message de bienvenue   → "welcome" (adresse du compte connecté uniquement)
+//   • vers un autre membre   → "user_message" (compte admin uniquement)
 // ────────────────────────────────────────────────────────────
-// ⚠️  CONFIGURATION REQUISE (5 minutes, gratuit) :
-// 1. Créez un compte sur https://www.emailjs.com
-// 2. "Email Services" → ajoutez votre Gmail (ou autre) → notez le SERVICE_ID
-// 3. "Email Templates" → créez un template avec les variables utilisées
-//    ci-dessous ({{to_email}}, {{subject}}, {{message}}, etc.) → notez le TEMPLATE_ID
-// 4. "Account" → "General" → copiez votre PUBLIC_KEY
-// 5. Remplacez les 3 valeurs ci-dessous.
-// ────────────────────────────────────────────────────────────
-const EMAILJS_PUBLIC_KEY  = "zu0PX9OrQ2n7gqnlB";    
-const EMAILJS_SERVICE_ID  = "service_econglobe";     
-const EMAILJS_TEMPLATE_ID = "template_v59ndul";    
 const EMAIL_LOGO_URL = "https://www.econglobe.com/css/Logo.png";
 
-let _emailjsReady = false;
-function initEmailJS(){
-  if(typeof emailjs === 'undefined'){
-    console.warn('EmailJS non chargé — vérifiez la balise <script> dans index.html');
-    return;
-  }
-  if(EMAILJS_PUBLIC_KEY==="VOTRE_PUBLIC_KEY"){
-    console.warn('EmailJS : clés non configurées (voir js/email.js). Les e-mails ne seront pas envoyés tant que ce n\'est pas fait.');
-    return;
-  }
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-  _emailjsReady = true;
-}
+// Conservé pour compatibilité avec main.js (plus rien à initialiser)
+function initEmailJS(){}
 
 // Envoi générique — renvoie true/false selon le succès
 async function sendEmail(params){
-  if(!_emailjsReady){
-    console.warn('EmailJS non configuré : e-mail non envoyé.', params);
+  if(!window._sb?.functions){
+    console.warn('Supabase indisponible : e-mail non envoyé.');
     return false;
   }
+  const toOwner=(params.to_email||'').toLowerCase()===OWNER_EMAIL.toLowerCase();
+  const type=params.type||(toOwner?'admin_notification':'user_message');
   try{
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    const { data, error } = await _sb.functions.invoke('send-email', {
+      body:{
+        type,
+        to:params.to_email,
+        subject:params.subject,
+        message:params.message,
+        reply_to:params.reply_to,
+        from_name:params.from_name
+      }
+    });
+    if(error||!data?.ok){ console.error('Échec envoi e-mail :', error||data); return false; }
     return true;
   }catch(err){
     console.error('Échec envoi e-mail :', err);
@@ -71,7 +59,7 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why,lan
     reply_to: email,
     message
   });
-  // Solution de repli : si EmailJS n'est pas configuré, on ouvre quand même
+  // Solution de repli : si l'envoi échoue, on ouvre quand même
   // un brouillon mailto pour ne jamais perdre la proposition.
   if(!ok){
     const body = encodeURIComponent(message);
@@ -171,6 +159,7 @@ async function emailSendWelcome(toEmail, toFirstName){
     `Vous pouvez dès maintenant lire tous nos articles, et proposer les vôtres depuis "Proposer un article".\n\n`+
     `— EconGlobe`;
   return await sendEmail({
+    type: 'welcome',
     to_email: toEmail,
     subject: 'Bienvenue sur EconGlobe !',
     from_name: 'EconGlobe',
