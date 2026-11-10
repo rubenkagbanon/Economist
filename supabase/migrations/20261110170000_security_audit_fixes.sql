@@ -53,6 +53,7 @@ drop policy if exists "kv_store_proposals_update"            on public.kv_store;
 drop policy if exists "kv_store_proposals_delete"            on public.kv_store;
 
 -- L'admin gère tout kv_store
+drop policy if exists "kv_store_admin_all" on public.kv_store;
 create policy "kv_store_admin_all" on public.kv_store for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
