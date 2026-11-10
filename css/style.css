@@ -458,7 +458,8 @@ nav{background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1p
 /* FOOTER */
 footer{background:var(--noir);color:white;padding:3.5rem 3.5rem 2.5rem;box-sizing:border-box;position:relative;z-index:1;width:100%;margin-top:auto;}
 .foot-copy{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-family:var(--sans);font-size:10.5px;color:#ddd;flex-wrap:wrap;max-width:1200px;margin:0 auto;}
-.foot-copy span{color:var(--rouge)}
+.foot-copy span{color:#ef6a63} /* rouge éclairci : contraste 6:1 sur le fond sombre (WCAG AA) */
+.foot-copy span[data-i18n]{color:inherit}
 .foot-links{display:flex;gap:2rem;flex-wrap:wrap;justify-content:flex-end;}
 .foot-link{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#bbb;cursor:pointer;transition:color .2s;text-decoration:none}
 .foot-link:hover{color:var(--rouge)}
