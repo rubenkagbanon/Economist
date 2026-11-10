@@ -46,12 +46,12 @@ async function emailNotifyOwnerOfProposal({first,last,email,job,cat,subj,why,lan
   const message = english
     ? `New article proposal — EconGlobe\n\nName: ${first} ${last}\nEmail: ${email}\n`+
       (job?`Profession: ${job}\n`:'')+
-      `Category: ${cat}\n\nSubject:\n${subj}\n\n`+
-      (why?`Motivation:\n${why}\n`:'')
+      `Category: ${cat}\nSubject: ${subj}\n`+
+      (why?`Motivation: ${why}\n`:'')
     : `Nouvelle proposition d'article — EconGlobe\n\nNom : ${first} ${last}\nEmail : ${email}\n`+
       (job?`Profession : ${job}\n`:'')+
-      `Rubrique : ${cat}\n\nSujet :\n${subj}\n\n`+
-      (why?`Motivation :\n${why}\n`:'');
+      `Rubrique : ${cat}\nSujet : ${subj}\n`+
+      (why?`Motivation : ${why}\n`:'');
   const ok = await sendEmail({
     to_email: OWNER_EMAIL,
     subject: english ? `[EconGlobe] Proposal — ${first} ${last}` : `[EconGlobe] Proposition — ${first} ${last}`,
