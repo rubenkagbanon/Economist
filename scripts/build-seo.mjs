@@ -70,8 +70,11 @@ function articleBody(a) {
 let sharp = null;
 try { sharp = (await import('sharp')).default; } catch { console.warn('sharp indisponible : couvertures non compressées'); }
 
-// Image de couverture (aperçu de partage) : URL distante telle quelle,
-// data URI → cover.jpg 1200 px de large (format accepté par tous les réseaux).
+// Articles dont la couverture compressée (cover.jpg + cover-800.jpg) a été générée
+const staticCovers = new Set();
+
+// Image de couverture : URL distante telle quelle, data URI → cover.jpg
+// (1200 px, aperçu de partage et grands écrans) + cover-800.jpg (mobiles).
 async function coverImage(a, dir) {
   if (!a.img) return null;
   const m = String(a.img).match(/^data:image\/(png|jpe?g|webp|gif);base64,(.+)$/);
@@ -79,13 +82,15 @@ async function coverImage(a, dir) {
   const input = Buffer.from(m[2], 'base64');
   if (sharp) {
     try {
-      const jpg = await sharp(input)
+      const make = width => sharp(input)
         .rotate()
-        .resize({ width: 1200, withoutEnlargement: true })
+        .resize({ width, withoutEnlargement: true })
         .flatten({ background: '#ffffff' })
-        .jpeg({ quality: 82, mozjpeg: true })
+        .jpeg({ quality: width > 800 ? 82 : 78, mozjpeg: true })
         .toBuffer();
-      await writeFile(path.join(dir, 'cover.jpg'), jpg);
+      await writeFile(path.join(dir, 'cover.jpg'), await make(1200));
+      await writeFile(path.join(dir, 'cover-800.jpg'), await make(800));
+      staticCovers.add(String(a.id));
       return `${SITE}${articlePath(a)}cover.jpg`;
     } catch (e) {
       console.warn(`Compression impossible pour l'article ${a.id} :`, e.message);
@@ -130,7 +135,9 @@ function buildPage(template, { lang, title, description, url, image, type, jsonL
 const organization = { '@type': 'Organization', '@id': `${SITE}/#organization`, name: 'EconGlobe', url: `${SITE}/`, logo: DEFAULT_IMAGE };
 
 async function main() {
-  const template = (await readFile(path.join(ROOT, 'index.html'), 'utf8')).replace(/\r\n/g, '\n');
+  // Les pages articles/profils ne reprennent pas le préchargement de l'image d'accueil
+  const template = (await readFile(path.join(ROOT, 'index.html'), 'utf8')).replace(/\r\n/g, '\n')
+    .replace(/<!-- seo:preload -->[\s\S]*?<!-- \/seo:preload -->/, '<!-- seo:preload --><!-- /seo:preload -->');
   if (template.includes(MARKER)) throw new Error('index.html est une page générée : modèle invalide');
 
   const [articles, profiles] = await Promise.all([
@@ -237,7 +244,21 @@ ${sitemap.map(u => `  <url>
   const region = /<!-- seo:articles -->[\s\S]*?<!-- \/seo:articles -->/;
   if (!region.test(home)) throw new Error('index.html : repère <!-- seo:articles --> introuvable');
   const links = [...articles].reverse().map(a => `<li><a href="${articlePath(a)}">${esc(a.title)}</a></li>`).join('');
-  await writeFile(homeFile, home.replace(region, `<!-- seo:articles -->${links ? `<ul>${links}</ul>` : ''}<!-- /seo:articles -->`));
+  let updatedHome = home.replace(region, `<!-- seo:articles -->${links ? `<ul>${links}</ul>` : ''}<!-- /seo:articles -->`);
+
+  // Préchargement de la couverture de l'article « à la une » (le plus récent) :
+  // le navigateur la télécharge dès le début au lieu d'attendre le JavaScript.
+  const preloadRegion = /<!-- seo:preload -->[\s\S]*?<!-- \/seo:preload -->/;
+  if (preloadRegion.test(updatedHome)) {
+    const hero = articles[articles.length - 1];
+    let tag = '';
+    if (hero && staticCovers.has(String(hero.id))) {
+      const p = articlePath(hero);
+      tag = `<link rel="preload" as="image" href="${p}cover.jpg" imagesrcset="${p}cover-800.jpg 800w, ${p}cover.jpg 1200w" imagesizes="100vw" fetchpriority="high">`;
+    }
+    updatedHome = updatedHome.replace(preloadRegion, `<!-- seo:preload -->${tag}<!-- /seo:preload -->`);
+  }
+  await writeFile(homeFile, updatedHome);
   console.log(`${articles.length} article(s), ${sitemap.length} URL dans le sitemap`);
 }
 

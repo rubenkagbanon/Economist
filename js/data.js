@@ -310,7 +310,10 @@ function optimizeImageUrl(url, { maxWidth = 1600, quality = 80 } = {}) {
 function imageAttrs(url, { maxWidth = 1600, quality = 80, sizes = '(max-width: 768px) 100vw, 50vw', loading = 'lazy', fetchPriority = 'auto', alt } = {}) {
   const src = esc(optimizeImageUrl(url, { maxWidth, quality }));
   const altAttr = alt === undefined ? '' : ` alt="${esc(alt)}"`;
-  return `src="${src}" srcset="${src} 1x" sizes="${sizes}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}"${altAttr}`;
+  // Couverture compressée générée par build-seo.mjs : version 800 px pour les mobiles
+  const isStaticCover = /^[/]article[/].+[/]cover[.]jpg$/.test(String(url||''));
+  const srcset = isStaticCover ? `${src.replace(/cover[.]jpg$/,'cover-800.jpg')} 800w, ${src} 1200w` : `${src} 1x`;
+  return `src="${src}" srcset="${srcset}" sizes="${sizes}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}"${altAttr}`;
 }
 
 // Génère un code numérique à 6 chiffres (codes de vérification par e-mail)
