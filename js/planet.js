@@ -7,7 +7,9 @@ function initPlanet(id,radius,dotCount,lineThreshold,speed){
   const size=canvas.offsetWidth||160;canvas.width=size;canvas.height=size;
   const cx=size/2,cy=size/2,r=radius*size/2,ctx=canvas.getContext('2d'),col='139,26,26';
   const small=window.matchMedia&&window.matchMedia('(max-width: 768px)').matches;
-  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Sur ordinateur, l'animation tourne toujours (choix éditorial) ; sur téléphone,
+  // on respecte le réglage « réduire les animations » de l'appareil.
+  const reduced=small&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count=small?Math.round(dotCount*.55):dotCount;
   const dots=Array.from({length:count},()=>{const theta=Math.acos(1-2*Math.random()),phi=2*Math.PI*Math.random();return{theta,phi,vT:(Math.random()-.5)*.0003*speed,vP:(Math.random()-.5)*.0003*speed};});
   const LEVELS=8, FRAME_MS=1000/30;
