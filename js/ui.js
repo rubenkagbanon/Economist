@@ -265,3 +265,24 @@ document.addEventListener('click',event=>{
   event.preventDefault();
   target.scrollIntoView({behavior:'smooth',block:'start'});
 });
+
+// ═══════════════ ZOOM MOBILE ═══════════════
+// Sur téléphone, toucher un champ de saisie fait zoomer la page (comportement
+// d'iOS). Quand la saisie est terminée, on ramène la page à sa taille normale.
+(function(){
+  const viewport=document.querySelector('meta[name="viewport"]');
+  if(!viewport || !window.visualViewport) return;
+  const normalContent=viewport.getAttribute('content');
+  const isField=el=>!!el && (el.tagName==='INPUT' || el.tagName==='TEXTAREA' || el.tagName==='SELECT' || el.isContentEditable);
+  let restoreTimer=null;
+  document.addEventListener('focusout',event=>{
+    if(!isField(event.target)) return;
+    setTimeout(()=>{
+      if(isField(document.activeElement)) return;      // passage d'un champ à un autre
+      if(window.visualViewport.scale<=1.01) return;    // pas de zoom à annuler
+      viewport.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0');
+      clearTimeout(restoreTimer);
+      restoreTimer=setTimeout(()=>viewport.setAttribute('content',normalContent),400);
+    },120);
+  });
+})();
