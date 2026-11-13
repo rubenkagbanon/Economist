@@ -191,15 +191,20 @@ function togglePwd(inputId, btn){
 }
 
 // ═══════════════ THEME ═══════════════
-const themeLogoSources=['css/Logo.png?v=20260909','css/dark logo.png?v=20260909'];
+// Adresse du dossier css/ calculée depuis l'emplacement de ce script : elle reste
+// correcte quand l'adresse de la page change (/article/…/, /profil/) sans rechargement.
+const CSS_ASSET_BASE=(()=>{
+  try{ return new URL('../css/', document.currentScript.src).href; }catch(e){ return 'css/'; }
+})();
+const themeLogoSources=[CSS_ASSET_BASE+'Logo.png?v=20260909',CSS_ASSET_BASE+'dark%20logo.png?v=20260909'];
 themeLogoSources.forEach(src=>{ const img=new Image(); img.src=src; });
 
 function updateLogoForTheme(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const logoSrc=isDark ? 'css/dark logo.png?v=20260909' : 'css/Logo.png?v=20260909';
+  const logoSrc=isDark ? themeLogoSources[1] : themeLogoSources[0];
   document.querySelectorAll('.loading-logo-image, .nav-logo-image').forEach(img=>{
     if(img.src !== new URL(logoSrc, document.baseURI).href) img.src=logoSrc;
-  }); 
+  });
   const favicon=document.getElementById('site-favicon');
   if(favicon) favicon.href=isDark ? logoSrc : '/favicon-192.png';
   updateThemeToggle(isDark);

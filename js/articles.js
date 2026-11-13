@@ -255,7 +255,7 @@ function renderHome(cat){
   const all=articles.filter(article=>article.status==='published').reverse();
   const filtered=cat==='all'?all:all.filter(a=>a.cat===cat);
   if(filtered.length===0){
-    wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="css/coming%20soon.png" alt="Coming soon"></div>
+    wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="${CSS_ASSET_BASE}coming%20soon.png" alt="Coming soon"></div>
       <h2>${t('home_coming')}</h2>
       <p>${cat==='all'?t('home_none_all'):tEmptyCategory(cat)}</p>
       <span class="empty-cta" onclick="showPage('propose')">${t('home_cta')}</span></div>`;
