@@ -298,32 +298,59 @@ function readGeoLocation(){
 function getVisitorCountry(){
   return readGeoLocation()?.c||guessCountryFromTimezone();
 }
+// Commune / quartier : le niveau administratif le plus précis qui n'est
+// ni la ville, ni la région, ni le pays (ex. « Cocody » pour Abidjan)
+function pickCommune(geo,city,region){
+  const skip=new Set([city,region,geo?.countryName].filter(Boolean).map(s=>String(s).toLowerCase()));
+  const all=(geo?.localityInfo?.administrative||[]).filter(a=>a?.name);
+  // Seulement les niveaux plus précis que la ville (jamais région, département…)
+  const cityLevel=Math.max(2,...all.filter(a=>String(a.name).toLowerCase()===String(city||'').toLowerCase()).map(a=>Number(a.adminLevel)||0));
+  const admin=all
+    .filter(a=>Number(a.adminLevel)>cityLevel)
+    .sort((a,b)=>Number(b.adminLevel)-Number(a.adminLevel)||Number(b.order||0)-Number(a.order||0))
+    .map(a=>a.name);
+  const found=[geo?.locality,...admin].find(name=>name && !skip.has(String(name).toLowerCase()));
+  return String(found||'').slice(0,100);
+}
+// Position → lieu. Le service de conversion reçoit une position arrondie
+// à ~1 km (assez pour trouver la commune) ; la position exacte reste chez nous.
+function locateFromPosition(pos){
+  const lat=pos.coords.latitude.toFixed(2), lon=pos.coords.longitude.toFixed(2);
+  return fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`)
+    .then(res=>res.json()).then(geo=>{
+      const code=String(geo?.countryCode||'').toUpperCase();
+      if(!/^[A-Z]{2}$/.test(code))return null;
+      const region=String(geo.principalSubdivision||'').slice(0,100);
+      const city=String(geo.city||geo.locality||'').slice(0,100);
+      const loc={c:code,region,city,commune:pickCommune(geo,city,region),
+        lat:pos.coords.latitude,lon:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0),at:Date.now()};
+      try{ localStorage.setItem(GEO_LOCATION_KEY,JSON.stringify(loc)); }catch(e){}
+      return loc;
+    }).catch(e=>{ console.error('geo location',e); return null; });
+}
+function getPosition(){
+  return new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+    pos=>resolve(pos),()=>resolve(null),{enableHighAccuracy:false,timeout:15000,maximumAge:24*60*60*1000}));
+}
 let geoLocationPromise=null;
 function requestGeoLocation(){
-  const saved=readGeoLocation();
-  if(saved)return Promise.resolve(saved);
   if(geoLocationPromise)return geoLocationPromise;
+  const saved=readGeoLocation();
+  if(saved){
+    // Lieu enregistré avant l'ajout de la commune : on le complète SANS
+    // redemander, seulement si le navigateur a déjà l'autorisation.
+    if(saved.commune!==undefined || !navigator.permissions?.query || !navigator.geolocation)return Promise.resolve(saved);
+    geoLocationPromise=navigator.permissions.query({name:'geolocation'})
+      .then(status=>status.state==='granted'?getPosition():null)
+      .then(pos=>pos?locateFromPosition(pos):null)
+      .then(loc=>loc||saved).catch(()=>saved);
+    return geoLocationPromise;
+  }
   let asked=false;
   try{ asked=!!localStorage.getItem(GEO_ASKED_KEY); }catch(e){}
   if(asked || !navigator.geolocation)return Promise.resolve(null);
   try{ localStorage.setItem(GEO_ASKED_KEY,String(Date.now())); }catch(e){}
-  geoLocationPromise=new Promise(resolve=>{
-    navigator.geolocation.getCurrentPosition(async pos=>{
-      try{
-        const lat=pos.coords.latitude.toFixed(1), lon=pos.coords.longitude.toFixed(1);
-        const res=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`);
-        const geo=await res.json();
-        const code=String(geo?.countryCode||'').toUpperCase();
-        if(/^[A-Z]{2}$/.test(code)){
-          const loc={c:code,region:String(geo.principalSubdivision||'').slice(0,100),city:String(geo.city||geo.locality||'').slice(0,100),
-            lat:pos.coords.latitude,lon:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0),at:Date.now()};
-          try{ localStorage.setItem(GEO_LOCATION_KEY,JSON.stringify(loc)); }catch(e){}
-          resolve(loc); return;
-        }
-      }catch(e){ console.error('geo location',e); }
-      resolve(null);
-    },()=>resolve(null),{enableHighAccuracy:false,timeout:15000,maximumAge:24*60*60*1000});
-  });
+  geoLocationPromise=getPosition().then(pos=>pos?locateFromPosition(pos):null);
   return geoLocationPromise;
 }
 // Envoie le lieu à la base (statistiques admin), seulement s'il a changé
@@ -331,15 +358,24 @@ function requestGeoLocation(){
 function recordVisitorLocation(loc,source){
   if(!_sb || !loc?.c || typeof getReadVisitorKey!=='function')return;
   const visitorKey=getReadVisitorKey(); if(!visitorKey)return;
-  const signature=[currentUser?.id||'anon',loc.c,loc.region||'',loc.city||'',source].join('|');
+  const signature=[currentUser?.id||'anon',loc.c,loc.region||'',loc.city||'',loc.commune||'',source].join('|');
   try{ if(localStorage.getItem(GEO_SYNCED_KEY)===signature)return; }catch(e){}
-  Promise.resolve(_sb.rpc('record_visitor_location',{
+  const params={
     p_visitor_key:visitorKey,p_country:loc.c,p_region:loc.region||null,p_city:loc.city||null,p_source:source,
-    p_latitude:Number.isFinite(loc.lat)?loc.lat:null,p_longitude:Number.isFinite(loc.lon)?loc.lon:null,p_accuracy:Number.isFinite(loc.acc)?loc.acc:null
-  })).then(({error})=>{
+    p_latitude:Number.isFinite(loc.lat)?loc.lat:null,p_longitude:Number.isFinite(loc.lon)?loc.lon:null,p_accuracy:Number.isFinite(loc.acc)?loc.acc:null,
+    p_commune:loc.commune||null
+  };
+  (async()=>{
+    let {error}=await _sb.rpc('record_visitor_location',params);
+    // Base pas encore mise à jour (sans commune) : on réessaie sans ce champ
+    if(error && /commune|PGRST202/i.test(String(error.message||error.code||''))){
+      const {p_commune,...rest}=params;
+      ({error}=await _sb.rpc('record_visitor_location',rest));
+      if(!error)return;   // pas de mémorisation : la commune sera renvoyée une fois la base à jour
+    }
     if(error){ console.error('record_visitor_location',error); return; }
     try{ localStorage.setItem(GEO_SYNCED_KEY,signature); }catch(e){}
-  }).catch(()=>{});
+  })().catch(()=>{});
 }
 function isMissingCountryColumn(error){
   const msg=String(error?.message||'');
