@@ -194,9 +194,17 @@ function userKey(email){
 // renseignées par la base elle-même à partir du compte connecté.)
 async function saveUser(u) {
   const row={id:u.id,first:u.first,last:u.last,joined:u.joined,avatar:u.avatar||'',bio:u.bio||'',level:u.level||''};
+  // Pays estimé (caché : jamais relu côté client, visible seulement par l'admin)
+  const country=getVisitorCountry();
+  if(country)row.country=country;
   let { data: updated, error } = await _sb.from('profiles').update(row).eq('id', u.id).select('id');
+  if(isMissingCountryColumn(error)){
+    delete row.country;
+    ({ data: updated, error } = await _sb.from('profiles').update(row).eq('id', u.id).select('id'));
+  }
   if(!error && (!updated || !updated.length)){
     ({ error } = await _sb.from('profiles').insert({ ...row, email: u.email || '' }));
+    if(isMissingCountryColumn(error)){ delete row.country; ({ error } = await _sb.from('profiles').insert({ ...row, email: u.email || '' })); }
   }
   if(error)console.error('saveUser',error);
   else writeDataCache();
@@ -251,6 +259,177 @@ async function deleteUserDB(userId) {
   } catch (error) {
     return error || new Error('Unable to delete user');
   }
+}
+
+// ═══════════════ PAYS (feed « À la une » localisé) ═══════════════
+// Donnée cachée : le pays des membres et des articles n'est jamais envoyé au
+// navigateur. Pays du lecteur : position GPS du navigateur (si autorisée),
+// sinon fuseau horaire ; la base renvoie seulement la liste des articles de
+// ce pays (fonction local_article_ids).
+// Fuseau horaire → pays : estimation de repli, calculée localement
+const TZ_COUNTRY={
+  'Africa/Abidjan':'CI','Africa/Accra':'GH','Africa/Addis_Ababa':'ET','Africa/Algiers':'DZ','Africa/Asmara':'ER','Africa/Bamako':'ML','Africa/Bangui':'CF','Africa/Banjul':'GM','Africa/Bissau':'GW','Africa/Blantyre':'MW','Africa/Brazzaville':'CG','Africa/Bujumbura':'BI','Africa/Cairo':'EG','Africa/Casablanca':'MA','Africa/Conakry':'GN','Africa/Dakar':'SN','Africa/Dar_es_Salaam':'TZ','Africa/Djibouti':'DJ','Africa/Douala':'CM','Africa/Freetown':'SL','Africa/Gaborone':'BW','Africa/Harare':'ZW','Africa/Johannesburg':'ZA','Africa/Juba':'SS','Africa/Kampala':'UG','Africa/Khartoum':'SD','Africa/Kigali':'RW','Africa/Kinshasa':'CD','Africa/Lagos':'NG','Africa/Libreville':'GA','Africa/Lome':'TG','Africa/Luanda':'AO','Africa/Lubumbashi':'CD','Africa/Lusaka':'ZM','Africa/Malabo':'GQ','Africa/Maputo':'MZ','Africa/Maseru':'LS','Africa/Mbabane':'SZ','Africa/Mogadishu':'SO','Africa/Monrovia':'LR','Africa/Nairobi':'KE','Africa/Ndjamena':'TD','Africa/Niamey':'NE','Africa/Nouakchott':'MR','Africa/Ouagadougou':'BF','Africa/Porto-Novo':'BJ','Africa/Sao_Tome':'ST','Africa/Tripoli':'LY','Africa/Tunis':'TN','Africa/Windhoek':'NA',
+  'Indian/Antananarivo':'MG','Indian/Comoro':'KM','Indian/Mauritius':'MU','Indian/Mahe':'SC','Indian/Reunion':'RE','Atlantic/Cape_Verde':'CV',
+  'Europe/Paris':'FR','Europe/Brussels':'BE','Europe/Zurich':'CH','Europe/Luxembourg':'LU','Europe/Monaco':'MC','Europe/London':'GB','Europe/Dublin':'IE','Europe/Berlin':'DE','Europe/Madrid':'ES','Europe/Lisbon':'PT','Europe/Rome':'IT','Europe/Amsterdam':'NL','Europe/Vienna':'AT','Europe/Warsaw':'PL','Europe/Prague':'CZ','Europe/Stockholm':'SE','Europe/Oslo':'NO','Europe/Copenhagen':'DK','Europe/Helsinki':'FI','Europe/Athens':'GR','Europe/Bucharest':'RO','Europe/Budapest':'HU','Europe/Kyiv':'UA','Europe/Kiev':'UA','Europe/Moscow':'RU','Europe/Istanbul':'TR',
+  'America/Montreal':'CA','America/Toronto':'CA','America/Vancouver':'CA','America/New_York':'US','America/Chicago':'US','America/Denver':'US','America/Los_Angeles':'US','America/Phoenix':'US','America/Mexico_City':'MX','America/Port-au-Prince':'HT','America/Sao_Paulo':'BR','America/Argentina/Buenos_Aires':'AR','America/Bogota':'CO','America/Lima':'PE','America/Santiago':'CL','America/Cayenne':'FR','America/Guadeloupe':'FR','America/Martinique':'FR',
+  'Asia/Dubai':'AE','Asia/Riyadh':'SA','Asia/Qatar':'QA','Asia/Beirut':'LB','Asia/Jerusalem':'IL','Asia/Kolkata':'IN','Asia/Calcutta':'IN','Asia/Shanghai':'CN','Asia/Hong_Kong':'HK','Asia/Tokyo':'JP','Asia/Seoul':'KR','Asia/Singapore':'SG','Asia/Bangkok':'TH','Asia/Ho_Chi_Minh':'VN','Asia/Jakarta':'ID','Asia/Manila':'PH','Asia/Karachi':'PK',
+  'Australia/Sydney':'AU','Australia/Melbourne':'AU','Pacific/Auckland':'NZ'
+};
+function guessCountryFromTimezone(){
+  try{ return TZ_COUNTRY[Intl.DateTimeFormat().resolvedOptions().timeZone]||null; }catch(e){ return null; }
+}
+// ── Position GPS du navigateur → pays / région / ville ──
+// La position est demandée UNE SEULE FOIS par navigateur (acceptée ou refusée,
+// on ne redemande plus). Le service de conversion ne reçoit que des
+// coordonnées arrondies (~10 km) ; la base EconGlobe garde le lieu
+// (pays / région / ville) ET les coordonnées exactes, lisibles par l'admin
+// uniquement. Refus ou échec : fuseau horaire.
+const GEO_LOCATION_KEY='eco_geo_location';
+const GEO_ASKED_KEY='eco_geo_asked';
+const GEO_SYNCED_KEY='eco_geo_synced';
+function readGeoLocation(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(GEO_LOCATION_KEY)||'null');
+    if(saved && /^[A-Z]{2}$/.test(saved.c))return saved;
+  }catch(e){}
+  return null;
+}
+// Meilleur pays connu tout de suite (sans attendre le GPS)
+function getVisitorCountry(){
+  return readGeoLocation()?.c||guessCountryFromTimezone();
+}
+let geoLocationPromise=null;
+function requestGeoLocation(){
+  const saved=readGeoLocation();
+  if(saved)return Promise.resolve(saved);
+  if(geoLocationPromise)return geoLocationPromise;
+  let asked=false;
+  try{ asked=!!localStorage.getItem(GEO_ASKED_KEY); }catch(e){}
+  if(asked || !navigator.geolocation)return Promise.resolve(null);
+  try{ localStorage.setItem(GEO_ASKED_KEY,String(Date.now())); }catch(e){}
+  geoLocationPromise=new Promise(resolve=>{
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const lat=pos.coords.latitude.toFixed(1), lon=pos.coords.longitude.toFixed(1);
+        const res=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`);
+        const geo=await res.json();
+        const code=String(geo?.countryCode||'').toUpperCase();
+        if(/^[A-Z]{2}$/.test(code)){
+          const loc={c:code,region:String(geo.principalSubdivision||'').slice(0,100),city:String(geo.city||geo.locality||'').slice(0,100),
+            lat:pos.coords.latitude,lon:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0),at:Date.now()};
+          try{ localStorage.setItem(GEO_LOCATION_KEY,JSON.stringify(loc)); }catch(e){}
+          resolve(loc); return;
+        }
+      }catch(e){ console.error('geo location',e); }
+      resolve(null);
+    },()=>resolve(null),{enableHighAccuracy:false,timeout:15000,maximumAge:24*60*60*1000});
+  });
+  return geoLocationPromise;
+}
+// Envoie le lieu à la base (statistiques admin), seulement s'il a changé
+// ou si le visiteur vient de se connecter (lien avec son compte).
+function recordVisitorLocation(loc,source){
+  if(!_sb || !loc?.c || typeof getReadVisitorKey!=='function')return;
+  const visitorKey=getReadVisitorKey(); if(!visitorKey)return;
+  const signature=[currentUser?.id||'anon',loc.c,loc.region||'',loc.city||'',source].join('|');
+  try{ if(localStorage.getItem(GEO_SYNCED_KEY)===signature)return; }catch(e){}
+  Promise.resolve(_sb.rpc('record_visitor_location',{
+    p_visitor_key:visitorKey,p_country:loc.c,p_region:loc.region||null,p_city:loc.city||null,p_source:source,
+    p_latitude:Number.isFinite(loc.lat)?loc.lat:null,p_longitude:Number.isFinite(loc.lon)?loc.lon:null,p_accuracy:Number.isFinite(loc.acc)?loc.acc:null
+  })).then(({error})=>{
+    if(error){ console.error('record_visitor_location',error); return; }
+    try{ localStorage.setItem(GEO_SYNCED_KEY,signature); }catch(e){}
+  }).catch(()=>{});
+}
+function isMissingCountryColumn(error){
+  const msg=String(error?.message||'');
+  return !!error && /country/i.test(msg) && /column|schema cache/i.test(msg);
+}
+// Ids des articles du pays du lecteur (vide si pays inconnu ou fonction absente)
+let localArticleIds=new Set();
+let localIdsPromise=null;
+let localIdsCountry=null;
+function loadLocalArticleIds(country=getVisitorCountry()){
+  if(!country || !_sb)return Promise.resolve(localArticleIds);
+  if(!localIdsPromise || localIdsCountry!==country){
+    localIdsCountry=country;
+    localIdsPromise=Promise.resolve(_sb.rpc('local_article_ids',{p_country:country})).then(({data,error})=>{
+      if(!error && Array.isArray(data))localArticleIds=new Set(data.map(row=>String(row&&typeof row==='object'?Object.values(row)[0]:row)));
+      return localArticleIds;
+    }).catch(()=>localArticleIds);
+  }
+  return localIdsPromise;
+}
+// Position (demandée une fois) → enregistrement en base → retri de l'accueil si besoin
+function refineCountryWithGps(){
+  const before=getVisitorCountry();
+  requestGeoLocation().then(async loc=>{
+    if(!loc){
+      const tz=guessCountryFromTimezone();
+      if(tz)recordVisitorLocation({c:tz},'timezone');
+      return;
+    }
+    recordVisitorLocation(loc,'gps');
+    if(loc.c===before)return;
+    await loadLocalArticleIds(loc.c);
+    if(currentUser?.id && typeof saveUser==='function')saveUser(currentUser);
+    if(document.getElementById('page-home')?.classList.contains('active') && typeof renderHome==='function')renderHome(currentActiveCat);
+  });
+}
+// ── Goûts de lecture (gardés dans ce navigateur uniquement, invisibles) ──
+// Chaque article ouvert ajoute des points à sa rubrique et à son auteur ;
+// une lecture complète (50 s) en ajoute davantage. Les anciens points
+// s'effacent peu à peu pour suivre l'évolution des goûts.
+const INTEREST_KEY='eco_reader_interests';
+function readInterests(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(INTEREST_KEY)||'null');
+    if(saved && saved.cat && saved.author)return saved;
+  }catch(e){}
+  return {cat:{},author:{}};
+}
+function trackReadInterest(article,weight=1){
+  if(!article)return;
+  const data=readInterests();
+  [data.cat,data.author].forEach(map=>Object.keys(map).forEach(k=>{ map[k]*=0.95; if(map[k]<0.05)delete map[k]; }));
+  if(article.cat)data.cat[article.cat]=(data.cat[article.cat]||0)+weight;
+  const author=String(article.owner_id||article.author||'');
+  if(author)data.author[author]=(data.author[author]||0)+weight;
+  try{ localStorage.setItem(INTEREST_KEY,JSON.stringify(data)); }catch(e){}
+}
+// ── Algorithme du feed (accueil et rubriques) ──
+// Score = récence + bonus pays du lecteur + bonus goûts (rubrique, auteur).
+// Puis on choisit les articles un par un en pénalisant les répétitions
+// (même rubrique, même auteur, trop d'articles locaux d'affilée) pour que
+// le lecteur voie aussi d'autres pays et d'autres sujets. Rien n'est masqué.
+function rankFeed(list){
+  if(list.length<2)return list;
+  const interests=readInterests();
+  const share=map=>{ const total=Object.values(map).reduce((s,v)=>s+v,0); return k=>total?(map[k]||0)/total:0; };
+  const catShare=share(interests.cat), authorShare=share(interests.author);
+  const authorKey=a=>String(a.owner_id||a.author||'');
+  const isLocal=a=>localArticleIds.has(String(a.id));
+  // list est déjà du plus récent au plus ancien
+  const pool=list.map((a,rank)=>({a,base:
+    Math.exp(-rank/10)                 // récence
+    +(isLocal(a)?0.45:0)               // pays du lecteur
+    +0.5*catShare(a.cat)               // rubriques préférées
+    +0.3*authorShare(authorKey(a))     // auteurs préférés
+  }));
+  const out=[];
+  while(pool.length){
+    const recent=out.slice(-3);
+    let best=0,bestScore=-Infinity;
+    pool.forEach((item,i)=>{
+      let s=item.base;
+      s-=0.25*recent.filter(a=>a.cat===item.a.cat).length;
+      s-=0.25*recent.filter(a=>authorKey(a)===authorKey(item.a)).length;
+      if(isLocal(item.a) && recent.length>=2 && recent.slice(-2).every(isLocal))s-=0.6;
+      if(s>bestScore){bestScore=s;best=i;}
+    });
+    out.push(pool.splice(best,1)[0].a);
+  }
+  return out;
 }
 
 // ═══════════════ SESSION ═══════════════

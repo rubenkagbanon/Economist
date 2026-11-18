@@ -34,6 +34,7 @@ function scheduleArticleRead(id){
   activeReadArticleId=id;
   activeReadTimer=setTimeout(async()=>{
     if(activeReadArticleId!==id)return;
+    trackReadInterest(articles.find(item=>item.id===id),2);   // lecture complète : goût plus marqué
     const {error}=await _sb.rpc('record_article_read',{p_article_id:id,p_visitor_key:getReadVisitorKey()});
     if(error){console.error('record_article_read',error);return;}
       const article=articles.find(item=>item.id===id);
@@ -253,7 +254,7 @@ function artCardHtml(a){
 function renderHome(cat){
   const wrap=document.getElementById('home-content');
   const all=articles.filter(article=>article.status==='published').reverse();
-  const filtered=cat==='all'?all:all.filter(a=>a.cat===cat);
+  const filtered=rankFeed(cat==='all'?all:all.filter(a=>a.cat===cat));
   if(filtered.length===0){
     wrap.innerHTML=`<div class="empty-state reveal"><div class="empty-anim"><img src="${CSS_ASSET_BASE}coming%20soon.png" alt="Coming soon"></div>
       <h2>${t('home_coming')}</h2>
@@ -327,7 +328,7 @@ async function openArticle(id,fromPage='home'){
   showPage('article');
   currentArticleRoute=null;
   setArticleShareMetadata(a);
-  if(backPage==='home')scheduleArticleRead(id);
+  if(backPage==='home'){ trackReadInterest(a,1); scheduleArticleRead(id); }
 }
 
 async function confirmDeleteArticle(id){

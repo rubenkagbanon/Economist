@@ -13,10 +13,10 @@ stable
 set search_path = public
 as $$
   select lower(coalesce(auth.jwt() ->> 'email', '')) = 'econglobe26@gmail.com'
-     and (
-       coalesce(auth.jwt() -> 'app_metadata' ->> 'provider', '') = 'google'
-       or coalesce(auth.jwt() -> 'app_metadata' -> 'providers', '[]'::jsonb) ? 'google'
-     );
+    and (
+      coalesce(auth.jwt() -> 'app_metadata' ->> 'provider', '') = 'google'
+      or coalesce(auth.jwt() -> 'app_metadata' -> 'providers', '[]'::jsonb) ? 'google'
+    );
 $$;
 grant execute on function public.is_admin() to anon, authenticated;
 
@@ -80,7 +80,7 @@ create policy "kv_store_proposals_delete" on public.kv_store for delete to authe
 -- Synchronise les e-mails existants sur ceux des comptes
 update public.profiles p set email = lower(u.email)
   from auth.users u
- where u.id = p.id and p.email is distinct from lower(u.email);
+where u.id = p.id and p.email is distinct from lower(u.email);
 
 create or replace function public.bind_profile_email()
 returns trigger
@@ -152,11 +152,11 @@ begin
   end if;
 
   delete from public.access_code_attempts
-   where email = current_email and attempted_at <= now() - interval '1 hour';
+  where email = current_email and attempted_at <= now() - interval '1 hour';
 
   select count(*) into recent_failures
     from public.access_code_attempts
-   where email = current_email and attempted_at > now() - interval '1 hour';
+  where email = current_email and attempted_at > now() - interval '1 hour';
 
   if recent_failures >= 5 then
     return jsonb_build_object('ok', false, 'error', 'Too many attempts');
@@ -164,8 +164,8 @@ begin
 
   select path, value into code_path, code_value
     from public.kv_store
-   where path like 'access_codes/%' and value ->> 'code' = p_code
-   for update;
+  where path like 'access_codes/%' and value ->> 'code' = p_code
+  for update;
 
   if code_path is null then
     insert into public.access_code_attempts (email) values (current_email);
@@ -185,8 +185,8 @@ begin
   end if;
 
   update public.kv_store
-     set value = jsonb_set(value, '{used}', to_jsonb(used_count + 1), true)
-   where path = code_path;
+    set value = jsonb_set(value, '{used}', to_jsonb(used_count + 1), true)
+  where path = code_path;
 
   -- Droit d'écrire UN article, enregistré côté serveur
   insert into public.writer_grants (user_id, remaining)
@@ -205,8 +205,8 @@ grant execute on function public.consume_access_code(text) to authenticated;
 insert into public.writer_grants (user_id, remaining)
 select substring(path from 'writer_sessions/(.*)')::uuid, 1
   from public.kv_store
- where path ~ '^writer_sessions/[0-9a-fA-F-]{36}$'
-   and coalesce(value ->> 'status', '') = 'draft'
+where path ~ '^writer_sessions/[0-9a-fA-F-]{36}$'
+  and coalesce(value ->> 'status', '') = 'draft'
 on conflict (user_id) do nothing;
 
 -- ════════════════════════════════════════════════════════════
@@ -233,8 +233,8 @@ begin
     end if;
     -- Un code d'accès consommé = un article
     update public.writer_grants
-       set remaining = remaining - 1, updated_at = now()
-     where user_id = auth.uid() and remaining > 0;
+      set remaining = remaining - 1, updated_at = now()
+    where user_id = auth.uid() and remaining > 0;
     if not found then
       raise exception 'writer access code required';
     end if;
@@ -246,9 +246,9 @@ begin
     new.status := old.status;
     -- Toute modification du contenu d'un article publié le renvoie en validation
     if old.status = 'published' and
-       row(new.title, new.deck, new.cat, new.author, new.img, new.body, new.body_html, new.date, new.lang)
-       is distinct from
-       row(old.title, old.deck, old.cat, old.author, old.img, old.body, old.body_html, old.date, old.lang) then
+      row(new.title, new.deck, new.cat, new.author, new.img, new.body, new.body_html, new.date, new.lang)
+      is distinct from
+      row(old.title, old.deck, old.cat, old.author, old.img, old.body, old.body_html, old.date, old.lang) then
       new.status := 'pending';
     end if;
   end if;
@@ -286,7 +286,7 @@ begin
 
   select count(*)::integer into recent_reads
     from public.article_read_events
-   where visitor_key = effective_visitor_key and recorded_at > now() - interval '1 hour';
+  where visitor_key = effective_visitor_key and recorded_at > now() - interval '1 hour';
   if recent_reads >= 60 then
     return;
   end if;
@@ -295,7 +295,7 @@ begin
   if auth.uid() is null then
     select count(*)::integer into recent_anon_reads
       from public.article_read_events
-     where article_id = p_article_id and recorded_at > now() - interval '1 hour';
+    where article_id = p_article_id and recorded_at > now() - interval '1 hour';
     if recent_anon_reads >= 300 then
       return;
     end if;

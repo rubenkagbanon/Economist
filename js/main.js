@@ -34,7 +34,11 @@ async function init(){
   initStarted=true;
   setLoadingStatus('Connexion sécurisée à Supabase…');
   try{
-    await loadData();
+    // Articles du pays du lecteur : attendus 1,5 s maximum pour ne pas ralentir l'accueil
+    await Promise.all([
+      loadData(),
+      Promise.race([loadLocalArticleIds(),new Promise(resolve=>setTimeout(resolve,1500))])
+    ]);
   }catch(error){
     console.error('initial data load',error);
   }
@@ -66,6 +70,7 @@ async function init(){
         if(isOwner())await loadData(true);
         renderNav();
         if(typeof renderHome==='function') renderHome(currentActiveCat);
+        if(typeof refineCountryWithGps==='function') refineCountryWithGps();   // relie le lieu au compte (sans redemander)
         if(_event==='SIGNED_IN')showToast(`${t('toast_welcome')}, ${currentUser.first} !`);
       },0);
     });
@@ -80,6 +85,7 @@ async function init(){
   setNavDate();
   renderNav();
   renderHome(currentActiveCat);
+  refineCountryWithGps();   // position GPS (autorisation du navigateur) → retri si besoin
 
   const sharedArticleId=articleIdFromPath()||new URLSearchParams(window.location.search).get('article');
   if(sharedArticleId){
