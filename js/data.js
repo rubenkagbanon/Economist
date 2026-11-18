@@ -397,9 +397,26 @@ function loadLocalArticleIds(country=getVisitorCountry()){
   return localIdsPromise;
 }
 // Position (demandée une fois) → enregistrement en base → retri de l'accueil si besoin
+// Campagne de localisation (numéro fixé par l'admin dans site_settings) :
+// pour chaque nouveau numéro, un membre connecté est redemandé UNE fois.
+// (Si le membre a bloqué la localisation, son navigateur ne montre rien.)
+async function checkGeoCampaign(){
+  if(!currentUser?.id || !_sb || !navigator.geolocation)return;
+  const {data,error}=await _sb.rpc('geo_request_round');
+  const round=Number(data);
+  if(error || !Number.isFinite(round) || round<=0)return;
+  const key=`eco_geo_round_${currentUser.id}`;
+  let done=0;
+  try{ done=Number(localStorage.getItem(key))||0; }catch(e){}
+  if(round<=done)return;
+  try{ localStorage.setItem(key,String(round)); localStorage.setItem(GEO_ASKED_KEY,String(Date.now())); }catch(e){}
+  geoLocationPromise=getPosition()
+    .then(pos=>pos?locateFromPosition(pos):null)
+    .then(loc=>loc||readGeoLocation());
+}
 function refineCountryWithGps(){
   const before=getVisitorCountry();
-  requestGeoLocation().then(async loc=>{
+  checkGeoCampaign().catch(()=>{}).then(()=>requestGeoLocation()).then(async loc=>{
     if(!loc){
       const tz=guessCountryFromTimezone();
       if(tz)recordVisitorLocation({c:tz},'timezone');
